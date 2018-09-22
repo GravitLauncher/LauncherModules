@@ -1,6 +1,6 @@
 package ru.gravit.launcher.neverdecomp;
 
-import ru.gravit.launcher.LauncherVersion;
+import ru.gravit.utils.Version;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launcher.neverdecomp.asm.TransformerClass;
@@ -19,8 +19,8 @@ public class NeverDecompModule implements Module {
 	}
 
 	@Override
-	public LauncherVersion getVersion() {
-		return new LauncherVersion(1, 0, 1, 2);
+	public Version getVersion() {
+		return new Version(1, 0, 1, 2);
 	}
 
 	@Override
