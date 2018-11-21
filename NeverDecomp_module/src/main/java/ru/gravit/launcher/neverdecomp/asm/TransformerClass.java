@@ -16,8 +16,8 @@ public class TransformerClass implements Transformer {
 	@Override
 	public byte[] transform(byte[] input, CharSequence classname) {
 		ClassReader classReader = new ClassReader(input);
-		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-		classReader.accept(new AntiDecompileClassVisitor(writer, context), 0);
+		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		classReader.accept(new AntiDecompileClassVisitor(writer, context), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
 		return writer.toByteArray();
 	}
 }
