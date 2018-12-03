@@ -9,6 +9,7 @@ import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launcher.neverdecomp.asm.AntiDecompileClassVisitor;
 import ru.gravit.launcher.serialize.config.entry.BooleanConfigEntry;
+import ru.gravit.launchserver.asm.SafeClassWriter;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 
 public class NeverDecompModule implements Module {
@@ -40,7 +41,7 @@ public class NeverDecompModule implements Module {
 			final boolean hobf = context.launchServer.config.block.hasEntry("hardAntiDecomp") ? context.launchServer.config.block.getEntryValue("hardAntiDecomp", BooleanConfigEntry.class) : false;
 			context.launchServer.buildHookManager.registerClassTransformer((src, name, e) -> {
 				ClassReader classReader = new ClassReader(src);
-				ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+				ClassWriter writer = new SafeClassWriter(e.reader, ClassWriter.COMPUTE_MAXS);
 				classReader.accept(new AntiDecompileClassVisitor(writer, hobf), ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
 				return writer.toByteArray();
 			});
