@@ -8,7 +8,6 @@ import org.objectweb.asm.ClassWriter;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launcher.neverdecomp.asm.AntiDecompileClassVisitor;
-import ru.gravit.launcher.neverdecomp.asm.TransformerClass;
 import ru.gravit.launcher.serialize.config.entry.BooleanConfigEntry;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 
