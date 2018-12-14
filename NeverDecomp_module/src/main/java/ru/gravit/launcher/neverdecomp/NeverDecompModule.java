@@ -5,6 +5,7 @@ import ru.gravit.utils.Version;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.asm.AntiDecomp;
+import ru.gravit.launchserver.manangers.BuildHookManager;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 
 public class NeverDecompModule implements Module {
@@ -32,9 +33,7 @@ public class NeverDecompModule implements Module {
 	public void init(ModuleContext context1) {
 		if (context1.getType().equals(ModuleContext.Type.LAUNCHSERVER)) {
 			LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
-			context.launchServer.buildHookManager.registerClassTransformer((src, name, e) -> {
-				return AntiDecomp.expAntiDecomp(src, e.reader);
-			});
+			context.launchServer.buildHookManager.registerClassTransformer(BuildHookManager.wrap(AntiDecomp::antiDecomp));
 		}
 	}
 
