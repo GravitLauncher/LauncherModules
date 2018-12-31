@@ -5,7 +5,6 @@ import ru.gravit.utils.Version;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 //import ru.gravit.launchserver.asm.AntiDecomp;
-import ru.gravit.launchserver.manangers.BuildHookManager;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 
 public class NeverDecompModule implements Module {
