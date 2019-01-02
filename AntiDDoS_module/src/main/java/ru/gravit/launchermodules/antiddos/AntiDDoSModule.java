@@ -3,6 +3,7 @@ package ru.gravit.launchermodules.antiddos;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.LaunchServer;
+import ru.gravit.launchserver.Reconfigurable;
 import ru.gravit.launchserver.Reloadable;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
@@ -16,7 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class AntiDDoSModule implements Module, Reloadable {
+public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     public static Version version = new Version(1,0,0,0,Version.Type.BETA);
     public static Path configfile = Paths.get("anti-ddos.json");
 
@@ -27,6 +28,26 @@ public class AntiDDoSModule implements Module, Reloadable {
         } catch (IOException e) {
             LogHelper.error(e);
         }
+    }
+
+    @Override
+    public void reconfig(String action, String[] args) {
+        if(action.equals("clear"))
+        {
+            banIPProtector.banlist.clear();
+            LogHelper.info("IP BanList clean");
+        }
+        else if(action.equals("remove"))
+        {
+            banIPProtector.banlist.remove(args[0]);
+            LogHelper.info("IP %s unbanned",args[0]);
+        }
+    }
+
+    @Override
+    public void printConfigHelp() {
+        LogHelper.info("clean [none] - clean banlist");
+        LogHelper.info("remove [ip] - remove ip from banlist");
     }
 
     public static class Config
@@ -81,6 +102,7 @@ public class AntiDDoSModule implements Module, Reloadable {
         banIPProtector.whitelist.addAll(config.whitelist);
         context.launchServer.socketHookManager.registerFatalErrorHook(banIPProtector);
         context.launchServer.reloadManager.registerReloadable("antiddos",this);
+        context.launchServer.reconfigurableManager.registerReconfigurable("antiddos",this);
     }
 
     @Override
