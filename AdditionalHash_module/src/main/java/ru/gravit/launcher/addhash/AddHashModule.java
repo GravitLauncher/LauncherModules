@@ -1,11 +1,13 @@
-package ru.gravit.launcher.neverdecomp;
+package ru.gravit.launcher.addhash;
 
 import ru.gravit.utils.Version;
 
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
+import ru.gravit.launchserver.auth.provider.AuthProvider;
 
-public class NeverDecompModule implements Module {
+public class AddHashModule implements Module {
+	private static boolean registred = false;
 	@Override
 	public void close() {
 
@@ -13,7 +15,7 @@ public class NeverDecompModule implements Module {
 
 	@Override
 	public String getName() {
-		return "NeverDecomp";
+		return "AddHash";
 	}
 
 	@Override
@@ -32,7 +34,10 @@ public class NeverDecompModule implements Module {
 
 	@Override
 	public void preInit(ModuleContext context1) {
-		
+        if (!registred) {
+            AuthProvider.registerProvider("mysql-bcrypt", MySQLBcryptAuthProvider.class);
+            registred = true;
+        }
 	}
 
 	@Override

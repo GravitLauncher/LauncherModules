@@ -1,9 +1,6 @@
 subprojects {
     dependencies {
 		compileOnly project(':LaunchServer')
-		compileOnly 'org.javassist:javassist:3.23.1-GA'
-		compileOnly 'org.ow2.asm:asm-commons:7.0'
-		compileOnly 'org.ow2.asm:asm-util:7.0'
 	}
 	jar {
 		from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
