@@ -3,6 +3,7 @@ package ru.gravit.launchermodules.antiddos;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.LaunchServer;
+import ru.gravit.launchserver.Reloadable;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
 import ru.gravit.utils.helper.IOHelper;
@@ -15,9 +16,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class AntiDDoSModule implements Module {
+public class AntiDDoSModule implements Module, Reloadable {
     public static Version version = new Version(1,0,0,0,Version.Type.BETA);
     public static Path configfile = Paths.get("anti-ddos.json");
+
+    @Override
+    public void reload() throws Exception {
+        try(Reader reader = IOHelper.newReader(configfile)) {
+            config = LaunchServer.gson.fromJson(reader,Config.class);
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
+    }
+
     public static class Config
     {
         public boolean disableSocketFatalErrors = false;
@@ -69,6 +80,7 @@ public class AntiDDoSModule implements Module {
         banIPProtector = new BanIPProtector();
         banIPProtector.whitelist.addAll(config.whitelist);
         context.launchServer.socketHookManager.registerFatalErrorHook(banIPProtector);
+        context.launchServer.reloadManager.registerReloadable("antiddos",this);
     }
 
     @Override
