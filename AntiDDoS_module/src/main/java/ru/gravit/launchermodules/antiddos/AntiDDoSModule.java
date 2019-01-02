@@ -14,12 +14,82 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
-    public static Version version = new Version(1,0,0,0,Version.Type.BETA);
-    public static Path configfile = Paths.get("anti-ddos.json");
+    public static final Version version = new Version(1, 0, 1, 3, Version.Type.BETA);
+
+    public static class Config
+    {
+        public boolean disableSocketFatalErrors = false;
+        public int maxFails = 3;
+        public boolean printBannedMessage = true;
+        public boolean printTryConnectionMessage = true;
+        public ArrayList<String> whitelist;
+    }
+    
+    public Path configfile;
+    public Config config;
+    public BanIPProtector banIPProtector;
+	public LaunchServer srv;
+	
+    @Override
+    public String getName() {
+        return "Gravit Anti-DDoS";
+    }
+
+    @Override
+    public Version getVersion() {
+        return version;
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public void init(ModuleContext context1) {
+        LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
+        LogHelper.debug("Init anti-DDoS");
+        srv = context.launchServer;
+        configfile = context.launchServer.dir.resolve("anti-ddos.json");
+        if(IOHelper.exists(configfile))
+        {
+            try(Reader reader = IOHelper.newReader(configfile)) {
+                config = LaunchServer.gson.fromJson(reader,Config.class);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        else
+        {
+            LogHelper.debug("Create new anti-ddos config file");
+            try(Writer writer = IOHelper.newWriter(configfile))
+            {
+                config = new Config();
+                LaunchServer.gson.toJson(config, writer);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        banIPProtector = new BanIPProtector( this);
+        banIPProtector.whitelist.addAll(config.whitelist);
+        context.launchServer.socketHookManager.registerFatalErrorHook(banIPProtector);
+        context.launchServer.reloadManager.registerReloadable("antiddos",this);
+        context.launchServer.reconfigurableManager.registerReconfigurable("antiddos",this);
+    }
+
+    @Override
+    public void postInit(ModuleContext context1) {
+        LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
+        context.launchServer.serverSocketHandler.setListener(banIPProtector);
+    }
+
+    @Override
+    public void preInit(ModuleContext context) {
+
+    }
 
     @Override
     public void reload() throws Exception {
@@ -49,79 +119,14 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         LogHelper.info("clean [none] - clean banlist");
         LogHelper.info("remove [ip] - remove ip from banlist");
     }
-
-    public static class Config
-    {
-        public boolean disableSocketFatalErrors = false;
-        public int maxFails = 3;
-        public boolean printBannedMessage = true;
-        public boolean printTryConnectionMessage = true;
-        public ArrayList<String> whitelist;
-    }
-    public static Config config;
-    public static BanIPProtector banIPProtector;
-    @Override
-    public String getName() {
-        return "Gravit Anti-DDoS";
-    }
-
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void init(ModuleContext context1) {
-        LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
-        LogHelper.debug("Init anti-DDoS");
-        if(IOHelper.exists(configfile))
-        {
-            try(Reader reader = IOHelper.newReader(configfile)) {
-                config = LaunchServer.gson.fromJson(reader,Config.class);
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
-        }
-        else
-        {
-            LogHelper.debug("Create new anti-ddos config file");
-            try(Writer writer = IOHelper.newWriter(configfile))
-            {
-                config = new Config();
-                LaunchServer.gson.toJson(config, writer);
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
-        }
-        banIPProtector = new BanIPProtector();
-        banIPProtector.whitelist.addAll(config.whitelist);
-        context.launchServer.socketHookManager.registerFatalErrorHook(banIPProtector);
-        context.launchServer.reloadManager.registerReloadable("antiddos",this);
-        context.launchServer.reconfigurableManager.registerReconfigurable("antiddos",this);
-    }
-
-    @Override
-    public void postInit(ModuleContext context1) {
-        LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
-        context.launchServer.serverSocketHandler.setListener(banIPProtector);
-    }
-
-    @Override
-    public void preInit(ModuleContext context) {
-
-    }
-
+    
     @Override
     public void close() throws Exception {
 
     }
+    
     public static void main(String[] args)
     {
-
+    	System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 }

@@ -1,9 +1,7 @@
 package ru.gravit.launchermodules.antiddos;
 
 import ru.gravit.launchserver.manangers.hook.SocketHookManager;
-import ru.gravit.launchserver.socket.Client;
 import ru.gravit.launchserver.socket.ServerSocketHandler;
-import ru.gravit.launchserver.socket.SocketContext;
 import ru.gravit.utils.helper.IOHelper;
 import ru.gravit.utils.helper.LogHelper;
 
@@ -15,20 +13,26 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, ServerSocketHandler.Listener {
-    @Override
+    private AntiDDoSModule mod;
+    
+	public BanIPProtector(AntiDDoSModule mod) {
+		this.mod = mod;
+	}
+
+	@Override
     public boolean fatalErrorHook(Socket socket, Exception ex) {
         String ip = IOHelper.getIP(socket.getRemoteSocketAddress());
-        if(whitelist.contains(ip)) return !AntiDDoSModule.config.disableSocketFatalErrors;
+        if(whitelist.contains(ip)) return !mod.config.disableSocketFatalErrors;
         if(!banlist.containsKey(ip)) banlist.put(ip,new Entry(1));
         else {
             Entry e = banlist.get(ip);
             e.fails++;
-            if(AntiDDoSModule.config.printBannedMessage && e.fails >= AntiDDoSModule.config.maxFails)
+            if(mod.config.printBannedMessage && e.fails >= mod.config.maxFails)
             {
                 LogHelper.warning("IP %s banned",ip);
             }
         }
-        return !AntiDDoSModule.config.disableSocketFatalErrors;
+        return !mod.config.disableSocketFatalErrors;
     }
 
     @Override
@@ -38,10 +42,10 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
         else
         {
             Entry e = banlist.get(ip);
-            if(e.fails >= AntiDDoSModule.config.maxFails)
+            if(e.fails >= mod.config.maxFails)
             {
                 e.tryconnection++;
-                if(AntiDDoSModule.config.printTryConnectionMessage)
+                if(mod.config.printTryConnectionMessage)
                     LogHelper.info("IP %s try connection #%d",ip,e.tryconnection);
                 return false;
             }
@@ -55,7 +59,7 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
     }
 
     @Override
-    public boolean onHandshake(long session, Integer type) {
+    public boolean onHandshake(long session, int type) {
         return false;
     }
 
