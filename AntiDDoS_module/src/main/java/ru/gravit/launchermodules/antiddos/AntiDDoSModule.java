@@ -86,4 +86,8 @@ public class AntiDDoSModule implements Module {
     public void close() throws Exception {
 
     }
+    public static void main(String[] args)
+    {
+
+    }
 }
