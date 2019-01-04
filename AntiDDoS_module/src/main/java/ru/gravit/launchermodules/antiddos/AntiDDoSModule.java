@@ -25,7 +25,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         public int maxFails = 3;
         public boolean printBannedMessage = true;
         public boolean printTryConnectionMessage = true;
-        public ArrayList<String> whitelist;
+        public ArrayList<String> whitelist = new ArrayList<>();
     }
     
     public Path configfile;
