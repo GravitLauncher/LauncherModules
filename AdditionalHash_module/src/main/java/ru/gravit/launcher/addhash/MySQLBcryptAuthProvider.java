@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import ru.gravit.launchserver.auth.AuthException;
-import ru.gravit.launchserver.auth.ClientPermissions;
+import ru.gravit.launcher.ClientPermissions;
 import ru.gravit.launchserver.auth.MySQLSourceConfig;
 import ru.gravit.launchserver.auth.provider.AuthProvider;
 import ru.gravit.launchserver.auth.provider.AuthProviderResult;
