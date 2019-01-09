@@ -1,5 +1,5 @@
 subprojects {
-    dependencies {
+	dependencies {
 		compileOnly project(':LaunchServer')
 	}
 	jar {
