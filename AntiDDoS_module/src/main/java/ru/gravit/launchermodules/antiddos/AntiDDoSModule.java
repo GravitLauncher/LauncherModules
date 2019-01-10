@@ -68,6 +68,8 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
             try(Writer writer = IOHelper.newWriter(configfile))
             {
                 config = new Config();
+                config.whitelist.add("localhost");
+                config.whitelist.add("127.0.0.1");
                 LaunchServer.gson.toJson(config, writer);
             } catch (IOException e) {
                 LogHelper.error(e);
