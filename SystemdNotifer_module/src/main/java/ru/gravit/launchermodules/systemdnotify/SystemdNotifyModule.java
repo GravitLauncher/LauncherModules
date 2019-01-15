@@ -22,7 +22,7 @@ public class SystemdNotifyModule implements Module {
 
     @Override
     public int getPriority() {
-        return 0;
+        return Integer.MIN_VALUE+1;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class SystemdNotifyModule implements Module {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("systemd-notify", "--ready");
         try {
-            Process process = processBuilder.start();
+            processBuilder.start();
             LogHelper.debug("Systemd notify successful");
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,15 +44,13 @@ public class SystemdNotifyModule implements Module {
 
     @Override
     public void preInit(ModuleContext moduleContext) {
-
     }
 
     @Override
     public void close() {
-
     }
 
     public static void main(String[] args) {
-
+        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 }

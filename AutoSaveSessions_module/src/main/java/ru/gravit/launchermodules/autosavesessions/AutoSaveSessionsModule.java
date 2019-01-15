@@ -8,7 +8,6 @@ import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.launchserver.socket.Client;
 import ru.gravit.utils.Version;
 import ru.gravit.utils.helper.IOHelper;
-import ru.gravit.utils.helper.JVMHelper;
 import ru.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
@@ -70,19 +69,6 @@ public class AutoSaveSessionsModule implements Module {
                 LogHelper.error(e);
             }
         }
-        JVMHelper.RUNTIME.addShutdownHook(new Thread(() -> {
-            if (isClearSessionsBeforeSave) {
-                LaunchServer.server.sessionManager.garbageCollection();
-            }
-            Set<Client> clientSet = LaunchServer.server.sessionManager.getSessions();
-            try (Writer writer = IOHelper.newWriter(file)) {
-                LogHelper.info("Write sessions to %s", FILENAME);
-                LaunchServer.gson.toJson(clientSet, writer);
-                LogHelper.info("%d sessions writed", clientSet.size());
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
-        }));
     }
 
     @Override
@@ -92,6 +78,16 @@ public class AutoSaveSessionsModule implements Module {
 
     @Override
     public void close() {
-
+        if (isClearSessionsBeforeSave) {
+            LaunchServer.server.sessionManager.garbageCollection();
+        }
+        Set<Client> clientSet = LaunchServer.server.sessionManager.getSessions();
+        try (Writer writer = IOHelper.newWriter(file)) {
+            LogHelper.info("Write sessions to %s", FILENAME);
+            LaunchServer.gson.toJson(clientSet, writer);
+            LogHelper.info("%d sessions writed", clientSet.size());
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
     }
 }
