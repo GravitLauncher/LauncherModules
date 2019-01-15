@@ -1,19 +1,18 @@
 package ru.gravit.launcher.addhash;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.mindrot.jbcrypt.BCrypt;
-
-import ru.gravit.launchserver.auth.AuthException;
 import ru.gravit.launcher.ClientPermissions;
+import ru.gravit.launchserver.auth.AuthException;
 import ru.gravit.launchserver.auth.MySQLSourceConfig;
 import ru.gravit.launchserver.auth.provider.AuthProvider;
 import ru.gravit.launchserver.auth.provider.AuthProviderResult;
 import ru.gravit.utils.helper.CommonHelper;
 import ru.gravit.utils.helper.SecurityHelper;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public final class MySQLBcryptAuthProvider extends AuthProvider {
     private MySQLSourceConfig mySQLHolder;

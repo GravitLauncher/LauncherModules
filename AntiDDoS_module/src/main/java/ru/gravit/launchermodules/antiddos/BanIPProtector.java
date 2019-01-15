@@ -14,22 +14,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, ServerSocketHandler.Listener {
     private AntiDDoSModule mod;
-    
-	public BanIPProtector(AntiDDoSModule mod) {
-		this.mod = mod;
-	}
 
-	@Override
+    public BanIPProtector(AntiDDoSModule mod) {
+        this.mod = mod;
+    }
+
+    @Override
     public boolean fatalErrorHook(Socket socket, Exception ex) {
         String ip = IOHelper.getIP(socket.getRemoteSocketAddress());
-        if(whitelist.contains(ip)) return !mod.config.disableSocketFatalErrors;
-        if(!banlist.containsKey(ip)) banlist.put(ip,new Entry(1));
+        if (whitelist.contains(ip)) return !mod.config.disableSocketFatalErrors;
+        if (!banlist.containsKey(ip)) banlist.put(ip, new Entry(1));
         else {
             Entry e = banlist.get(ip);
             e.fails++;
-            if(mod.config.printBannedMessage && e.fails >= mod.config.maxFails)
-            {
-                LogHelper.warning("IP %s banned",ip);
+            if (mod.config.printBannedMessage && e.fails >= mod.config.maxFails) {
+                LogHelper.warning("IP %s banned", ip);
             }
         }
         return !mod.config.disableSocketFatalErrors;
@@ -38,15 +37,13 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
     @Override
     public boolean onConnect(InetAddress address) {
         String ip = address.getHostAddress();
-        if(!banlist.containsKey(ip)) banlist.put(ip,new Entry(0));
-        else
-        {
+        if (!banlist.containsKey(ip)) banlist.put(ip, new Entry(0));
+        else {
             Entry e = banlist.get(ip);
-            if(e.fails >= mod.config.maxFails)
-            {
+            if (e.fails >= mod.config.maxFails) {
                 e.tryconnection++;
-                if(mod.config.printTryConnectionMessage)
-                    LogHelper.info("IP %s try connection #%d",ip,e.tryconnection);
+                if (mod.config.printTryConnectionMessage)
+                    LogHelper.info("IP %s try connection #%d", ip, e.tryconnection);
                 return false;
             }
         }
@@ -63,8 +60,7 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
         return false;
     }
 
-    public class Entry
-    {
+    public class Entry {
         public Entry(int fails) {
             this.fails = fails;
             this.tryconnection = 0;
@@ -73,6 +69,7 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
         int fails;
         int tryconnection;
     }
-    public Map<String,Entry> banlist = new ConcurrentHashMap<>();
+
+    public Map<String, Entry> banlist = new ConcurrentHashMap<>();
     public Set<String> whitelist = new HashSet<>();
 }

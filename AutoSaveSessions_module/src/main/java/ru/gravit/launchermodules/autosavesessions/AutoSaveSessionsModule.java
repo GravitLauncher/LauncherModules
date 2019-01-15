@@ -21,10 +21,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AutoSaveSessionsModule implements Module {
-    public static Version version = new Version(1,0,0);
+    public static Version version = new Version(1, 0, 0);
     public static String FILENAME = "sessions.json";
     public static boolean isClearSessionsBeforeSave = true;
     public Path file;
+
     @Override
     public String getName() {
         return "AutoSaveSessions";
@@ -49,7 +50,7 @@ public class AutoSaveSessionsModule implements Module {
     public void postInit(ModuleContext context1) {
         LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
         Path configDir = context.modulesConfigManager.getModuleConfigDir(getName());
-        if(!IOHelper.isDir(configDir)) {
+        if (!IOHelper.isDir(configDir)) {
             try {
                 Files.createDirectories(configDir);
             } catch (IOException e) {
@@ -57,30 +58,27 @@ public class AutoSaveSessionsModule implements Module {
             }
         }
         file = configDir.resolve(FILENAME);
-        if(IOHelper.exists(file))
-        {
-            LogHelper.info("Load sessions from %s",FILENAME);
-            Type setType = new TypeToken<HashSet<Client>>(){}.getType();
-            try(Reader reader = IOHelper.newReader(file))
-            {
-                Set<Client> clientSet = LaunchServer.gson.fromJson(reader,setType);
+        if (IOHelper.exists(file)) {
+            LogHelper.info("Load sessions from %s", FILENAME);
+            Type setType = new TypeToken<HashSet<Client>>() {
+            }.getType();
+            try (Reader reader = IOHelper.newReader(file)) {
+                Set<Client> clientSet = LaunchServer.gson.fromJson(reader, setType);
                 context.launchServer.sessionManager.loadSessions(clientSet);
-                LogHelper.info("Loaded %d sessions",clientSet.size());
+                LogHelper.info("Loaded %d sessions", clientSet.size());
             } catch (IOException e) {
                 LogHelper.error(e);
             }
         }
         JVMHelper.RUNTIME.addShutdownHook(new Thread(() -> {
-            if(isClearSessionsBeforeSave)
-            {
+            if (isClearSessionsBeforeSave) {
                 LaunchServer.server.sessionManager.garbageCollection();
             }
             Set<Client> clientSet = LaunchServer.server.sessionManager.getSessions();
-            try(Writer writer = IOHelper.newWriter(file))
-            {
-                LogHelper.info("Write sessions to %s",FILENAME);
-                LaunchServer.gson.toJson(clientSet,writer);
-                LogHelper.info("%d sessions writed",clientSet.size());
+            try (Writer writer = IOHelper.newWriter(file)) {
+                LogHelper.info("Write sessions to %s", FILENAME);
+                LaunchServer.gson.toJson(clientSet, writer);
+                LogHelper.info("%d sessions writed", clientSet.size());
             } catch (IOException e) {
                 LogHelper.error(e);
             }

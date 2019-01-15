@@ -8,7 +8,8 @@ import ru.gravit.utils.helper.LogHelper;
 import java.io.IOException;
 
 public class SystemdNotifyModule implements Module {
-    public static Version version =new Version(1,0,0);
+    public static Version version = new Version(1, 0, 0);
+
     @Override
     public String getName() {
         return "SystemdNotifer";
@@ -50,8 +51,8 @@ public class SystemdNotifyModule implements Module {
     public void close() {
 
     }
-    public static void main(String[] args)
-    {
+
+    public static void main(String[] args) {
 
     }
 }

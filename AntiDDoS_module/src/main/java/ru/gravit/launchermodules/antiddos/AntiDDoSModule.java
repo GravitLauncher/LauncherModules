@@ -19,20 +19,19 @@ import java.util.ArrayList;
 public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     public static final Version version = new Version(1, 0, 1, 3, Version.Type.BETA);
 
-    public static class Config
-    {
+    public static class Config {
         public boolean disableSocketFatalErrors = false;
         public int maxFails = 3;
         public boolean printBannedMessage = true;
         public boolean printTryConnectionMessage = true;
         public ArrayList<String> whitelist = new ArrayList<>();
     }
-    
+
     public Path configfile;
     public Config config;
     public BanIPProtector banIPProtector;
-	public LaunchServer srv;
-	
+    public LaunchServer srv;
+
     @Override
     public String getName() {
         return "Gravit Anti-DDoS";
@@ -54,19 +53,15 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         LogHelper.debug("Init anti-DDoS");
         srv = context.launchServer;
         configfile = context.modulesConfigManager.getModuleConfig(getName());
-        if(IOHelper.exists(configfile))
-        {
-            try(Reader reader = IOHelper.newReader(configfile)) {
-                config = LaunchServer.gson.fromJson(reader,Config.class);
+        if (IOHelper.exists(configfile)) {
+            try (Reader reader = IOHelper.newReader(configfile)) {
+                config = LaunchServer.gson.fromJson(reader, Config.class);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
-        }
-        else
-        {
+        } else {
             LogHelper.debug("Create new anti-ddos config file");
-            try(Writer writer = IOHelper.newWriter(configfile))
-            {
+            try (Writer writer = IOHelper.newWriter(configfile)) {
                 config = new Config();
                 config.whitelist.add("localhost");
                 config.whitelist.add("127.0.0.1");
@@ -75,11 +70,11 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
                 LogHelper.error(e);
             }
         }
-        banIPProtector = new BanIPProtector( this);
+        banIPProtector = new BanIPProtector(this);
         banIPProtector.whitelist.addAll(config.whitelist);
         context.launchServer.socketHookManager.registerFatalErrorHook(banIPProtector);
-        context.launchServer.reloadManager.registerReloadable("antiddos",this);
-        context.launchServer.reconfigurableManager.registerReconfigurable("antiddos",this);
+        context.launchServer.reloadManager.registerReloadable("antiddos", this);
+        context.launchServer.reconfigurableManager.registerReconfigurable("antiddos", this);
     }
 
     @Override
@@ -95,8 +90,8 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
 
     @Override
     public void reload() {
-        try(Reader reader = IOHelper.newReader(configfile)) {
-            config = LaunchServer.gson.fromJson(reader,Config.class);
+        try (Reader reader = IOHelper.newReader(configfile)) {
+            config = LaunchServer.gson.fromJson(reader, Config.class);
         } catch (IOException e) {
             LogHelper.error(e);
         }
@@ -104,15 +99,12 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
 
     @Override
     public void reconfig(String action, String[] args) {
-        if(action.equals("clear"))
-        {
+        if (action.equals("clear")) {
             banIPProtector.banlist.clear();
             LogHelper.info("IP BanList clean");
-        }
-        else if(action.equals("remove"))
-        {
+        } else if (action.equals("remove")) {
             banIPProtector.banlist.remove(args[0]);
-            LogHelper.info("IP %s unbanned",args[0]);
+            LogHelper.info("IP %s unbanned", args[0]);
         }
     }
 
@@ -121,14 +113,13 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         LogHelper.info("clean [none] - clean banlist");
         LogHelper.info("remove [ip] - remove ip from banlist");
     }
-    
+
     @Override
     public void close() {
 
     }
-    
-    public static void main(String[] args)
-    {
-    	System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
+
+    public static void main(String[] args) {
+        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 }
