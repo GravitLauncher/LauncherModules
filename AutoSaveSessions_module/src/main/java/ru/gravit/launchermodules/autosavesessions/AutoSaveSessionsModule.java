@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,7 +48,15 @@ public class AutoSaveSessionsModule implements Module {
     @Override
     public void postInit(ModuleContext context1) {
         LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
-        file = context.launchServer.dir.resolve(FILENAME);
+        Path configDir = context.modulesConfigManager.getModuleConfigDir(getName());
+        if(!IOHelper.isDir(configDir)) {
+            try {
+                Files.createDirectories(configDir);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        file = configDir.resolve(FILENAME);
         if(IOHelper.exists(file))
         {
             LogHelper.info("Load sessions from %s",FILENAME);

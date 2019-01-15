@@ -53,7 +53,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
         LogHelper.debug("Init anti-DDoS");
         srv = context.launchServer;
-        configfile = context.launchServer.dir.resolve("anti-ddos.json");
+        configfile = context.modulesConfigManager.getModuleConfig(getName());
         if(IOHelper.exists(configfile))
         {
             try(Reader reader = IOHelper.newReader(configfile)) {
