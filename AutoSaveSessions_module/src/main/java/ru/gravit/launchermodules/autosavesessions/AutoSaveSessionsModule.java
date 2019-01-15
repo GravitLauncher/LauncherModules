@@ -93,7 +93,7 @@ public class AutoSaveSessionsModule implements Module {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
 
     }
 }

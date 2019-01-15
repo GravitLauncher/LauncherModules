@@ -94,7 +94,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     }
 
     @Override
-    public void reload() throws Exception {
+    public void reload() {
         try(Reader reader = IOHelper.newReader(configfile)) {
             config = LaunchServer.gson.fromJson(reader,Config.class);
         } catch (IOException e) {
@@ -123,7 +123,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     }
     
     @Override
-    public void close() throws Exception {
+    public void close() {
 
     }
     

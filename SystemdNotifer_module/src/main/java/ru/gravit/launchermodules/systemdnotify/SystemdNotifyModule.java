@@ -47,7 +47,7 @@ public class SystemdNotifyModule implements Module {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
 
     }
     public static void main(String[] args)
