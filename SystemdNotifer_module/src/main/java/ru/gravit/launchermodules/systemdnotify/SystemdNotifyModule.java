@@ -32,13 +32,17 @@ public class SystemdNotifyModule implements Module {
 
     @Override
     public void postInit(ModuleContext moduleContext) {
+    }
+
+    @Override
+    public void finish(ModuleContext moduleContext) {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("systemd-notify", "--ready");
         try {
             processBuilder.start();
             LogHelper.debug("Systemd notify successful");
         } catch (IOException e) {
-            e.printStackTrace();
+            LogHelper.error(e);
         }
     }
 
