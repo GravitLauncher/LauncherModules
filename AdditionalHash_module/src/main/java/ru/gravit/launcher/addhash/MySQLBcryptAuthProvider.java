@@ -2,6 +2,7 @@ package ru.gravit.launcher.addhash;
 
 import org.mindrot.jbcrypt.BCrypt;
 import ru.gravit.launcher.ClientPermissions;
+import ru.gravit.launchserver.LaunchServer;
 import ru.gravit.launchserver.auth.AuthException;
 import ru.gravit.launchserver.auth.MySQLSourceConfig;
 import ru.gravit.launchserver.auth.provider.AuthProvider;
