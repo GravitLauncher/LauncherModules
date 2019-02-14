@@ -1,13 +1,14 @@
-package ru.gravit.launcher.addhash;
+package ru.gravit.launchermodules.legacysupport;
 
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
+import ru.gravit.launchserver.auth.handler.AuthHandler;
 import ru.gravit.launchserver.auth.provider.AuthProvider;
 import ru.gravit.utils.Version;
 
-public class AddHashModule implements Module {
+public class ModuleImpl implements Module {
     private static boolean registred = false;
-    public static final Version version = new Version(1, 0, 2, 1, Version.Type.LTS);
+    public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
 
     @Override
     public void close() {
@@ -16,7 +17,7 @@ public class AddHashModule implements Module {
 
     @Override
     public String getName() {
-        return "AddHash";
+        return "DepcreatedFunctions";
     }
 
     @Override
@@ -36,7 +37,7 @@ public class AddHashModule implements Module {
     @Override
     public void preInit(ModuleContext context1) {
         if (!registred) {
-            AuthProvider.registerProvider("mysql-bcrypt", MySQLBcryptAuthProvider.class);
+            AuthHandler.registerHandler("binaryFile", BinaryFileAuthHandler.class);
             registred = true;
         }
     }

@@ -1,4 +1,4 @@
-package ru.gravit.launcher.addhash;
+package ru.gravit.launchermodules.addhash;
 
 import org.mindrot.jbcrypt.BCrypt;
 import ru.gravit.launcher.ClientPermissions;

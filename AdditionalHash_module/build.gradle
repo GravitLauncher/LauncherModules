@@ -1,4 +1,4 @@
-def mainClassName = "ru.gravit.launcher.addhash.AddHashModule"
+def mainClassName = "ru.gravit.launchermodules.addhash.AddHashModule"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
