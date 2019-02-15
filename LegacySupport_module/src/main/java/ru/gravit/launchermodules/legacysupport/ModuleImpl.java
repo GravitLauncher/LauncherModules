@@ -4,7 +4,6 @@ import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.auth.handler.AuthHandler;
 import ru.gravit.launchserver.auth.provider.AuthProvider;
-import ru.gravit.launchserver.auth.provider.MojangAuthProvider;
 import ru.gravit.utils.Version;
 
 public class ModuleImpl implements Module {
