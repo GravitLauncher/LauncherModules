@@ -1,6 +1,5 @@
 package ru.gravit.launchermodules.addhash;
 
-import org.mindrot.jbcrypt.BCrypt;
 import ru.gravit.launcher.ClientPermissions;
 import ru.gravit.launchserver.LaunchServer;
 import ru.gravit.launchserver.auth.AuthException;
@@ -15,13 +14,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public final class MySQLBcryptAuthProvider extends AuthProvider {
+import com.github.wolf480pl.phpass.PHPass;
+
+public final class MySQLPhpHashAuthProvider extends AuthProvider {
     private MySQLSourceConfig mySQLHolder;
     private String query;
     private String message;
     private String[] queryParams;
     private boolean usePermission;
-
+    private int passIterationCountLog2 = 8; // default
+    private transient PHPass pass;
+    
     @Override
     public AuthProviderResult auth(String login, String password, String ip) throws SQLException, AuthException {
         Connection c = mySQLHolder.getConnection();
@@ -33,10 +36,15 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
         // Execute SQL query
         s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
         try (ResultSet set = s.executeQuery()) {
-            return set.next() ? BCrypt.checkpw(password, set.getString(1)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : LaunchServer.server.config.permissionsHandler.getPermissions(set.getString(1))) : authError(message) : authError(message);
+            return set.next() ? pass.checkPassword(password, set.getString(1)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : LaunchServer.server.config.permissionsHandler.getPermissions(set.getString(1))) : authError(message) : authError(message);
         }
     }
 
+    @Override
+    public void init() {
+    	pass = new PHPass(passIterationCountLog2);
+    }
+    
     @Override
     public void close() {
     	mySQLHolder.close();
