@@ -61,7 +61,7 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
 
     @Override
     public boolean onHandshake(long session, int type) {
-        return false;
+        return true;
     }
 
     public static final class Entry {
