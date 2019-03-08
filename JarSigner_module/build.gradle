@@ -1,0 +1,11 @@
+def mainClassName = "ru.gravit.launchermodules.jarsigner.ModuleImpl"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+dependencies {
+	compile 'org.bouncycastle:bcpkix-jdk15on:1.61'
+}
+jar {
+	manifest.attributes("Main-Class": mainClassName)
+}
