@@ -38,6 +38,7 @@ public class ModuleImpl implements Module {
     public void preInit(ModuleContext context1) {
         if (!registred) {
             AuthHandler.registerHandler("binaryFile", BinaryFileAuthHandler.class);
+            AuthHandler.registerHandler("mojang", MojangAuthHandler.class);
             AuthProvider.registerProvider("mojang", MojangAuthProvider.class);
             registred = true;
         }

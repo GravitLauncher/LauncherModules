@@ -25,20 +25,22 @@ public final class MojangAuthProvider extends AuthProvider {
             throw new InternalError(e);
         }
     }
-
-    public class mojangAuth {
+	public static class mojangAgent
+	{
+        public String name;
+        public int version;
+	};
+    public static class mojangAuth {
         public mojangAuth(String username, String password) {
             this.username = username;
             this.password = password;
-            name = "Minecraft";
-            version = 1;
+			agent = new mojangAgent();
+            agent.name = "Minecraft";
+            agent.version = 1;
         }
-
-        String name;
-        int version;
-        String username;
-        String password;
-
+		public mojangAgent agent;
+        public String username;
+        public String password;
     }
 
     @Override
@@ -57,9 +59,9 @@ public final class MojangAuthProvider extends AuthProvider {
         // Parse JSON data
         JsonObject selectedProfile = response.get("selectedProfile").getAsJsonObject();
         String username = selectedProfile.get("name").getAsString();
-        String accessToken = response.get("clientToken").getAsString();
+        String accessToken = response.get("accessToken").getAsString();
         UUID uuid = UUID.fromString(UUID_REGEX.matcher(selectedProfile.get("id").getAsString()).replaceFirst("$1-$2-$3-$4-$5"));
-        String launcherToken = response.get("accessToken").getAsString();
+        String launcherToken = response.get("clientToken").getAsString();
 
         // We're done
         return new MojangAuthProviderResult(username, accessToken, uuid, launcherToken);
