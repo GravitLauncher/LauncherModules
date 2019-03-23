@@ -19,6 +19,7 @@ public class MojangAuthHandler extends AuthHandler {
     public HashMap<String, UUID> usernameToUUID = new HashMap<>();
     public static URL joinServer;
     private static final Gson gson = new Gson();
+    boolean returnSuccess = true;
 
     static {
         try {
@@ -78,11 +79,7 @@ public class MojangAuthHandler extends AuthHandler {
         {
             //Ignored
         }
-        catch (Exception e)
-        {
-            LogHelper.error(e);
-        }
-        return true;
+        return returnSuccess;
     }
 
     @Override
