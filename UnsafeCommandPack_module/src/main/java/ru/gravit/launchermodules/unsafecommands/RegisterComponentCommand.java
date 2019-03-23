@@ -20,7 +20,7 @@ public class RegisterComponentCommand extends Command {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
         Class clazz = Class.forName(args[1]);
