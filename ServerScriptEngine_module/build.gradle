@@ -1,0 +1,8 @@
+def mainClassName = "ru.gravit.launchermodules.serverscript.ServerScriptEngineModule"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+jar {
+	manifest.attributes("Main-Class": mainClassName)
+}

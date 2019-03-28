@@ -114,13 +114,13 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         	banIPProtector.banList.remove(args[0]);
             LogHelper.info("IP %s unbanned", args[0]);
         }
-        case "saveBans": {
+        case "savebans": {
         	banIPProtector.serialize(bansFile, whiteListFile);
         }
-        case "readBans": {
+        case "readbans": {
         	banIPProtector.deserialize(bansFile, whiteListFile);
         }
-        case "whiteList": {
+        case "whitelist": {
         	if (args.length < 1) {
         		LogHelper.error("Invalid arguments.");
         		return;
@@ -128,7 +128,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         	banIPProtector.whiteList.add(args[0]);
             LogHelper.info("IP %s whitelisted", args[0]);
         }
-        case "dewhiteList": {
+        case "dewhitelist": {
         	if (args.length < 1) {
         		LogHelper.error("Invalid arguments.");
         		return;
