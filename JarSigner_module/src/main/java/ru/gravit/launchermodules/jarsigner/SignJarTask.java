@@ -34,6 +34,7 @@ public class SignJarTask implements LauncherBuildTask {
              JarInputStream input = new JarInputStream(IOHelper.newInput(inputFile))) {
             ZipEntry e = input.getNextEntry();
             while (e != null) {
+            	if ("META-INF/MANIFEST.MF".equals(e.getName())) continue;
                 output.addFileContents(e, input);
                 e = input.getNextEntry();
             }
