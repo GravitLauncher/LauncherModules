@@ -4,6 +4,7 @@ import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.auth.handler.AuthHandler;
 import ru.gravit.launchserver.auth.provider.AuthProvider;
+import ru.gravit.launchserver.texture.TextureProvider;
 import ru.gravit.utils.Version;
 
 public class ModuleImpl implements Module {
@@ -40,6 +41,7 @@ public class ModuleImpl implements Module {
             AuthHandler.registerHandler("binaryFile", BinaryFileAuthHandler.class);
             AuthHandler.registerHandler("mojang", MojangAuthHandler.class);
             AuthProvider.registerProvider("mojang", MojangAuthProvider.class);
+            TextureProvider.registerProvider("mojang", MojangTextureProvider.class);
             registred = true;
         }
     }
