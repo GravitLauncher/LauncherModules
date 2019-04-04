@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import ru.gravit.launcher.LauncherAPI;
 import ru.gravit.launcher.profiles.Texture;
-import ru.gravit.launchserver.texture.TextureProvider;
+import ru.gravit.launchserver.auth.texture.TextureProvider;
 import ru.gravit.utils.HTTPRequest;
 import ru.gravit.utils.helper.IOHelper;
 import ru.gravit.utils.helper.LogHelper;
