@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import ru.gravit.launcher.Launcher;
 import ru.gravit.launcher.LauncherAPI;
 import ru.gravit.launcher.profiles.Texture;
 import ru.gravit.launchserver.auth.texture.TextureProvider;
@@ -20,6 +21,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class MojangTextureProvider extends TextureProvider {
+    public class EmptyObject
+    {
+
+    }
     @LauncherAPI
     public static final long CACHE_DURATION_MS = VerifyHelper.verifyLong(
             Long.parseLong(System.getProperty("launcher.mysql.cacheDurationHours", Integer.toString(24))),
@@ -57,7 +62,7 @@ public final class MojangTextureProvider extends TextureProvider {
         try {
             // TODO Don't query UUID by username if using mojang auth handler (not implemented yet)
             URL uuidURL = new URL("https://api.mojang.com/users/profiles/minecraft/" + IOHelper.urlEncode(username));
-            JsonObject uuidResponse = HTTPRequest.jsonRequest(null, uuidURL).getAsJsonObject();
+            JsonObject uuidResponse = HTTPRequest.jsonRequest(Launcher.gson.toJsonTree(new EmptyObject()), uuidURL).getAsJsonObject();
             if (uuidResponse == null) {
                 throw new IllegalArgumentException("Empty UUID response");
             }
@@ -65,7 +70,7 @@ public final class MojangTextureProvider extends TextureProvider {
 
             // Obtain player profile
             URL profileURL = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidResolved);
-            JsonObject profileResponse = HTTPRequest.jsonRequest(null, profileURL).getAsJsonObject();
+            JsonObject profileResponse = HTTPRequest.jsonRequest(Launcher.gson.toJsonTree(new EmptyObject()), profileURL).getAsJsonObject();
             if (profileResponse == null) {
                 throw new IllegalArgumentException("Empty Mojang response");
             }
