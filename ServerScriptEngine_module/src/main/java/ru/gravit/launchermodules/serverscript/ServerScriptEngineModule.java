@@ -6,7 +6,7 @@ import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
 
 public class ServerScriptEngineModule implements Module {
-    public static Version version = new Version(1,0,0);
+    public static Version version = new Version(1,1,0);
     public static ServerScriptEngine scriptEngine;
     @Override
     public String getName() {
@@ -34,6 +34,7 @@ public class ServerScriptEngineModule implements Module {
         scriptEngine = new ServerScriptEngine();
         scriptEngine.initBaseBindings();
         context.launchServer.commandHandler.registerCommand("eval", new EvalCommand(context.launchServer));
+        context.launchServer.commandHandler.registerCommand("scriptMappings", new ScriptMappingsCommand(context.launchServer));
     }
 
     @Override
