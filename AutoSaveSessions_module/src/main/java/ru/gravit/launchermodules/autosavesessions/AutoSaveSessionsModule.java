@@ -1,6 +1,7 @@
 package ru.gravit.launchermodules.autosavesessions;
 
 import com.google.gson.reflect.TypeToken;
+import ru.gravit.launcher.Launcher;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.LaunchServer;
@@ -62,7 +63,7 @@ public class AutoSaveSessionsModule implements Module {
             Type setType = new TypeToken<HashSet<Client>>() {
             }.getType();
             try (Reader reader = IOHelper.newReader(file)) {
-                Set<Client> clientSet = LaunchServer.gson.fromJson(reader, setType);
+                Set<Client> clientSet = Launcher.gsonManager.configGson.fromJson(reader, setType);
                 for(Client client : clientSet)
                 {
                     if(client.isAuth) client.updateAuth();
@@ -88,7 +89,7 @@ public class AutoSaveSessionsModule implements Module {
         Set<Client> clientSet = LaunchServer.server.sessionManager.getSessions();
         try (Writer writer = IOHelper.newWriter(file)) {
             LogHelper.info("Write sessions to %s", FILENAME);
-            LaunchServer.gson.toJson(clientSet, writer);
+            Launcher.gsonManager.configGson.toJson(clientSet, writer);
             LogHelper.info("%d sessions writed", clientSet.size());
         } catch (IOException e) {
             LogHelper.error(e);

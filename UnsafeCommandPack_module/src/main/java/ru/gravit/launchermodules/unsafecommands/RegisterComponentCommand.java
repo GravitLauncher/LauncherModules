@@ -25,6 +25,6 @@ public class RegisterComponentCommand extends Command {
         verifyArgs(args, 2);
         Class clazz = Class.forName(args[1]);
         if(clazz == null) throw new ClassNotFoundException(args[1]);
-        Component.registerComponent(args[0], clazz);
+        Component.providers.registerProvider(args[0], clazz);
     }
 }

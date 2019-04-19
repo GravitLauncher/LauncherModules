@@ -1,5 +1,6 @@
 package ru.gravit.launchermodules.antiddos;
 
+import ru.gravit.launcher.Launcher;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.LaunchServer;
@@ -60,7 +61,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
         configFile = configDir.resolve("config.json");
         if (IOHelper.exists(configFile)) {
             try (Reader reader = IOHelper.newReader(configFile)) {
-                config = LaunchServer.gson.fromJson(reader, Config.class);
+                config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
@@ -68,7 +69,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
             LogHelper.debug("Create new anti-ddos config file");
             try (Writer writer = IOHelper.newWriter(configFile)) {
                 config = new Config();
-                LaunchServer.gson.toJson(config, writer);
+                Launcher.gsonManager.configGson.toJson(config, writer);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
@@ -94,7 +95,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     @Override
     public void reload() {
         try (Reader reader = IOHelper.newReader(configFile)) {
-            config = LaunchServer.gson.fromJson(reader, Config.class);
+            config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
         } catch (IOException e) {
             LogHelper.error(e);
         }
@@ -140,7 +141,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
             if (IOHelper.exists(configFile)) {
             	LogHelper.info("Loading AntiDDOS config...");
                 try (Reader reader = IOHelper.newReader(configFile)) {
-                    config = LaunchServer.gson.fromJson(reader, Config.class);
+                    config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
                     LogHelper.info("Successfully loaded config.");
                 } catch (IOException e) {
                     LogHelper.error(e);
@@ -149,7 +150,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
                 LogHelper.debug("Create new anti-ddos config file");
                 try (Writer writer = IOHelper.newWriter(configFile)) {
                     config = new Config();
-                    LaunchServer.gson.toJson(config, writer);
+                    Launcher.gsonManager.configGson.toJson(config, writer);
                     LogHelper.info("Successfully created config.");
                 } catch (IOException e) {
                     LogHelper.error(e);

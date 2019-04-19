@@ -36,8 +36,8 @@ public class AddHashModule implements Module {
     @Override
     public void preInit(ModuleContext context1) {
         if (!registred) {
-            AuthProvider.registerProvider("mysql-bcrypt", MySQLBcryptAuthProvider.class);
-            AuthProvider.registerProvider("mysql-phphash", MySQLPhpHashAuthProvider.class);
+            AuthProvider.providers.registerProvider("mysql-bcrypt", MySQLBcryptAuthProvider.class);
+            AuthProvider.providers.registerProvider("mysql-phphash", MySQLPhpHashAuthProvider.class);
             registred = true;
         }
     }

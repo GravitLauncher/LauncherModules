@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
 
+import ru.gravit.launcher.Launcher;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
 import ru.gravit.launchserver.LaunchServer;
@@ -66,7 +67,7 @@ public class ModuleImpl implements Module, Reloadable  {
     	configFile = context.modulesConfigManager.getModuleConfig("jar-signing");
         if (IOHelper.exists(configFile)) {
             try (Reader reader = IOHelper.newReader(configFile)) {
-                config  = LaunchServer.gson.fromJson(reader, Config.class);
+                config  = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
@@ -74,7 +75,7 @@ public class ModuleImpl implements Module, Reloadable  {
             LogHelper.debug("Create new jar signing config file");
             try (Writer writer = IOHelper.newWriter(configFile)) {
                 config = new Config();
-                LaunchServer.gson.toJson(config, writer);
+                Launcher.gsonManager.configGson.toJson(config, writer);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
@@ -85,7 +86,7 @@ public class ModuleImpl implements Module, Reloadable  {
     @Override
     public void reload() {
         try (Reader reader = IOHelper.newReader(configFile )) {
-            config = LaunchServer.gson.fromJson(reader, Config.class);
+            config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
         } catch (IOException e) {
             LogHelper.error(e);
         }
