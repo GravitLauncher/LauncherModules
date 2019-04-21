@@ -46,7 +46,7 @@ public class ServerScriptEngine {
             {
                 if(!e.getValue().startsWith("ru.gravit")) continue; //Отсекаем библиотеки
                 try {
-                    Class clazz = Class.forName(e.getValue(), false, ClassLoader.getSystemClassLoader());
+                    Class<?> clazz = Class.forName(e.getValue(), false, ClassLoader.getSystemClassLoader());
                     String bindClassName = e.getKey() + "Class";
                     bindings.put(bindClassName, clazz);
                     eval(String.format("var %s = %s.static;", e.getKey(), bindClassName));

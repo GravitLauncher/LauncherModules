@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import ru.gravit.launcher.Launcher;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
-import ru.gravit.launchserver.LaunchServer;
 import ru.gravit.launchserver.Reloadable;
 import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
