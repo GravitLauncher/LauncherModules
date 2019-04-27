@@ -38,10 +38,10 @@ public class ModuleImpl implements Module {
     @Override
     public void preInit(ModuleContext context1) {
         if (!registred) {
-            AuthHandler.providers.registerProvider("binaryFile", BinaryFileAuthHandler.class);
-            AuthHandler.providers.registerProvider("mojang", MojangAuthHandler.class);
-            AuthProvider.providers.registerProvider("mojang", MojangAuthProvider.class);
-            TextureProvider.providers.registerProvider("mojang", MojangTextureProvider.class);
+            AuthHandler.providers.register("binaryFile", BinaryFileAuthHandler.class);
+            AuthHandler.providers.register("mojang", MojangAuthHandler.class);
+            AuthProvider.providers.register("mojang", MojangAuthProvider.class);
+            TextureProvider.providers.register("mojang", MojangTextureProvider.class);
             registred = true;
         }
     }
