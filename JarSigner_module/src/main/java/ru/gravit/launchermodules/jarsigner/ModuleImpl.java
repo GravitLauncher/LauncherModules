@@ -45,7 +45,7 @@ public class ModuleImpl implements Module, Reloadable  {
 
     @Override
     public int getPriority() {
-        return Integer.MIN_VALUE;
+        return Integer.MIN_VALUE+200;
     }
 
     @Override
