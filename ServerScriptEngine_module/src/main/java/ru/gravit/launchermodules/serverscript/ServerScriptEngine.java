@@ -50,7 +50,7 @@ public class ServerScriptEngine {
                     String bindClassName = e.getKey() + "Class";
                     bindings.put(bindClassName, clazz);
                     eval(String.format("var %s = %s.static;", e.getKey(), bindClassName));
-                } catch (ClassNotFoundException ex)
+                } catch (ClassNotFoundException | NoClassDefFoundError ex)
                 {
                     LogHelper.debug("[ScriptEngine] Class %s not found", e.getValue());
                 } catch (ScriptException e1) {
