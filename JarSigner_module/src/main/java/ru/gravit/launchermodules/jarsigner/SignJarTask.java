@@ -38,9 +38,7 @@ public class SignJarTask implements LauncherBuildTask {
                 output.addFileContents(e, input);
                 e = input.getNextEntry();
             }
-            input.getManifest().getMainAttributes().forEach((a, b) -> {
-            	output.addManifestAttribute(a.toString(), b.toString());
-            });
+            input.getManifest().getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
         }
 		return toRet;
 	}

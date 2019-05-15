@@ -44,7 +44,7 @@ public class PHPass {
 
     private String encode64(byte[] src, int count) {
         int i, value;
-        String output = "";
+        StringBuilder output = new StringBuilder();
         i = 0;
 
         if (src.length < count) {
@@ -57,24 +57,24 @@ public class PHPass {
         do {
             value = src[i] + (src[i] < 0 ? 256 : 0);
             ++i;
-            output += itoa64.charAt(value & 63);
+            output.append(itoa64.charAt(value & 63));
             if (i < count) {
                 value |= (src[i] + (src[i] < 0 ? 256 : 0)) << 8;
             }
-            output += itoa64.charAt((value >> 6) & 63);
+            output.append(itoa64.charAt((value >> 6) & 63));
             if (i++ >= count) {
                 break;
             }
             if (i < count) {
                 value |= (src[i] + (src[i] < 0 ? 256 : 0)) << 16;
             }
-            output += itoa64.charAt((value >> 12) & 63);
+            output.append(itoa64.charAt((value >> 12) & 63));
             if (i++ >= count) {
                 break;
             }
-            output += itoa64.charAt((value >> 18) & 63);
+            output.append(itoa64.charAt((value >> 18) & 63));
         } while (i < count);
-        return output;
+        return output.toString();
     }
 
     private String cryptPrivate(String password, String setting) {
