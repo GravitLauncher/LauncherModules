@@ -104,68 +104,68 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     @Override
     public void reconfig(String action, String[] args) {
         switch (action) {
-        case "clean": {
-        	 banIPProtector.banList.clear();
-        }
-        case "remove": {
-        	if (args.length < 1) {
-        		LogHelper.error("Invalid arguments.");
-        		return;
-        	}
-        	banIPProtector.banList.remove(args[0]);
-            LogHelper.info("IP %s unbanned", args[0]);
-        }
-        case "savebans": {
-        	banIPProtector.serialize(bansFile, whiteListFile);
-        }
-        case "readbans": {
-        	banIPProtector.deserialize(bansFile, whiteListFile);
-        }
-        case "whitelist": {
-        	if (args.length < 1) {
-        		LogHelper.error("Invalid arguments.");
-        		return;
-        	}
-        	banIPProtector.whiteList.add(args[0]);
-            LogHelper.info("IP %s whitelisted", args[0]);
-        }
-        case "dewhitelist": {
-        	if (args.length < 1) {
-        		LogHelper.error("Invalid arguments.");
-        		return;
-        	}
-        	banIPProtector.whiteList.remove(args[0]);
-            LogHelper.info("IP %s dewhitelisted", args[0]);
-        }
-        case "reloadconf": {
-            if (IOHelper.exists(configFile)) {
-            	LogHelper.info("Loading AntiDDOS config...");
-                try (Reader reader = IOHelper.newReader(configFile)) {
-                    config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
-                    LogHelper.info("Successfully loaded config.");
-                } catch (IOException e) {
-                    LogHelper.error(e);
+            case "clean": {
+                banIPProtector.banList.clear();
+            }
+            case "remove": {
+                if (args.length < 1) {
+                    LogHelper.error("Invalid arguments.");
+                    return;
                 }
-            } else {
-                LogHelper.debug("Create new anti-ddos config file");
-                try (Writer writer = IOHelper.newWriter(configFile)) {
-                    config = new Config();
-                    Launcher.gsonManager.configGson.toJson(config, writer);
-                    LogHelper.info("Successfully created config.");
-                } catch (IOException e) {
-                    LogHelper.error(e);
+                banIPProtector.banList.remove(args[0]);
+                LogHelper.info("IP %s unbanned", args[0]);
+            }
+            case "savebans": {
+                banIPProtector.serialize(bansFile, whiteListFile);
+            }
+            case "readbans": {
+                banIPProtector.deserialize(bansFile, whiteListFile);
+            }
+            case "whitelist": {
+                if (args.length < 1) {
+                    LogHelper.error("Invalid arguments.");
+                    return;
+                }
+                banIPProtector.whiteList.add(args[0]);
+                LogHelper.info("IP %s whitelisted", args[0]);
+            }
+            case "dewhitelist": {
+                if (args.length < 1) {
+                    LogHelper.error("Invalid arguments.");
+                    return;
+                }
+                banIPProtector.whiteList.remove(args[0]);
+                LogHelper.info("IP %s dewhitelisted", args[0]);
+            }
+            case "reloadconf": {
+                if (IOHelper.exists(configFile)) {
+                    LogHelper.info("Loading AntiDDOS config...");
+                    try (Reader reader = IOHelper.newReader(configFile)) {
+                        config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
+                        LogHelper.info("Successfully loaded config.");
+                    } catch (IOException e) {
+                        LogHelper.error(e);
+                    }
+                } else {
+                    LogHelper.debug("Create new anti-ddos config file");
+                    try (Writer writer = IOHelper.newWriter(configFile)) {
+                        config = new Config();
+                        Launcher.gsonManager.configGson.toJson(config, writer);
+                        LogHelper.info("Successfully created config.");
+                    } catch (IOException e) {
+                        LogHelper.error(e);
+                    }
                 }
             }
-        }
-        default: {
-        	LogHelper.error("Invalid command.");
-        }
+            default: {
+                LogHelper.error("Invalid command.");
+            }
         }
     }
 
     @Override
     public void printConfigHelp() {
-    	LogHelper.info("reloadconf [none] - reload AntiDDOS config");
+        LogHelper.info("reloadconf [none] - reload AntiDDOS config");
         LogHelper.info("clean [none] - clean banlist");
         LogHelper.info("remove [ip] - remove ip from banlist");
         LogHelper.info("saveBans [none] - save banList");
@@ -176,7 +176,7 @@ public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
 
     @Override
     public void close() {
-    	banIPProtector.serialize(bansFile, whiteListFile);
+        banIPProtector.serialize(bansFile, whiteListFile);
     }
 
     public static void main(String[] args) {

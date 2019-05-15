@@ -6,7 +6,8 @@ import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
 
 public class UnsafeCommandsModule implements Module {
-    public static Version version = new Version(1,0,0);
+    public static Version version = new Version(1, 0, 0);
+
     @Override
     public String getName() {
         return "UnsafeCommands";

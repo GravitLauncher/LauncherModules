@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class MojangTextureProvider extends TextureProvider {
-    public class EmptyObject
-    {
+    public class EmptyObject {
 
     }
+
     @LauncherAPI
     public static final long CACHE_DURATION_MS = VerifyHelper.verifyLong(
             Long.parseLong(System.getProperty("launcher.mysql.cacheDurationHours", Integer.toString(24))),

@@ -31,8 +31,7 @@ public class MojangAuthHandler extends AuthHandler {
 
     @Override
     public UUID auth(AuthProviderResult authResult) throws IOException {
-        if(authResult instanceof MojangAuthProviderResult)
-        {
+        if (authResult instanceof MojangAuthProviderResult) {
             MojangAuthProviderResult result = (MojangAuthProviderResult) authResult;
             usernameToUUID.put(result.username, result.uuid);
             return result.uuid;
@@ -49,8 +48,8 @@ public class MojangAuthHandler extends AuthHandler {
     public void close() throws IOException {
 
     }
-    public class mojangJoinServerRequest
-    {
+
+    public class mojangJoinServerRequest {
         public MojangAuthProvider.mojangAgent agent;
         public String accessToken;
         public String selectedProfile;
@@ -67,16 +66,14 @@ public class MojangAuthHandler extends AuthHandler {
         request.selectedProfile = usernameToUUID(username).toString().replace("-", "");
         request.serverId = serverID;
         try {
-            JsonObject response = HTTPRequest.jsonRequest( gson.toJsonTree(request), joinServer).getAsJsonObject();
-            if (response != null)
-            {
+            JsonObject response = HTTPRequest.jsonRequest(gson.toJsonTree(request), joinServer).getAsJsonObject();
+            if (response != null) {
                 JsonElement errorMessage = response.get("errorMessage");
                 if (errorMessage != null)
                     authError(errorMessage.getAsString());
             }
 
-        } catch (IllegalStateException ignore)
-        {
+        } catch (IllegalStateException ignore) {
             //Ignored
         }
         return returnSuccess;
@@ -89,9 +86,8 @@ public class MojangAuthHandler extends AuthHandler {
 
     @Override
     public String uuidToUsername(UUID uuid) throws IOException {
-        for(Map.Entry<String, UUID> entry : usernameToUUID.entrySet())
-        {
-            if(entry.getValue().equals(uuid)) return entry.getKey();
+        for (Map.Entry<String, UUID> entry : usernameToUUID.entrySet()) {
+            if (entry.getValue().equals(uuid)) return entry.getKey();
         }
         return null;
     }

@@ -4,8 +4,8 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 dependencies {
-	compile 'org.mindrot:jbcrypt:0.4'
+    compile 'org.mindrot:jbcrypt:0.4'
 }
 jar {
-	manifest.attributes("Main-Class": mainClassName)
+    manifest.attributes("Main-Class": mainClassName)
 }

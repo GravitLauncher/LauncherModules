@@ -64,9 +64,8 @@ public class AutoSaveSessionsModule implements Module {
             }.getType();
             try (Reader reader = IOHelper.newReader(file)) {
                 Set<Client> clientSet = Launcher.gsonManager.configGson.fromJson(reader, setType);
-                for(Client client : clientSet)
-                {
-                    if(client.isAuth) client.updateAuth();
+                for (Client client : clientSet) {
+                    if (client.isAuth) client.updateAuth();
                 }
                 context.launchServer.sessionManager.loadSessions(clientSet);
                 LogHelper.info("Loaded %d sessions", clientSet.size());

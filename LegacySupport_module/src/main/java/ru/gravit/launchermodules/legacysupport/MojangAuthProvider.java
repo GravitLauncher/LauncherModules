@@ -24,21 +24,22 @@ public final class MojangAuthProvider extends AuthProvider {
             throw new InternalError(e);
         }
     }
-	public static class mojangAgent
-	{
+
+    public static class mojangAgent {
         public String name;
         public int version;
-	}
+    }
 
     public static class mojangAuth {
         public mojangAuth(String username, String password) {
             this.username = username;
             this.password = password;
-			agent = new mojangAgent();
+            agent = new mojangAgent();
             agent.name = "Minecraft";
             agent.version = 1;
         }
-		public mojangAgent agent;
+
+        public mojangAgent agent;
         public String username;
         public String password;
     }

@@ -26,14 +26,15 @@ public class ServerScriptEngine {
             return engine.eval(reader, engine.getBindings(ScriptContext.ENGINE_SCOPE));
         }
     }
-    public Object eval(String line) throws ScriptException
-    {
+
+    public Object eval(String line) throws ScriptException {
         return engine.eval(line, engine.getBindings(ScriptContext.ENGINE_SCOPE));
     }
-    public void initBaseBindings()
-    {
+
+    public void initBaseBindings() {
         setScriptBindings();
     }
+
     private void setScriptBindings() {
         LogHelper.info("Setting up script engine bindings");
         Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -42,16 +43,14 @@ public class ServerScriptEngine {
 
         try {
             mappings = JarHelper.jarMap(LaunchServer.class, false);
-            for(Map.Entry<String, String> e : mappings.entrySet())
-            {
-                if(!e.getValue().startsWith("ru.gravit")) continue; //Отсекаем библиотеки
+            for (Map.Entry<String, String> e : mappings.entrySet()) {
+                if (!e.getValue().startsWith("ru.gravit")) continue; //Отсекаем библиотеки
                 try {
                     Class<?> clazz = Class.forName(e.getValue(), false, ClassLoader.getSystemClassLoader());
                     String bindClassName = e.getKey() + "Class";
                     bindings.put(bindClassName, clazz);
                     eval(String.format("var %s = %s.static;", e.getKey(), bindClassName));
-                } catch (ClassNotFoundException | NoClassDefFoundError ex)
-                {
+                } catch (ClassNotFoundException | NoClassDefFoundError ex) {
                     LogHelper.debug("[ScriptEngine] Class %s not found", e.getValue());
                 } catch (ScriptException e1) {
                     LogHelper.error(e1);

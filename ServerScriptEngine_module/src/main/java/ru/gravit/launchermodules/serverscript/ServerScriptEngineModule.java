@@ -6,11 +6,12 @@ import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
 
 public class ServerScriptEngineModule implements Module {
-    public static Version version = new Version(1,1,0);
+    public static Version version = new Version(1, 1, 0);
     public static ServerScriptEngine scriptEngine;
+
     @Override
     public String getName() {
-        return  "ServerScriptEngine";
+        return "ServerScriptEngine";
     }
 
     @Override

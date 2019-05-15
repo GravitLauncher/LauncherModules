@@ -1,17 +1,17 @@
 task bundleZip(type: Zip) {
-	archiveName 'modules.zip'
-	destinationDir file("$buildDir")
+    archiveName 'modules.zip'
+    destinationDir file("$buildDir")
 }
 
 subprojects {
-	apply from: '../../module.gradle'
-	parent.tasks.bundleZip.dependsOn tasks.jar
-	parent.tasks.bundleZip.from tasks.jar
+    apply from: '../../module.gradle'
+    parent.tasks.bundleZip.dependsOn tasks.jar
+    parent.tasks.bundleZip.from tasks.jar
 }
 
 if (!project.tasks.findByName('build')) {
-	task build {
-	}
+    task build {
+    }
 }
 
 project.tasks.findByName('build').dependsOn tasks.bundleZip

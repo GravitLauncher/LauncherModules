@@ -20,11 +20,11 @@ public class RegisterComponentCommand extends Command {
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
         Class clazz = Class.forName(args[1]);
-        if(clazz == null) throw new ClassNotFoundException(args[1]);
+        if (clazz == null) throw new ClassNotFoundException(args[1]);
         Component.providers.register(args[0], clazz);
     }
 }

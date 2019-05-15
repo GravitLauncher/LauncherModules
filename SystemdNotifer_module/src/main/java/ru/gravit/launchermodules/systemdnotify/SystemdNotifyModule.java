@@ -22,7 +22,7 @@ public class SystemdNotifyModule implements Module {
 
     @Override
     public int getPriority() {
-        return Integer.MIN_VALUE+1;
+        return Integer.MIN_VALUE + 1;
     }
 
     @Override

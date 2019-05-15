@@ -75,53 +75,54 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
     }
 
     public void serialize(Path banList, Path whiteList) {
-    	if (mod.config.saveBans)
-    		try (PrintWriter out = new PrintWriter(IOHelper.newWriter(banList))) {
-    			this.banList.forEach((k, v) -> {
-    				if (v.fails >= mod.config.maxFails) out.println(k + " " + v.fails);
-    			});
-    		} catch (IOException ioexc) {
-    			LogHelper.error(ioexc);
-    		}
-    	try (PrintWriter out = new PrintWriter(IOHelper.newWriter(whiteList))) {
-    		this.whiteList.forEach(out::println);
-    	} catch (IOException ioexc) {
-    		LogHelper.error(ioexc);
-    	}
+        if (mod.config.saveBans)
+            try (PrintWriter out = new PrintWriter(IOHelper.newWriter(banList))) {
+                this.banList.forEach((k, v) -> {
+                    if (v.fails >= mod.config.maxFails) out.println(k + " " + v.fails);
+                });
+            } catch (IOException ioexc) {
+                LogHelper.error(ioexc);
+            }
+        try (PrintWriter out = new PrintWriter(IOHelper.newWriter(whiteList))) {
+            this.whiteList.forEach(out::println);
+        } catch (IOException ioexc) {
+            LogHelper.error(ioexc);
+        }
     }
-    
+
     public void deserialize(Path banList, Path whiteList) {
-    	this.whiteList.clear();
-    	this.banList.clear();
-    	if (Files.exists(banList) && mod.config.saveBans)
-    		try (BufferedReader reader = IOHelper.newReader(banList)) {
-    			String line = reader.readLine();
-				while (line != null) {
-					if (!line.isEmpty()) {
-						String[] parts = line.split(" ");
-						if (parts.length > 1)
-							this.banList.put(parts[0], new Entry(Integer.parseInt(parts[1])));
-					}
-	                line = reader.readLine();
-	            }
-    		} catch (IOException ioexc) {
-        		LogHelper.error(ioexc);
-        	}
-    	if (Files.exists(whiteList))
-			try (BufferedReader reader = IOHelper.newReader(whiteList)) {
-				String line = reader.readLine();
-				while (line != null) {
-					if (!line.isEmpty()) this.whiteList.add(line);
-	                line = reader.readLine();
-	            }
-			} catch (IOException ioexc) {
-				LogHelper.error(ioexc);
-			}
-		else {
-			this.whiteList.add("localhost");
-    		this.whiteList.add("127.0.0.1");
-    	} 
+        this.whiteList.clear();
+        this.banList.clear();
+        if (Files.exists(banList) && mod.config.saveBans)
+            try (BufferedReader reader = IOHelper.newReader(banList)) {
+                String line = reader.readLine();
+                while (line != null) {
+                    if (!line.isEmpty()) {
+                        String[] parts = line.split(" ");
+                        if (parts.length > 1)
+                            this.banList.put(parts[0], new Entry(Integer.parseInt(parts[1])));
+                    }
+                    line = reader.readLine();
+                }
+            } catch (IOException ioexc) {
+                LogHelper.error(ioexc);
+            }
+        if (Files.exists(whiteList))
+            try (BufferedReader reader = IOHelper.newReader(whiteList)) {
+                String line = reader.readLine();
+                while (line != null) {
+                    if (!line.isEmpty()) this.whiteList.add(line);
+                    line = reader.readLine();
+                }
+            } catch (IOException ioexc) {
+                LogHelper.error(ioexc);
+            }
+        else {
+            this.whiteList.add("localhost");
+            this.whiteList.add("127.0.0.1");
+        }
     }
+
     public Map<String, Entry> banList = new ConcurrentHashMap<>();
     public Set<String> whiteList = Collections.newSetFromMap(new ConcurrentHashMap<>());
 }

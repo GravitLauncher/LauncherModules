@@ -251,7 +251,7 @@ public class SignerJar implements AutoCloseable {
 
         List<Certificate> certChain = new ArrayList<>(Arrays.asList(keyStore.getCertificateChain(keyAlias)));
         @SuppressWarnings("rawtypes")
-		Store certStore = new JcaCertStore(certChain);
+        Store certStore = new JcaCertStore(certChain);
         Certificate cert = keyStore.getCertificate(keyAlias);
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, password != null ? password.toCharArray() : null);
         ContentSigner signer = new JcaContentSignerBuilder("SHA256WITHRSA").setProvider("BC").build(privateKey);
