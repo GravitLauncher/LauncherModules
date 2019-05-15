@@ -21,13 +21,13 @@
  */
 package com.github.wolf480pl.phpass;
 
-import java.io.UnsupportedEncodingException;
+import org.mindrot.jbcrypt.BCrypt;
+
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
-
-import org.mindrot.jbcrypt.BCrypt;
 
 public class PHPass {
     private static String itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -123,15 +123,11 @@ public class PHPass {
     }
 
     private byte[] stringToUtf8(String string) {
-        try {
-            return string.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new UnsupportedOperationException("This system doesn't support UTF-8!", e);
-        }
+        return string.getBytes(StandardCharsets.UTF_8);
     }
 
     public String hashPassword(String password) {
-        byte random[] = new byte[6];
+        byte[] random = new byte[6];
         this.randomGen.nextBytes(random);
         // Unportable hashes (Blowfish, EXT_DES) could be added here, but I won't do this.
         String hash = cryptPrivate(password, gensaltPrivate(stringToUtf8(new String(random))));

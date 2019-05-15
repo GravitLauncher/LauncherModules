@@ -1,5 +1,6 @@
 package ru.gravit.launchermodules.addhash;
 
+import com.github.wolf480pl.phpass.PHPass;
 import ru.gravit.launcher.ClientPermissions;
 import ru.gravit.launchserver.LaunchServer;
 import ru.gravit.launchserver.auth.AuthException;
@@ -13,8 +14,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import com.github.wolf480pl.phpass.PHPass;
 
 public final class MySQLPhpHashAuthProvider extends AuthProvider {
     private MySQLSourceConfig mySQLHolder;

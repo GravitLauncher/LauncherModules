@@ -1,10 +1,5 @@
 package ru.gravit.launchermodules.jarsigner;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Path;
-
 import ru.gravit.launcher.Launcher;
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
@@ -13,6 +8,11 @@ import ru.gravit.launchserver.modules.LaunchServerModuleContext;
 import ru.gravit.utils.Version;
 import ru.gravit.utils.helper.IOHelper;
 import ru.gravit.utils.helper.LogHelper;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Path;
 
 public class ModuleImpl implements Module, Reloadable  {
     public static final Version version = new Version(0, 1, 0, 0, Version.Type.EXPERIMENTAL);

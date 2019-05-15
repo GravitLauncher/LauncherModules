@@ -3,7 +3,6 @@ package ru.gravit.launchermodules.legacysupport;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import ru.gravit.launchserver.auth.provider.AuthProvider;
 import ru.gravit.launchserver.auth.provider.AuthProviderResult;
 import ru.gravit.utils.HTTPRequest;
@@ -29,7 +28,8 @@ public final class MojangAuthProvider extends AuthProvider {
 	{
         public String name;
         public int version;
-	};
+	}
+
     public static class mojangAuth {
         public mojangAuth(String username, String password) {
             this.username = username;

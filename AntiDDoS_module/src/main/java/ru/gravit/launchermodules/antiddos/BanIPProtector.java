@@ -78,7 +78,7 @@ public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, S
     	if (mod.config.saveBans)
     		try (PrintWriter out = new PrintWriter(IOHelper.newWriter(banList))) {
     			this.banList.forEach((k, v) -> {
-    				if (v.fails >= mod.config.maxFails) out.println(k + " " + Integer.toString(v.fails));
+    				if (v.fails >= mod.config.maxFails) out.println(k + " " + v.fails);
     			});
     		} catch (IOException ioexc) {
     			LogHelper.error(ioexc);

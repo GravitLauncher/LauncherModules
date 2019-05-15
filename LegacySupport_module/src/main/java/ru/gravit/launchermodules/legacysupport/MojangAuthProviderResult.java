@@ -1,8 +1,8 @@
 package ru.gravit.launchermodules.legacysupport;
 
-import java.util.UUID;
-
 import ru.gravit.launchserver.auth.provider.AuthProviderResult;
+
+import java.util.UUID;
 
 public final class MojangAuthProviderResult extends AuthProviderResult {
     public final UUID uuid;
