@@ -156,7 +156,7 @@ public class PHPass {
                 }
             }
             if (md == null && storedHash.startsWith("$2")) {
-                return BCrypt.checkpw(password, storedHash);
+                return BCrypt.checkpw(password, "$2a" + storedHash.substring(3));
             }
             if (md == null && storedHash.startsWith("$1$")) {
                 try {
