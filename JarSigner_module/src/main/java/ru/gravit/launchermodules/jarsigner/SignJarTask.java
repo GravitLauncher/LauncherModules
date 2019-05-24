@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
 public class SignJarTask implements LauncherBuildTask {
@@ -34,14 +35,15 @@ public class SignJarTask implements LauncherBuildTask {
              JarInputStream input = new JarInputStream(IOHelper.newInput(inputFile))) {
             ZipEntry e = input.getNextEntry();
             while (e != null) {
-                if ("META-INF/MANIFEST.MF".equals(e.getName())) {
+                if ("META-INF/MANIFEST.MF".equals(e.getName()) || "/META-INF/MANIFEST.MF".equals(e.getName())) {
+                	Manifest m = new Manifest(input);
+                	m.getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
                 	e = input.getNextEntry();
                 	continue;
                 }
                 output.addFileContents(e, input);
                 e = input.getNextEntry();
             }
-            input.getManifest().getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
         }
         return toRet;
     }
