@@ -36,10 +36,10 @@ public class SignJarTask implements LauncherBuildTask {
             ZipEntry e = input.getNextEntry();
             while (e != null) {
                 if ("META-INF/MANIFEST.MF".equals(e.getName()) || "/META-INF/MANIFEST.MF".equals(e.getName())) {
-                	Manifest m = new Manifest(input);
-                	m.getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
-                	e = input.getNextEntry();
-                	continue;
+                    Manifest m = new Manifest(input);
+                    m.getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
+                    e = input.getNextEntry();
+                    continue;
                 }
                 output.addFileContents(e, input);
                 e = input.getNextEntry();
