@@ -44,7 +44,7 @@ public class ServerScriptEngine {
         try {
             mappings = JarHelper.jarMap(LaunchServer.class, false);
             for (Map.Entry<String, String> e : mappings.entrySet()) {
-                if (!e.getValue().startsWith("ru.gravit")) continue; //Отсекаем библиотеки
+                if (!e.getValue().startsWith("pro.gravit")) continue; //Отсекаем библиотеки
                 try {
                     Class<?> clazz = Class.forName(e.getValue(), false, ClassLoader.getSystemClassLoader());
                     String bindClassName = e.getKey() + "Class";
