@@ -1,4 +1,4 @@
-def mainClassName = "ru.gravit.launchermodules.systemdnotify.SystemdNotifyModule"
+def mainClassName = "pro.gravit.launchermodules.systemdnotify.SystemdNotifyModule"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'

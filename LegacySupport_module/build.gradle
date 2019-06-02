@@ -1,4 +1,4 @@
-def mainClassName = "ru.gravit.launchermodules.legacysupport.ModuleImpl"
+def mainClassName = "pro.gravit.launchermodules.legacysupport.ModuleImpl"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
