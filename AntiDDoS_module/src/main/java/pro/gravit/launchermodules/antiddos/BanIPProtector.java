@@ -1,10 +1,5 @@
 package pro.gravit.launchermodules.antiddos;
 
-import pro.gravit.launchserver.manangers.hook.SocketHookManager;
-import pro.gravit.launchserver.socket.ServerSocketHandler;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,6 +11,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import pro.gravit.launchserver.manangers.hook.SocketHookManager;
+import pro.gravit.launchserver.socket.ServerSocketHandler;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 public class BanIPProtector implements SocketHookManager.SocketFatalErrorHook, ServerSocketHandler.Listener {
     private AntiDDoSModule mod;

@@ -1,11 +1,11 @@
 package pro.gravit.launchermodules.systemdnotify;
 
+import java.io.IOException;
+
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
-
-import java.io.IOException;
 
 public class SystemdNotifyModule implements Module {
     public static Version version = new Version(1, 0, 0);

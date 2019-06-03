@@ -1,15 +1,15 @@
 package pro.gravit.launchermodules.jarsigner;
 
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
-import pro.gravit.utils.helper.IOHelper;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
+
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
+import pro.gravit.utils.helper.IOHelper;
 
 public class SignJarTask implements LauncherBuildTask {
 

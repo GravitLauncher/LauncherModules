@@ -1,16 +1,17 @@
 package pro.gravit.launchermodules.legacysupport;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import pro.gravit.launchserver.auth.provider.AuthProvider;
-import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.utils.HTTPRequest;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 import java.util.regex.Pattern;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import pro.gravit.launchserver.auth.provider.AuthProvider;
+import pro.gravit.launchserver.auth.provider.AuthProviderResult;
+import pro.gravit.utils.HTTPRequest;
 
 public final class MojangAuthProvider extends AuthProvider {
     private static final Pattern UUID_REGEX = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");

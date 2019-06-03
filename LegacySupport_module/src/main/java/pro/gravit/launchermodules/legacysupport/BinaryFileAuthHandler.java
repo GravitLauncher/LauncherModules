@@ -1,19 +1,26 @@
 package pro.gravit.launchermodules.legacysupport;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launcher.serialize.stream.StreamObject;
-import pro.gravit.utils.helper.*;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.utils.helper.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import pro.gravit.utils.helper.CommonHelper;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
+import pro.gravit.utils.helper.SecurityHelper;
+import pro.gravit.utils.helper.VerifyHelper;
 
 public final class BinaryFileAuthHandler extends AuthHandler {
     public static final class Entry extends StreamObject {

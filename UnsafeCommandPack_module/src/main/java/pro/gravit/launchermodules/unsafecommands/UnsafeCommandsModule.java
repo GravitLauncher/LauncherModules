@@ -2,8 +2,8 @@ package pro.gravit.launchermodules.unsafecommands;
 
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.utils.Version;
 
 public class UnsafeCommandsModule implements Module {
     public static Version version = new Version(1, 0, 0);

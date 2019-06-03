@@ -1,18 +1,18 @@
 package pro.gravit.launchermodules.jarsigner;
 
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launchserver.Reloadable;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
+
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.modules.Module;
+import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launchserver.Reloadable;
+import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.utils.Version;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 public class ModuleImpl implements Module, Reloadable {
     public static final Version version = new Version(0, 1, 0, 0, Version.Type.EXPERIMENTAL);

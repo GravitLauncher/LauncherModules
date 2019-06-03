@@ -2,8 +2,8 @@ package pro.gravit.launchermodules.addhash;
 
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
+import pro.gravit.utils.Version;
 
 public class AddHashModule implements Module {
     private static boolean registred = false;

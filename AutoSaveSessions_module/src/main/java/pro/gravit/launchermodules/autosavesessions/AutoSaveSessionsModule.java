@@ -1,16 +1,5 @@
 package pro.gravit.launchermodules.autosavesessions;
 
-import com.google.gson.reflect.TypeToken;
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
-import pro.gravit.launchserver.socket.Client;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -19,6 +8,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
+
+import com.google.gson.reflect.TypeToken;
+
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.modules.Module;
+import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launchserver.socket.Client;
+import pro.gravit.utils.Version;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 public class AutoSaveSessionsModule implements Module {
     public static Version version = new Version(1, 0, 0);

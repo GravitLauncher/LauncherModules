@@ -21,13 +21,13 @@
  */
 package com.github.wolf480pl.phpass;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 public class PHPass {
     private static String itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

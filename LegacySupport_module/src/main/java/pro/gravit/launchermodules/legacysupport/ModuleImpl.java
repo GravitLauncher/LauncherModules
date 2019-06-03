@@ -2,10 +2,10 @@ package pro.gravit.launchermodules.legacysupport;
 
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.texture.TextureProvider;
+import pro.gravit.utils.Version;
 
 public class ModuleImpl implements Module {
     private static boolean registred = false;

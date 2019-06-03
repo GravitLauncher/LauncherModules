@@ -1,19 +1,20 @@
 package pro.gravit.launchermodules.legacysupport;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import pro.gravit.launchserver.auth.handler.AuthHandler;
-import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.utils.HTTPRequest;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import pro.gravit.launchserver.auth.handler.AuthHandler;
+import pro.gravit.launchserver.auth.provider.AuthProviderResult;
+import pro.gravit.utils.HTTPRequest;
+import pro.gravit.utils.helper.LogHelper;
 
 public class MojangAuthHandler extends AuthHandler {
     public HashMap<String, UUID> usernameToUUID = new HashMap<>();

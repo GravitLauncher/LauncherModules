@@ -1,10 +1,10 @@
 package pro.gravit.launchermodules.serverscript;
 
+import java.util.Map;
+
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.LogHelper;
-
-import java.util.Map;
 
 public class ScriptMappingsCommand extends Command {
     public ScriptMappingsCommand(LaunchServer server) {

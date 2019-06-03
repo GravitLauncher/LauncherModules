@@ -1,20 +1,20 @@
 package pro.gravit.launchermodules.antiddos;
 
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.Reconfigurable;
-import pro.gravit.launchserver.Reloadable;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
+
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.modules.Module;
+import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.Reconfigurable;
+import pro.gravit.launchserver.Reloadable;
+import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.utils.Version;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 public class AntiDDoSModule implements Module, Reloadable, Reconfigurable {
     public static final Version version = new Version(1, 0, 1, 3, Version.Type.BETA);

@@ -1,24 +1,25 @@
 package pro.gravit.launchermodules.legacysupport;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import pro.gravit.launcher.LauncherAPI;
-import pro.gravit.launcher.profiles.Texture;
-import pro.gravit.utils.HTTPRequest;
-import pro.gravit.utils.helper.VerifyHelper;
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launchserver.auth.texture.TextureProvider;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.LauncherAPI;
+import pro.gravit.launcher.profiles.Texture;
+import pro.gravit.launchserver.auth.texture.TextureProvider;
+import pro.gravit.utils.HTTPRequest;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
+import pro.gravit.utils.helper.VerifyHelper;
 
 public final class MojangTextureProvider extends TextureProvider {
     public class EmptyObject {

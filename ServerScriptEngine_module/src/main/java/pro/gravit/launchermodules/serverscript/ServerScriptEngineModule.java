@@ -2,8 +2,8 @@ package pro.gravit.launchermodules.serverscript;
 
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.utils.Version;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.utils.Version;
 
 public class ServerScriptEngineModule implements Module {
     public static Version version = new Version(1, 1, 0);
