@@ -36,13 +36,14 @@ public final class MySQLPhpHashAuthProvider extends AuthProvider {
             // Execute SQL query
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
-                return set.next() ? pass.checkPassword(password, set.getString(1)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : LaunchServer.server.config.permissionsHandler.getPermissions(set.getString(1))) : authError(message) : authError(message);
+                return set.next() ? pass.checkPassword(password, set.getString(1)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : srv.config.permissionsHandler.getPermissions(set.getString(1))) : authError(message) : authError(message);
             }
         }
     }
 
     @Override
-    public void init() {
+    public void init(LaunchServer srv) {
+    	super.init(srv);
         pass = new PHPass(passIterationCountLog2);
     }
 

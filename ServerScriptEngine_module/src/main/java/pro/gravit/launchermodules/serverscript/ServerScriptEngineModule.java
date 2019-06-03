@@ -33,7 +33,7 @@ public class ServerScriptEngineModule implements Module {
     public void postInit(ModuleContext context1) {
         LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
         scriptEngine = new ServerScriptEngine();
-        scriptEngine.initBaseBindings();
+        scriptEngine.initBaseBindings(context.launchServer);
         context.launchServer.commandHandler.registerCommand("eval", new EvalCommand(context.launchServer));
         context.launchServer.commandHandler.registerCommand("scriptMappings", new ScriptMappingsCommand(context.launchServer));
     }

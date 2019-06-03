@@ -26,6 +26,7 @@ public class AutoSaveSessionsModule implements Module {
     public static String FILENAME = "sessions.json";
     public static boolean isClearSessionsBeforeSave = true;
     public Path file;
+	private LaunchServer srv;
 
     @Override
     public String getName() {
@@ -58,6 +59,7 @@ public class AutoSaveSessionsModule implements Module {
                 LogHelper.error(e);
             }
         }
+        srv = context.launchServer;
         file = configDir.resolve(FILENAME);
         if (IOHelper.exists(file)) {
             LogHelper.info("Load sessions from %s", FILENAME);
@@ -66,7 +68,7 @@ public class AutoSaveSessionsModule implements Module {
             try (Reader reader = IOHelper.newReader(file)) {
                 Set<Client> clientSet = Launcher.gsonManager.configGson.fromJson(reader, setType);
                 for (Client client : clientSet) {
-                    if (client.isAuth) client.updateAuth();
+                    if (client.isAuth) client.updateAuth(srv);
                 }
                 context.launchServer.sessionManager.loadSessions(clientSet);
                 LogHelper.info("Loaded %d sessions", clientSet.size());
@@ -84,9 +86,9 @@ public class AutoSaveSessionsModule implements Module {
     @Override
     public void close() {
         if (isClearSessionsBeforeSave) {
-            LaunchServer.server.sessionManager.garbageCollection();
+        	srv.sessionManager.garbageCollection();
         }
-        Set<Client> clientSet = LaunchServer.server.sessionManager.getSessions();
+        Set<Client> clientSet = srv.sessionManager.getSessions();
         try (Writer writer = IOHelper.newWriter(file)) {
             LogHelper.info("Write sessions to %s", FILENAME);
             Launcher.gsonManager.configGson.toJson(clientSet, writer);

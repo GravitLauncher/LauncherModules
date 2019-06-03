@@ -32,15 +32,15 @@ public class ServerScriptEngine {
         return engine.eval(line, engine.getBindings(ScriptContext.ENGINE_SCOPE));
     }
 
-    public void initBaseBindings() {
-        setScriptBindings();
+    public void initBaseBindings(LaunchServer launchServer) {
+        setScriptBindings(launchServer);
     }
 
-    private void setScriptBindings() {
+    private void setScriptBindings(LaunchServer server) {
         LogHelper.info("Setting up script engine bindings");
         Bindings bindings = engine.getBindings(ScriptContext.ENGINE_SCOPE);
         bindings.put("engine", this);
-        bindings.put("launchserver", LaunchServer.server);
+        bindings.put("launchserver", server);
 
         try {
             mappings = JarHelper.jarMap(LaunchServer.class, false);
