@@ -1,4 +1,4 @@
-package ru.gravit.launchermodules.systemdnotify;
+package ru.gravit.launchermodules.dontuseallmodules;
 
 import ru.gravit.launcher.modules.Module;
 import ru.gravit.launcher.modules.ModuleContext;
@@ -7,12 +7,12 @@ import ru.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
 
-public class SystemdNotifyModule implements Module {
+public class DontUseAllModulesModule implements Module {
     public static Version version = new Version(1, 0, 0);
 
     @Override
     public String getName() {
-        return "SystemdNotifer";
+        return "DontUseAllModules";
     }
 
     @Override
@@ -36,18 +36,14 @@ public class SystemdNotifyModule implements Module {
 
     @Override
     public void finish(ModuleContext moduleContext) {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("systemd-notify", "--ready");
-        try {
-            processBuilder.start();
-            LogHelper.debug("Systemd notify successful");
-        } catch (IOException e) {
-            LogHelper.error(e);
-        }
+
     }
 
     @Override
     public void preInit(ModuleContext moduleContext) {
+        LogHelper.error("DONT USE ALL MODULES");
+        LogHelper.error("ONLY USE THOSE MODULES YOU NEED");
+        System.exit(0);
     }
 
     @Override
