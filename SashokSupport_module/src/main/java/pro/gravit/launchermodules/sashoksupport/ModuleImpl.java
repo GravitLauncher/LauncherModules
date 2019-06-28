@@ -1,10 +1,13 @@
-package pro.gravit.launchermodules.legacysupport;
+package pro.gravit.launchermodules.sashoksupport;
 
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
+import pro.gravit.launchermodules.sashoksupport.socket.ServerSocketHandler;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.texture.TextureProvider;
+import pro.gravit.launchserver.components.Component;
 import pro.gravit.utils.Version;
 
 public class ModuleImpl implements Module {
@@ -38,9 +41,8 @@ public class ModuleImpl implements Module {
     @Override
     public void preInit(ModuleContext context1) {
         if (!registred) {
-            AuthHandler.providers.register("mojang", MojangAuthHandler.class);
-            AuthProvider.providers.register("mojang", MojangAuthProvider.class);
-            TextureProvider.providers.register("mojang", MojangTextureProvider.class);
+            AuthHandler.providers.register("binaryFile", BinaryFileAuthHandler.class);
+            Component.providers.register("legacyServer", LegacyServerComponent.class);
             registred = true;
         }
     }

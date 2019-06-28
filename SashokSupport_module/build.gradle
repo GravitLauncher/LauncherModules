@@ -1,4 +1,4 @@
-def mainClassName = "pro.gravit.launchermodules.antiddos.AntiDDoSModule"
+def mainClassName = "pro.gravit.launchermodules.sashoksupport.ModuleImpl"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'

@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.legacysupport;
+package pro.gravit.launchermodules.sashoksupport;
 
 import java.io.File;
 import java.io.IOException;
