@@ -13,6 +13,8 @@ public class LegacyServerComponent extends Component {
     public static boolean registerCommands = false;
     public String bindAddress;
     public int port;
+    public int threadCoreCount;
+    public int threadCount;
     public ServerSocketHandler handler;
     public SocketAddress getSocketAddress() {
         return new InetSocketAddress(bindAddress, port);
