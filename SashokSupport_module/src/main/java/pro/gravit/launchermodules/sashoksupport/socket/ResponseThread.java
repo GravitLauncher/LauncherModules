@@ -86,7 +86,7 @@ public final class ResponseThread implements Runnable {
             LogHelper.info("Connection #%d", session);
 
         // Choose response based on type
-        Response response = Response.getResponse(type, server, session, input, output);
+        Response response = Response.getResponse(type, handler.component, session, input, output);
 
         // Reply
         response.reply();

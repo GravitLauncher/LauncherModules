@@ -4,6 +4,7 @@ import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.request.RequestType;
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
+import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LauncherResponse;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LegacyLauncherResponse;
 import pro.gravit.launchserver.LaunchServer;
@@ -18,13 +19,13 @@ public abstract class Response {
     @FunctionalInterface
     public interface Factory<R> {
 
-        Response newResponse(LaunchServer server, long id, HInput input, HOutput output);
+        Response newResponse(LegacyServerComponent component, long id, HInput input, HOutput output);
     }
 
     private static final Map<Integer, Factory<?>> RESPONSES = new ConcurrentHashMap<>(8);
 
-    public static Response getResponse(int type, LaunchServer server, long session, HInput input, HOutput output) {
-        return RESPONSES.get(type).newResponse(server, session, input, output);
+    public static Response getResponse(int type, LegacyServerComponent component, long session, HInput input, HOutput output) {
+        return RESPONSES.get(type).newResponse(component, session, input, output);
     }
 
     public static void registerResponse(int type, Factory<?> factory) {
@@ -43,7 +44,7 @@ public abstract class Response {
     }
 
 
-    protected final LaunchServer server;
+    protected final LegacyServerComponent component;
 
 
     protected final HInput input;
@@ -54,8 +55,8 @@ public abstract class Response {
 
     protected final long session;
 
-    protected Response(LaunchServer server, long session, HInput input, HOutput output) {
-        this.server = server;
+    protected Response(LegacyServerComponent component, long session, HInput input, HOutput output) {
+        this.component = component;
         this.input = input;
         this.output = output;
         this.session = session;

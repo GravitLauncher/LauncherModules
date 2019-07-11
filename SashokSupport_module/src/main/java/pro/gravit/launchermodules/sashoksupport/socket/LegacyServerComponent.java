@@ -8,6 +8,8 @@ import pro.gravit.utils.helper.CommonHelper;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class LegacyServerComponent extends Component {
     public static boolean registerCommands = false;
@@ -15,13 +17,18 @@ public class LegacyServerComponent extends Component {
     public int port;
     public int threadCoreCount;
     public int threadCount;
-    public ServerSocketHandler handler;
+    public String launcherFile;
+    public String launcherEXEFile;
+    public transient Path launcher;
+    public transient Path launcherEXE;
+    public transient LaunchServer launchServer;
+    public transient ServerSocketHandler handler;
     public SocketAddress getSocketAddress() {
         return new InetSocketAddress(bindAddress, port);
     }
     @Override
     public void preInit(LaunchServer launchServer) {
-
+        this.launchServer = launchServer;
     }
 
     @Override
@@ -31,6 +38,8 @@ public class LegacyServerComponent extends Component {
 
     @Override
     public void postInit(LaunchServer launchServer) {
+        launcher = Paths.get(launcherFile);
+        launcherEXE = Paths.get(launcherEXEFile);
         handler = new ServerSocketHandler(launchServer, this);
         CommonHelper.newThread("Legacy Sashok Server", true, handler);
         if(!registerCommands)
