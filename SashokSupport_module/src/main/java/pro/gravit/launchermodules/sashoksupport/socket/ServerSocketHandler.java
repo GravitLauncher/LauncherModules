@@ -108,7 +108,7 @@ public final class ServerSocketHandler implements Runnable, AutoCloseable {
 
 
                 // Reply in separate thread
-                threadPool.execute(new ResponseThread(server, this, id, socket, sessionManager));
+                threadPool.execute(new ResponseThread(server, this, socket, sessionManager));
             }
         } catch (IOException e) {
             // Ignore error after close/rebind

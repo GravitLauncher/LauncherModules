@@ -33,7 +33,7 @@ public final class ResponseThread implements Runnable {
     private final SessionManager sessions;
     private final ServerSocketHandler handler;
 
-    public ResponseThread(LaunchServer server, ServerSocketHandler handler, long id, Socket socket, SessionManager sessionManager) throws SocketException {
+    public ResponseThread(LaunchServer server, ServerSocketHandler handler, Socket socket, SessionManager sessionManager) throws SocketException {
         this.server = server;
         this.socket = socket;
         sessions = sessionManager;
