@@ -40,27 +40,27 @@ public class AutoReHashModule implements Module {
         } catch (IOException e) {
             LogHelper.error(e.toString());
         }
-	}
+    }
 
     @Override
     public void init(ModuleContext context1) {
         LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
-		Runnable task = () -> {
-			try {
-				while (true) {
-					WatchKey key = watchService.take();
-					for (WatchEvent<?> event : key.pollEvents()) {
-						LogHelper.debug("Rehashing updates for you");
-						context.launchServer.syncUpdatesDir(null);
-					}
-					key.reset();
-				}
-			} catch (InterruptedException | IOException e) {
-				LogHelper.error(e.toString());
-			}
-		};
-		Thread thread = new Thread(task);
-		thread.start();
+        Runnable task = () -> {
+            try {
+                while (true) {
+                    WatchKey key = watchService.take();
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        LogHelper.debug("Rehashing updates for you");
+                        context.launchServer.syncUpdatesDir(null);
+                    }
+                    key.reset();
+                }
+            } catch (InterruptedException | IOException e) {
+                LogHelper.error(e.toString());
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class AutoReHashModule implements Module {
     }
 
     @Override
-    public void close()  {
+    public void close() {
 
     }
 }
