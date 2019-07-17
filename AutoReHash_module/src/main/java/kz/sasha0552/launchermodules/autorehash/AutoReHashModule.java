@@ -1,13 +1,22 @@
 package kz.sasha0552.launchermodules.autorehash;
 
+import pro.gravit.launcher.hasher.HashedDir;
+import pro.gravit.launcher.hasher.HashedFile;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static pro.gravit.utils.helper.CommonHelper.newThread;
 
 public class AutoReHashModule implements Module {
     public static Version version = new Version(1, 0, 0);
@@ -59,7 +68,7 @@ public class AutoReHashModule implements Module {
                 LogHelper.error(e.toString());
             }
         };
-        Thread thread = new Thread(task);
+        Thread thread = newThread("ReHashing", true, task);
         thread.start();
     }
 
