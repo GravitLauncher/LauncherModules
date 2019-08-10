@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.launchermoduleloader;
 
+import javassist.NotFoundException;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
 import pro.gravit.launchserver.LaunchServer;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipInputStream;
@@ -84,12 +86,19 @@ public class LauncherModuleLoaderModule implements Module {
             }
             server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
             server.buildHookManager.registerHook((buildContext) -> {
+                HashSet<String> fileList = new HashSet<>();
+                fileList.add("META-INF/MANIFEST.MF");
                 for(Path file : module_jars)
                 {
+                    try {
+                        buildContext.config.pool.appendClassPath(file.toString());
+                    } catch (NotFoundException e) {
+                        LogHelper.error(e);
+                    }
                     LogHelper.debug("Put %s launcher module", file.toString());
                     try(ZipInputStream input = new ZipInputStream(IOHelper.newInput(file)))
                     {
-                        buildContext.pushJarFile(input, buildContext.fileList);
+                        buildContext.pushJarFile(input, fileList);
                     } catch (IOException e) {
                         LogHelper.error(e);
                     }
