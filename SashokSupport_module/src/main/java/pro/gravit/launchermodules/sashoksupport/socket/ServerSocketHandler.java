@@ -100,7 +100,8 @@ public final class ServerSocketHandler implements Runnable, AutoCloseable {
                 Socket socket = serverSocket.accept();
 
                 // Invoke pre-connect listener
-                long id = idCounter.incrementAndGet();
+                @SuppressWarnings("unused")
+				long id = idCounter.incrementAndGet();
                 if (listener != null && !listener.onConnect(socket.getInetAddress())) {
                     socket.close();
                     continue; // Listener didn't accepted this connection

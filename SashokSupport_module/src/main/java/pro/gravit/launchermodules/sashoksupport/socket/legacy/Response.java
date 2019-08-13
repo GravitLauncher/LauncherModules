@@ -7,8 +7,6 @@ import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LauncherResponse;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LegacyLauncherResponse;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.socket.Client;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;

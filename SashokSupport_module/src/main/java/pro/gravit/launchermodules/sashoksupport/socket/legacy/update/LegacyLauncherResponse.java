@@ -4,9 +4,6 @@ import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.Response;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.binary.LauncherBinary;
-import pro.gravit.launchserver.socket.Client;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
