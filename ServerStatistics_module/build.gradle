@@ -1,0 +1,10 @@
+def mainClassName = "pro.gravit.launchermodules.statistics.ServerStatisticsModule"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+dependencies {
+}
+jar {
+    manifest.attributes("Main-Class": mainClassName)
+}
