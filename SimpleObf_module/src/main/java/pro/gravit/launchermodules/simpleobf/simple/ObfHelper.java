@@ -10,11 +10,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Base64;
+import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -22,6 +24,7 @@ public class ObfHelper {
 	public static final MethodNode INDY_SPEC;
 	public static final MethodNode INDY_STAT;
 	public static final MethodNode INDY_VIRT;
+	public static final MethodNode СHECK_CLAZZ;
 
 	static {
 		final ClassNode node = new ClassNode();
@@ -30,7 +33,7 @@ public class ObfHelper {
 		} catch (final IOException e) {
 			throw new IOError(e);
 		}
-		MethodNode iSt = null, iVr = null, iSp = null;
+		MethodNode iSt = null, iVr = null, iSp = null, iCh = null;
 		for (final MethodNode m : node.methods) {
 			if (!m.name.startsWith("bootstrap"))
 				continue;
@@ -44,6 +47,9 @@ public class ObfHelper {
 			case "bootstrapSpecial":
 				iSp = m;
 				break;
+			case "bootstrapСheckCerts":
+				iCh = m;
+				break;
 			default:
 				break;
 			}
@@ -51,12 +57,32 @@ public class ObfHelper {
 		INDY_STAT = iSt;
 		INDY_VIRT = iVr;
 		INDY_SPEC = iSp;
+		СHECK_CLAZZ = iCh;
 	}
 
 	public static void accept(final ClassVisitor classVisitor, final MethodNode n, final String newName) {
 		final MethodVisitor methodVisitor = classVisitor.visitMethod(n.access, newName, n.desc, n.signature, null);
 		if (methodVisitor != null)
 			n.accept(methodVisitor);
+	}
+
+	public static void acceptRepType(final MethodNode n, final MethodVisitor mw, final boolean returnT, Map<Type, Type> replace) {
+		if (mw != null)
+			n.accept(new MethodVisitor(Opcodes.ASM7, mw) {
+				@Override public void visitCode() { }
+				@Override public void visitEnd() { }
+				@Override public void visitLdcInsn(Object val) {
+					if (val instanceof Type) {
+						super.visitLdcInsn(replace.getOrDefault(val, (Type) val));
+					} else {
+						super.visitLdcInsn(val);
+					}
+				}
+				@Override public void visitInsn(int opcode) {
+					if (opcode == Opcodes.RETURN && returnT) return;
+					super.visitInsn(opcode);
+				}
+			});
 	}
 
 	public static CallSite bootstrapSpecial(final MethodHandles.Lookup caller, final String name, final MethodType type)
@@ -66,6 +92,15 @@ public class ObfHelper {
 				Class.forName(daos.readUTF()));
 
 		return new ConstantCallSite(mh);
+	}
+
+	public static void bootstrapСheckCerts() {
+		if (Object.class.getSigners() == null) {
+			try {
+				System.exit(0);
+			} catch (Throwable e) { }
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public static CallSite bootstrapStatic(final MethodHandles.Lookup caller, final String name, final MethodType type)

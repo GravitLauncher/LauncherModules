@@ -22,10 +22,12 @@ public class ModuleImpl implements Module, Reloadable {
     public static class Config {
         public boolean simpleIndy = true;
         public boolean stripNOP = true;
+        public boolean certCheck = false;
     }
 
     public Path configFile = null;
     public Config config = null;
+    public boolean certCheck = false;
 
     @Override
     public void close() {
@@ -78,7 +80,7 @@ public class ModuleImpl implements Module, Reloadable {
                 LogHelper.error(e);
             }
         }
-        
+        certCheck = context.launchServer.modulesManager.modules.stream().anyMatch(e -> e.getName().equals("JarSigner"));	
         TaskUtil.add(context.launchServer.launcherBinary.tasks, t -> t instanceof AdditionalFixesApplyTask, new SimpleObfTask(context.launchServer, this));
     }
 

@@ -18,6 +18,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 
 import pro.gravit.launchermodules.simpleobf.simple.NOPRemover;
+import pro.gravit.launchermodules.simpleobf.simple.SimpleCertCheck;
 import pro.gravit.launchermodules.simpleobf.simple.SimpleInvokeDynamicObf;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.asm.ClassMetadataReader;
@@ -53,6 +54,7 @@ public class SimpleObfTask implements LauncherBuildTask {
     	List<Transformer> aTrans = new ArrayList<>();
     	List<Processor> aProc = new ArrayList<>();
     	if (i.config.stripNOP) aTrans.add(new NOPRemover());
+    	if (i.certCheck && i.config.certCheck) aTrans.add(new SimpleCertCheck());
     	if (i.config.simpleIndy) aProc.add(new SimpleInvokeDynamicObf());
     	try (ClassMetadataReader reader = new ClassMetadataReader()) {
             reader.getCp().add(new JarFile(inputFile.toFile()));
