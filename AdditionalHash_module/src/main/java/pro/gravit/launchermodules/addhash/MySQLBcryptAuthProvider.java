@@ -33,7 +33,7 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
             // Execute SQL query
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
-                return set.next() ? BCrypt.checkpw(password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : srv.config.permissionsHandler.getPermissions(set.getString(1))) : authError(message) : authError(message);
+                return set.next() ? BCrypt.checkpw(password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : srv.config.permissionsHandler.getPermissions(set.getString(2))) : authError(message) : authError(message);
             }
         }
     }
