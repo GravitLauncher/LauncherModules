@@ -8,21 +8,42 @@ if (!project.tasks.findByName('build')) {
     }
 }
 
+subprojects {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    shadowJar {
+        classifier = null
+        configurations = [project.configurations.runtime]
+        exclude 'module-info.class'
+    }
+
+    parent.tasks.bundleZip.dependsOn tasks.shadowJar
+    parent.tasks.bundleZip.from tasks.shadowJar
+}
+
 configure(subprojects.findAll { it.name.endsWith('_module') }) {
-    apply from: '../../scripts/lsrv_module.gradle'
+    dependencies {
+        compileOnly project(':LaunchServer')
+    }
 }
 
 configure(subprojects.findAll { it.name.endsWith('_swmodule') }) {
-    apply from: '../../scripts/srvwrap_module.gradle'
+    dependencies {
+        compileOnly project(':ServerWrapper')
+    }
+    shadowJar {
+        relocate 'io.netty', 'pro.gravit.repackage.io.netty'   
+    }
 }
 
 configure(subprojects.findAll { it.name.endsWith('_lmodule') }) {
-    apply from: '../../scripts/launch_module.gradle'
-}
-
-subprojects {
-    parent.tasks.bundleZip.dependsOn tasks.jar
-    parent.tasks.bundleZip.from tasks.jar
+    dependencies {
+        compileOnly project(':Launcher')
+    }
+    shadowJar {
+        relocate 'org.objectweb.asm', 'pro.gravit.repackage.org.objectweb.asm'    
+        relocate 'io.netty', 'pro.gravit.repackage.io.netty'
+    }
 }
 
 project.tasks.findByName('build').dependsOn tasks.bundleZip

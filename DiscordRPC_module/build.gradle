@@ -1,0 +1,19 @@
+def mainClassName = "pro.gravit.launchermodules.discordrpc.ModuleImpl"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+	jcenter()
+}
+
+dependencies {
+    compileOnly project(':Launcher')
+	compile('club.minnced:java-discord-rpc:2.0.2') {
+		exclude group: 'net.java.dev.jna'
+	}
+}
+
+jar {
+    manifest.attributes("Main-Class": mainClassName)
+}
