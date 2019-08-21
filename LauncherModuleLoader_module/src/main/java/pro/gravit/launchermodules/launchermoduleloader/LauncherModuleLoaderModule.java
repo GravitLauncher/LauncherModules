@@ -1,6 +1,5 @@
 package pro.gravit.launchermodules.launchermoduleloader;
 
-import javassist.NotFoundException;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
 import pro.gravit.launchserver.LaunchServer;
@@ -83,15 +82,15 @@ public class LauncherModuleLoaderModule implements Module {
                     LogHelper.error(e);
                 }
             }
+            HashSet<String> fileList = new HashSet<>();
+            fileList.add("META-INF/MANIFEST.MF");
             server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
             server.buildHookManager.registerHook((buildContext) -> {
-                HashSet<String> fileList = new HashSet<>();
-                fileList.add("META-INF/MANIFEST.MF");
                 for(Path file : module_jars)
                 {
                     try {
-                        buildContext.config.pool.appendClassPath(file.toString());
-                    } catch (NotFoundException e) {
+                        buildContext.data.reader.getCp().add(new JarFile(file.toFile()));
+                    } catch (IOException e) {
                         LogHelper.error(e);
                     }
                     LogHelper.debug("Put %s launcher module", file.toString());

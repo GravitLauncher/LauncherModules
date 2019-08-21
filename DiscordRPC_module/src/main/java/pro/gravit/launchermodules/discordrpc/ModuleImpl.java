@@ -7,7 +7,6 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.jar.JarFile;
 
-import javassist.NotFoundException;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
@@ -57,7 +56,6 @@ public class ModuleImpl implements Module {
 			context.launchServer.buildHookManager.registerClientModuleClass("pro.gravit.launchermodules.discordrpc.ClientModule");
 			context.launchServer.buildHookManager.registerHook(ctx -> {
 				try {
-					ctx.config.pool.appendClassPath(IOHelper.getCodeSource(ModuleImpl.class).toFile().getAbsolutePath());
 					ctx.data.reader.getCp().add(new JarFile(IOHelper.getCodeSource(ModuleImpl.class).toFile()));
 			        ctx.output.putNextEntry(IOHelper.newZipEntry("rpc.config.json"));
 			        ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -66,7 +64,7 @@ public class ModuleImpl implements Module {
 			        w.flush();
 			        ctx.output.write(baos.toByteArray());
 			        ctx.fileList.add("rpc.config.json");
-				} catch (IOException | NotFoundException e) {
+				} catch (IOException e) {
 					LogHelper.error(e);
 				}
 			});
