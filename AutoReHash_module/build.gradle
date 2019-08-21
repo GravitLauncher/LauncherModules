@@ -1,0 +1,8 @@
+def mainClassName = "kz.sasha0552.launchermodules.autorehash.AutoReHashModule"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+jar {
+    manifest.attributes("Main-Class": mainClassName)
+}
