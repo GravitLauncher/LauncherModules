@@ -1,26 +1,23 @@
-package kz.sasha0552.launchermodules.autorehash;
+package pro.gravit.launchermodules.autorehash;
 
-import pro.gravit.launcher.hasher.HashedDir;
-import pro.gravit.launcher.hasher.HashedFile;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static pro.gravit.utils.helper.CommonHelper.newThread;
 
 public class AutoReHashModule implements Module {
     public static Version version = new Version(1, 0, 0);
     private WatchService watchService;
+    private volatile boolean changed = false;
+	private Timer timer;
 
     @Override
     public String getName() {
@@ -59,17 +56,32 @@ public class AutoReHashModule implements Module {
                 while (true) {
                     WatchKey key = watchService.take();
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        LogHelper.debug("Rehashing updates for you");
-                        context.launchServer.syncUpdatesDir(null);
+                    	LogHelper.info("Changed " + (event.context() != null ? event.context().toString() : "unknown") + " kind " + event.kind().name());
+                    	changed = true;
                     }
                     key.reset();
                 }
-            } catch (InterruptedException | IOException e) {
+            } catch (InterruptedException e) {
                 LogHelper.error(e.toString());
             }
         };
         Thread thread = newThread("ReHashing", true, task);
         thread.start();
+        timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (changed) {
+					try {
+						context.launchServer.syncUpdatesDir(null);
+					} catch (IOException e) {
+						LogHelper.error(e);
+					}
+					changed = false;
+				}
+			}
+        	
+        }, 30000, 30000);
     }
 
     @Override

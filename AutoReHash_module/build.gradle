@@ -1,4 +1,4 @@
-def mainClassName = "kz.sasha0552.launchermodules.autorehash.AutoReHashModule"
+def mainClassName = "pro.gravit.launchermodules.autorehash.AutoReHashModule"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
