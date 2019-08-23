@@ -6,15 +6,20 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.jar.JarFile;
+import java.util.zip.ZipInputStream;
+
+import org.objectweb.asm.Type;
 
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.JarHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 public class ModuleImpl implements Module {
+	private static final String keepClass = Type.getInternalName(ModuleImpl.class);
     public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
 	public Path config;
 
@@ -51,11 +56,9 @@ public class ModuleImpl implements Module {
     public void postInit(ModuleContext context1) {
     	LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
     	try {
-			context.launchServer.buildHookManager.registerIncludeClass(DiscordRPC.class.getName(), IOHelper.read(ModuleImpl.class.getResourceAsStream(DiscordRPC.class.getName().replace('.', '/') + ".class")));
-			context.launchServer.buildHookManager.registerIncludeClass(Config.class.getName(), IOHelper.read(ModuleImpl.class.getResourceAsStream(Config.class.getName().replace('.', '/') + ".class")));
 			context.launchServer.buildHookManager.registerClientModuleClass("pro.gravit.launchermodules.discordrpc.ClientModule");
 			context.launchServer.buildHookManager.registerHook(ctx -> {
-				try {
+				try (ZipInputStream in = IOHelper.newZipInput(IOHelper.getCodeSource(ModuleImpl.class))) {
 					ctx.data.reader.getCp().add(new JarFile(IOHelper.getCodeSource(ModuleImpl.class).toFile()));
 			        ctx.output.putNextEntry(IOHelper.newZipEntry("rpc.config.json"));
 			        ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -63,6 +66,13 @@ public class ModuleImpl implements Module {
 			        Config.getOrCreate(config).write(w);
 			        w.flush();
 			        ctx.output.write(baos.toByteArray());
+			        JarHelper.zipWalk(in, (i, e) -> {
+			        	if (!e.getName().startsWith("META-INF") && !e.getName().startsWith(keepClass)) {
+			        		ctx.output.putNextEntry(IOHelper.newZipEntry(e));
+			        		IOHelper.transfer(i, ctx.output);
+					        ctx.fileList.add(e.getName());
+			        	}
+			        });
 			        ctx.fileList.add("rpc.config.json");
 				} catch (IOException e) {
 					LogHelper.error(e);
