@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.launchserver.Reloadable;
 import pro.gravit.launchserver.binary.tasks.AdditionalFixesApplyTask;
 import pro.gravit.launchserver.binary.tasks.TaskUtil;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
@@ -16,7 +15,7 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
-public class ModuleImpl implements Module, Reloadable {
+public class ModuleImpl implements Module {
     public static final Version version = new Version(0, 1, 0, 0, Version.Type.BETA);
 
     public static class Config {
@@ -84,7 +83,7 @@ public class ModuleImpl implements Module, Reloadable {
         TaskUtil.add(context.launchServer.launcherBinary.tasks, t -> t instanceof AdditionalFixesApplyTask, new SimpleObfTask(context.launchServer, this));
     }
 
-    @Override
+
     public void reload() {
         try (Reader reader = IOHelper.newReader(configFile)) {
             config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
