@@ -81,7 +81,7 @@ public class ModuleImpl implements Module {
         context.launchServer.launcherBinary.tasks.add(new SignJarTask(context.launchServer, this));
     }
 
-    
+
     public void reload() {
         try (Reader reader = IOHelper.newReader(configFile)) {
             config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
