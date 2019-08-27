@@ -5,5 +5,5 @@ targetCompatibility = '1.8'
 
 
 jar {
-    manifest.attributes("Main-Class": mainClassName)
+    manifest.attributes("Module-Main-Class": mainClassName)
 }

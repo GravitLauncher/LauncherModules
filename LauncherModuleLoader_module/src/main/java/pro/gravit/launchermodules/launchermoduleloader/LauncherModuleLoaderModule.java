@@ -1,9 +1,10 @@
 package pro.gravit.launchermodules.launchermoduleloader;
 
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.events.PostInitPhase;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -17,9 +18,18 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipInputStream;
 
-public class LauncherModuleLoaderModule implements Module {
-    public static Version version = new Version(1,0,0);
-    public transient LaunchServer server;
+public class LauncherModuleLoaderModule extends LauncherModule {
+    private transient LaunchServer server;
+
+    public LauncherModuleLoaderModule() {
+        super(new LauncherModuleInfo("LauncherModuleLoader", new Version(1,1,0)));
+    }
+
+    @Override
+    public void init(LauncherInitContext initContext) {
+        registerEvent((e) -> { server = e.server; }, LaunchServerInitPhase.class);
+        registerEvent(this::postInit, PostInitPhase.class);
+    }
 
     protected final class ModulesVisitor extends SimpleFileVisitor<Path> {
         private ModulesVisitor() {
@@ -47,72 +57,42 @@ public class LauncherModuleLoaderModule implements Module {
     public List<String> module_class = new ArrayList<>();
     public List<Path> module_jars = new ArrayList<>();
     public Path modules_dir;
-    @Override
-    public String getName() {
-        return "LauncherModuleLoader";
-    }
 
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void init(ModuleContext context) {
-    }
-
-    @Override
-    public void postInit(ModuleContext context) {
-        if (context.getType() == ModuleContext.Type.LAUNCHSERVER)
+    public void postInit(PostInitPhase phase) {
+        modules_dir = server.dir.resolve("launcher-modules");
+        if(!IOHelper.isDir(modules_dir))
         {
-            LaunchServerModuleContext con = (LaunchServerModuleContext) context;
-            LaunchServer server = con.launchServer;
-            this.server = server;
-            modules_dir = server.dir.resolve("launcher-modules");
-            if(!IOHelper.isDir(modules_dir))
-            {
-                try {
-                    Files.createDirectories(modules_dir);
-                } catch (IOException e) {
-                    LogHelper.error(e);
-                }
-            }
-            HashSet<String> fileList = new HashSet<>();
-            fileList.add("META-INF/MANIFEST.MF");
-            server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
-            server.buildHookManager.registerHook((buildContext) -> {
-                for(Path file : module_jars)
-                {
-                    try {
-                        buildContext.data.reader.getCp().add(new JarFile(file.toFile()));
-                    } catch (IOException e) {
-                        LogHelper.error(e);
-                    }
-                    LogHelper.debug("Put %s launcher module", file.toString());
-                    try(ZipInputStream input = new ZipInputStream(IOHelper.newInput(file)))
-                    {
-                        buildContext.pushJarFile(input, fileList);
-                    } catch (IOException e) {
-                        LogHelper.error(e);
-                    }
-                }
-            });
             try {
-                syncModules();
+                Files.createDirectories(modules_dir);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
         }
-    }
-
-    @Override
-    public void preInit(ModuleContext context) {
-
+        HashSet<String> fileList = new HashSet<>();
+        fileList.add("META-INF/MANIFEST.MF");
+        server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
+        server.buildHookManager.registerHook((buildContext) -> {
+            for(Path file : module_jars)
+            {
+                try {
+                    buildContext.data.reader.getCp().add(new JarFile(file.toFile()));
+                } catch (IOException e) {
+                    LogHelper.error(e);
+                }
+                LogHelper.debug("Put %s launcher module", file.toString());
+                try(ZipInputStream input = new ZipInputStream(IOHelper.newInput(file)))
+                {
+                    buildContext.pushJarFile(input, fileList);
+                } catch (IOException e) {
+                    LogHelper.error(e);
+                }
+            }
+        });
+        try {
+            syncModules();
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
     }
 
     public void syncModules() throws IOException
@@ -128,10 +108,5 @@ public class LauncherModuleLoaderModule implements Module {
         {
             server.buildHookManager.registerClientModuleClass(s);
         }
-    }
-
-    @Override
-    public void close() throws Exception {
-
     }
 }

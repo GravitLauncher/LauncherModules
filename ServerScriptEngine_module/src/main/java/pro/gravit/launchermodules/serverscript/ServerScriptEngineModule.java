@@ -1,50 +1,36 @@
 package pro.gravit.launchermodules.serverscript;
 
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.modules.*;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
+import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
-public class ServerScriptEngineModule implements Module {
+public class ServerScriptEngineModule extends LauncherModule {
     public static Version version = new Version(1, 1, 0);
     public static ServerScriptEngine scriptEngine;
 
-    @Override
-    public String getName() {
-        return "ServerScriptEngine";
+    public ServerScriptEngineModule() {
+        super(new LauncherModuleInfo("ServerScriptEngine", version));
     }
 
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void init(ModuleContext context) {
-
-    }
-
-    @Override
-    public void postInit(ModuleContext context1) {
-        LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
+    public void postInit(LaunchServerFullInitEvent event) {
         scriptEngine = new ServerScriptEngine();
-        scriptEngine.initBaseBindings(context.launchServer);
-        context.launchServer.commandHandler.registerCommand("eval", new EvalCommand(context.launchServer));
-        context.launchServer.commandHandler.registerCommand("scriptMappings", new ScriptMappingsCommand(context.launchServer));
+        scriptEngine.initBaseBindings(event.server);
+        event.server.commandHandler.registerCommand("eval", new EvalCommand(event.server));
+        event.server.commandHandler.registerCommand("scriptMappings", new ScriptMappingsCommand(event.server));
     }
 
     @Override
-    public void preInit(ModuleContext context) {
-
-    }
-
-    @Override
-    public void close() throws Exception {
-
+    public void init(LauncherInitContext initContext) {
+        registerEvent(this::postInit, LaunchServerFullInitEvent.class);
+        if(initContext != null)
+        {
+            if(initContext instanceof LaunchServerInitContext)
+            {
+                postInit(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
+            }
+        }
     }
 }

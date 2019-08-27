@@ -12,79 +12,30 @@ import java.util.Set;
 import com.google.gson.reflect.TypeToken;
 
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.events.ClosePhase;
+import pro.gravit.launcher.modules.events.PostInitPhase;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
+import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
-public class AutoSaveSessionsModule implements Module {
-    public static Version version = new Version(1, 0, 0);
+public class AutoSaveSessionsModule extends LauncherModule {
     public static String FILENAME = "sessions.json";
     public static boolean isClearSessionsBeforeSave = true;
     public Path file;
 	private LaunchServer srv;
 
-    @Override
-    public String getName() {
-        return "AutoSaveSessions";
+    public AutoSaveSessionsModule() {
+        super(new LauncherModuleInfo("AutoSaveSessions", new Version(1,1,0)));
     }
 
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void init(ModuleContext context) {
-
-    }
-
-    @Override
-    public void postInit(ModuleContext context1) {
-        LaunchServerModuleContext context = (LaunchServerModuleContext) context1;
-        Path configDir = context.modulesConfigManager.getModuleConfigDir(getName());
-        if (!IOHelper.isDir(configDir)) {
-            try {
-                Files.createDirectories(configDir);
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
-        }
-        srv = context.launchServer;
-        file = configDir.resolve(FILENAME);
-        if (IOHelper.exists(file)) {
-            LogHelper.info("Load sessions from %s", FILENAME);
-            Type setType = new TypeToken<HashSet<Client>>() {
-            }.getType();
-            try (Reader reader = IOHelper.newReader(file)) {
-                Set<Client> clientSet = Launcher.gsonManager.configGson.fromJson(reader, setType);
-                for (Client client : clientSet) {
-                    if (client.isAuth) client.updateAuth(srv);
-                }
-                context.launchServer.sessionManager.loadSessions(clientSet);
-                LogHelper.info("Loaded %d sessions", clientSet.size());
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
-        }
-    }
-
-    @Override
-    public void preInit(ModuleContext context) {
-
-    }
-
-    @Override
-    public void close() {
+    public void close(ClosePhase closePhase) {
         if (isClearSessionsBeforeSave) {
         	srv.sessionManager.garbageCollection();
         }
@@ -95,6 +46,54 @@ public class AutoSaveSessionsModule implements Module {
             LogHelper.info("%d sessions writed", clientSet.size());
         } catch (IOException e) {
             LogHelper.error(e);
+        }
+    }
+
+    @Override
+    public void init(LauncherInitContext initContext) {
+        registerEvent(this::init, LaunchServerInitPhase.class);
+        registerEvent(this::postInit, LaunchServerFullInitEvent.class);
+        registerEvent(this::close, ClosePhase.class);
+        if(initContext != null)
+        {
+            if(initContext instanceof LaunchServerInitContext)
+            {
+                srv = ((LaunchServerInitContext) initContext).server;
+                postInit(null);
+            }
+        }
+    }
+
+    public void init(LaunchServerInitPhase initPhase)
+    {
+        srv = initPhase.server;
+    }
+
+    public void postInit(LaunchServerFullInitEvent postInitPhase)
+    {
+        Path configDir = modulesConfigManager.getModuleConfigDir("AutoSaveSessions");
+        if (!IOHelper.isDir(configDir)) {
+            try {
+                Files.createDirectories(configDir);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        file = configDir.resolve(FILENAME);
+        if (IOHelper.exists(file)) {
+            LogHelper.info("Load sessions from %s", FILENAME);
+            Type setType = new TypeToken<HashSet<Client>>() {
+            }.getType();
+            try (Reader reader = IOHelper.newReader(file)) {
+                Set<Client> clientSet = Launcher.gsonManager.configGson.fromJson(reader, setType);
+                for (Client client : clientSet) {
+                    if (client.isAuth) client.updateAuth(srv);
+                }
+                srv.sessionManager.loadSessions(clientSet);
+                LogHelper.info("Loaded %d sessions", clientSet.size());
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
         }
     }
 }

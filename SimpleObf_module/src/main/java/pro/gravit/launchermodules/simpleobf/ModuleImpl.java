@@ -6,17 +6,30 @@ import java.io.Writer;
 import java.nio.file.Path;
 
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launchserver.binary.tasks.AdditionalFixesApplyTask;
 import pro.gravit.launchserver.binary.tasks.TaskUtil;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
-public class ModuleImpl implements Module {
+public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(0, 1, 0, 0, Version.Type.BETA);
+
+    @Override
+    public void init(LauncherInitContext initContext) {
+        registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        if(initContext != null)
+        {
+            if(initContext instanceof LaunchServerInitContext)
+            {
+                finish(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
+            }
+        }
+    }
 
     public static class Config {
         public boolean simpleIndy = true;
@@ -28,42 +41,8 @@ public class ModuleImpl implements Module {
     public Config config = null;
     public boolean certCheck = false;
 
-    @Override
-    public void close() {
-
-    }
-
-    @Override
-    public String getName() {
-        return "SimpleObf";
-    }
-
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return Integer.MIN_VALUE + 600;
-    }
-
-    @Override
-    public void init(ModuleContext context1) {
-    }
-
-    @Override
-    public void preInit(ModuleContext context1) {
-    }
-
-    @Override
-    public void postInit(ModuleContext context1) {
-    }
-
-    @Override
-    public void finish(ModuleContext context1) {
-        LaunchServerModuleContext context = ((LaunchServerModuleContext) context1);
-        configFile = context.modulesConfigManager.getModuleConfig("simple-obf");
+    public void finish(LaunchServerFullInitEvent event) {
+        configFile = modulesConfigManager.getModuleConfig("simple-obf");
         if (IOHelper.exists(configFile)) {
             try (Reader reader = IOHelper.newReader(configFile)) {
                 config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);
@@ -79,8 +58,8 @@ public class ModuleImpl implements Module {
                 LogHelper.error(e);
             }
         }
-        certCheck = context.launchServer.modulesManager.modules.stream().anyMatch(e -> e.getName().equals("JarSigner"));	
-        TaskUtil.add(context.launchServer.launcherBinary.tasks, t -> t instanceof AdditionalFixesApplyTask, new SimpleObfTask(context.launchServer, this));
+        certCheck = event.server.modulesManager.containsModule("JarSigner");
+        TaskUtil.add(event.server.launcherBinary.tasks, t -> t instanceof AdditionalFixesApplyTask, new SimpleObfTask(event.server, this));
     }
 
 

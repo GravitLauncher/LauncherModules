@@ -1,16 +1,9 @@
 package pro.gravit.launchermodules.discordrpc;
 
-import java.io.Reader;
-
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.client.ClientLauncher;
-import pro.gravit.launcher.client.ClientModuleContext;
 import pro.gravit.launcher.modules.Module;
 import pro.gravit.launcher.modules.ModuleContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.CommonHelper;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 public class ClientModule implements Module {
     public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
@@ -36,7 +29,8 @@ public class ClientModule implements Module {
 
 	@Override
 	public void init(ModuleContext context1) {
-		if (context1 instanceof ClientModuleContext) {
+		//TODO: FIX
+		/*if (context1 instanceof ClientModuleContext) {
 			String title = Launcher.profile.getTitle();
 			String nick = ClientLauncher.playerProfile.username;
 			try (Reader r = IOHelper.newReader(ClientModule.class.getResource("rpc.config.json"))) {
@@ -49,7 +43,7 @@ public class ClientModule implements Module {
 			} catch (Throwable e) {
 				LogHelper.error(e);
 			}
-		}
+		}*/
 	}
 
 	private String replace(String src, String nick, String title) {
