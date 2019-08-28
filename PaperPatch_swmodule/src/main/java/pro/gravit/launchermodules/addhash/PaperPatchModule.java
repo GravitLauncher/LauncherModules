@@ -5,8 +5,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launcher.server.ServerAgent;
 import pro.gravit.utils.Version;
 
@@ -16,36 +16,15 @@ import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.regex.Pattern;
 
-public final class PaperPatchModule implements Module {
+public final class PaperPatchModule extends LauncherModule {
 
     private static final Version VERSION = new Version(1, 0, 0);
 
-    @Override
-    public String getName() {
-        return "PaerPatch";
+    public PaperPatchModule() {
+        super(new LauncherModuleInfo("PaperSpigotPatch", VERSION));
     }
 
-    @Override
-    public Version getVersion() {
-        return VERSION;
-    }
-
-    @Override
-    public int getPriority() {
-        return 1;
-    }
-
-    @Override
-    public void init(ModuleContext context) {
-
-    }
-
-    @Override
-    public void postInit(ModuleContext context) {
-    }
-
-    @Override
-    public void preInit(ModuleContext context) {
+    public void preInit(PreConfigPhase preConfigPhase) {
         Instrumentation instrumentation = ServerAgent.inst;
         if (instrumentation == null) {
             throw new IllegalStateException("PaperPatch requires instrumentation to work!");
@@ -98,6 +77,7 @@ public final class PaperPatchModule implements Module {
     }
 
     @Override
-    public void close() throws Exception {
+    public void init(LauncherInitContext initContext) {
+        registerEvent(this::preInit, PreConfigPhase.class);
     }
 }

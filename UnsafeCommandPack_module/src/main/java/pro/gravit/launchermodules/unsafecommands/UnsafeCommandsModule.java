@@ -1,47 +1,36 @@
 package pro.gravit.launchermodules.unsafecommands;
 
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launcher.modules.*;
+import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
+import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
+import pro.gravit.utils.command.BaseCommandCategory;
+import pro.gravit.utils.command.CommandHandler;
 
-public class UnsafeCommandsModule implements Module {
+public class UnsafeCommandsModule extends LauncherModule {
     public static Version version = new Version(1, 0, 0);
 
-    @Override
-    public String getName() {
-        return "UnsafeCommands";
+    public UnsafeCommandsModule() {
+        super(new LauncherModuleInfo("UnsafeCommands", version));
+    }
+
+    public void init(LaunchServerInitPhase initPhase) {
+        BaseCommandCategory category = new BaseCommandCategory();
+        category.registerCommand("loadJar", new LoadJarCommand(initPhase.server));
+        category.registerCommand("registerComponent", new RegisterComponentCommand(initPhase.server));
+        category.registerCommand("setSecurityManager", new SetSystemSecurityManagerCommand(initPhase.server));
+        initPhase.server.commandHandler.registerCategory(new CommandHandler.Category(category, "Unsafe"));
     }
 
     @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void init(ModuleContext context) {
-
-    }
-
-    @Override
-    public void postInit(ModuleContext context) {
-        LaunchServerModuleContext context1 = (LaunchServerModuleContext) context;
-        context1.launchServer.commandHandler.registerCommand("loadJar", new LoadJarCommand(context1.launchServer));
-        context1.launchServer.commandHandler.registerCommand("registerComponent", new RegisterComponentCommand(context1.launchServer));
-    }
-
-    @Override
-    public void preInit(ModuleContext context) {
-
-    }
-
-    @Override
-    public void close() throws Exception {
-
+    public void init(LauncherInitContext initContext) {
+        registerEvent(this::init, LaunchServerInitPhase.class);
+        if(initContext != null)
+        {
+            if(initContext instanceof LaunchServerInitContext)
+            {
+                init(new LaunchServerInitPhase(((LaunchServerInitContext) initContext).server));
+            }
+        }
     }
 }

@@ -39,7 +39,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             if (file.toFile().getName().endsWith(".jar"))
                 try (JarFile f = new JarFile(file.toFile())) {
-                    String mainClass = f.getManifest().getMainAttributes().getValue("Main-Class");
+                    String mainClass = f.getManifest().getMainAttributes().getValue("Module-Main-Class");
                     if(mainClass == null)
                     {
                         LogHelper.error("In module %s MainClass not found", file.toString());
