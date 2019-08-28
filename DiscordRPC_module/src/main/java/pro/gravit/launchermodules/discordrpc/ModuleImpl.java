@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.jar.JarFile;
 import java.util.zip.ZipInputStream;
 
@@ -21,7 +22,7 @@ import pro.gravit.utils.helper.LogHelper;
 public class ModuleImpl implements Module {
 	private static final String keepClass = Type.getInternalName(ModuleImpl.class);
     public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
-	public Path config;
+	public Path config = Paths.get("config/discordrpc.json");
 
     @Override
     public void close() {
