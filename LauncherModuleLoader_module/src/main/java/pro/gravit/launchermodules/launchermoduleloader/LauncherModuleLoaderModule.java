@@ -5,6 +5,7 @@ import pro.gravit.launcher.modules.events.PostInitPhase;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.LaunchServerModuleContext;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -28,7 +29,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent((e) -> { server = e.server; }, LaunchServerInitPhase.class);
-        registerEvent(this::postInit, PostInitPhase.class);
+        registerEvent(this::postInit, LaunchServerPostInitPhase.class);
     }
 
     protected final class ModulesVisitor extends SimpleFileVisitor<Path> {
@@ -58,7 +59,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
     public List<Path> module_jars = new ArrayList<>();
     public Path modules_dir;
 
-    public void postInit(PostInitPhase phase) {
+    public void postInit(LaunchServerPostInitPhase phase) {
         modules_dir = server.dir.resolve("launcher-modules");
         if(!IOHelper.isDir(modules_dir))
         {
