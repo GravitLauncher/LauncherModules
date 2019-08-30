@@ -11,19 +11,19 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class Config {
 	@SerializedName("appId")
-	public String appId;
+    public String appId;
 	@SerializedName("firstLine")
-	public String firstLine = "Играет на %profile%";
+    public String firstLine = "Играет на %profile%";
 	@SerializedName("secondLine")
-	public String secondLine = "%user%";
+    public String secondLine = "Ник: %user%";
 	@SerializedName("largeKey")
-	public String largeKey = "large.png";
+    public String largeKey = "large.png";
 	@SerializedName("smallKey")
-	public String smallKey = "small.png";
+    public String smallKey = "small.png";
 	@SerializedName("largeText")
-	public String largeText = "Everything";
+    public String largeText = "Everything";
 	@SerializedName("smallText")
-	public String smallText = "Everything";
+    public String smallText = "Everything";
 	
 	public static Config read(Reader r) {
         return r != null ? DiscordRPC.confGson.fromJson(r, Config.class) : new Config();
