@@ -6,9 +6,9 @@ import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRichPresence;
 import pro.gravit.utils.helper.CommonHelper;
 
-public class DiscordRPC {
-	public static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
-	public static void onConfig(Config conf) {
+class DiscordRPC {
+	static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
+	static void onConfig(Config conf) {
 		club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
         DiscordEventHandlers handlers = new DiscordEventHandlers();
         lib.Discord_Initialize(conf.appId, handlers, true, "");
@@ -40,7 +40,6 @@ public class DiscordRPC {
                 } catch (InterruptedException ignored) {}
             }
         }, "RPC");
-        thr.setPriority(Short.MIN_VALUE);
         thr.setDaemon(true);
         thr.start();
 	}

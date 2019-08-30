@@ -1,49 +1,24 @@
 package pro.gravit.launchermodules.discordrpc;
 
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.client.ClientLauncher;
+import pro.gravit.launcher.client.events.ClientLauncherInitPhase;
+import pro.gravit.launcher.modules.*;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.CommonHelper;
+import pro.gravit.utils.helper.IOHelper;
 
-public class ClientModule implements Module {
-    public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
+import java.io.Reader;
 
-	@Override
-	public void close() throws Exception {
+public class ClientModule extends LauncherModule {
+    public static final Version version = new Version(1, 1, 0, 0, Version.Type.LTS);
+
+	public ClientModule() {
+		super(new LauncherModuleInfo("DiscordRPC", version));
 	}
-
 	@Override
-	public String getName() {
-		return "DiscordRPC";
-	}
-
-	@Override
-	public Version getVersion() {
-		return version;
-	}
-
-	@Override
-	public int getPriority() {
-		return 0;
-	}
-
-	@Override
-	public void init(ModuleContext context1) {
-		//TODO: FIX
-		/*if (context1 instanceof ClientModuleContext) {
-			String title = Launcher.profile.getTitle();
-			String nick = ClientLauncher.playerProfile.username;
-			try (Reader r = IOHelper.newReader(ClientModule.class.getResource("rpc.config.json"))) {
-				Config c = Config.read(r);
-				c.firstLine = replace(c.firstLine, nick, title);
-				c.secondLine = replace(c.secondLine, nick, title);
-				c.largeText = replace(c.largeText, nick, title);
-				c.smallText = replace(c.smallText, nick, title);
-				DiscordRPC.onConfig(c);
-			} catch (Throwable e) {
-				LogHelper.error(e);
-			}
-		}*/
+	public void init(LauncherInitContext initContext) {
+		registerEvent(this::PostInit, ClientLauncherInitPhase.class);
 	}
 
 	private String replace(String src, String nick, String title) {
@@ -51,13 +26,25 @@ public class ClientModule implements Module {
 		return CommonHelper.replace(src, "user", nick, "profile", title);
 	}
 
-	@Override
-	public void postInit(ModuleContext context) {
-		
+	private void PostInit(ClientLauncherInitPhase phase) {
+		try {
+			String title = Launcher.profile.getTitle();
+			String nick = ClientLauncher.playerProfile.username;
+			Reader r = IOHelper.newReader(ClientModule.class.getResource("/rpc.config.json"));
+			Config c = Config.read(r);
+			c.firstLine = replace(c.firstLine, nick, title);
+			c.secondLine = replace(c.secondLine, nick, title);
+			c.largeText = replace(c.largeText, nick, title);
+			c.smallText = replace(c.smallText, nick, title);
+			DiscordRPC.onConfig(c);
+
+		} catch (Exception ignored) {
+
+		}
 	}
 
-	@Override
-	public void preInit(ModuleContext context) {
+	public static void main(String[] args) {
+		System.err.println("This is module, use with GravitLauncher`s Launcher.");
 	}
 
 }
