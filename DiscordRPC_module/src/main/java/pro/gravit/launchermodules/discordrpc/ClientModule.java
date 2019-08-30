@@ -19,7 +19,7 @@ public class ClientModule extends LauncherModule {
 	@Override
 	public void init(LauncherInitContext initContext) {
 
-		registerEvent(this::ClientInit, ClientLauncherInitPhase.class);
+		registerEvent(this::clientInit, ClientLauncherInitPhase.class);
 	}
 
 	private String replace(String src, String nick, String title) {
@@ -27,7 +27,7 @@ public class ClientModule extends LauncherModule {
 		return CommonHelper.replace(src, "user", nick, "profile", title);
 	}
 
-	private void ClientInit(ClientLauncherInitPhase phase) {
+	private void clientInit(ClientLauncherInitPhase phase) {
 		try {
 			String title = Launcher.profile.getTitle();
 			String nick = ClientLauncher.playerProfile.username;
