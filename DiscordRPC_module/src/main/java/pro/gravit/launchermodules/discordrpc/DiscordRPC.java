@@ -7,9 +7,9 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import pro.gravit.utils.helper.CommonHelper;
 
 class DiscordRPC {
-	static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
-	static void onConfig(Config conf) {
-		club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
+    static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
+    static void onConfig(Config conf) {
+        club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
         DiscordEventHandlers handlers = new DiscordEventHandlers();
         lib.Discord_Initialize(conf.appId, handlers, true, "");
         DiscordRichPresence presence = new DiscordRichPresence();
@@ -29,8 +29,8 @@ class DiscordRPC {
         if(conf.smallKey != null && conf.smallText != null){
             presence.smallImageText = conf.smallText;
         }
+
         lib.Discord_UpdatePresence(presence);
-        lib.Discord_RunCallbacks();
 
         Thread thr = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
@@ -42,5 +42,5 @@ class DiscordRPC {
         }, "RPC");
         thr.setDaemon(true);
         thr.start();
-	}
+    }
 }

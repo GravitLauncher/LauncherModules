@@ -9,27 +9,27 @@ import com.google.gson.annotations.SerializedName;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
-public class Config {
+class Config {
 	@SerializedName("appId")
-	public String appId;
+    String appId;
 	@SerializedName("firstLine")
-	public String firstLine = "Играет на %profile%";
+    String firstLine = "Играет на %profile%";
 	@SerializedName("secondLine")
-	public String secondLine = "%user%";
+    String secondLine = "Ник: %user%";
 	@SerializedName("largeKey")
-	public String largeKey = "large.png";
+    String largeKey = "large.png";
 	@SerializedName("smallKey")
-	public String smallKey = "small.png";
+    String smallKey = "small.png";
 	@SerializedName("largeText")
-	public String largeText = "Everything";
+    String largeText = "Everything";
 	@SerializedName("smallText")
-	public String smallText = "Everything";
+    String smallText = "Everything";
 	
-	public static Config read(Reader r) {
+	static Config read(Reader r) {
         return r != null ? DiscordRPC.confGson.fromJson(r, Config.class) : new Config();
 	}
 
-	public static Config getOrCreate(Path f) {
+	static Config getOrCreate(Path f) {
 		try {
 			if (IOHelper.exists(f))
 				try (Reader r = IOHelper.newReader(f)) {
@@ -48,7 +48,7 @@ public class Config {
 		}
 	}
 	
-	public void write(Writer w) {
+	void write(Writer w) {
 		DiscordRPC.confGson.toJson(this, Config.class, w);
 	}
 }
