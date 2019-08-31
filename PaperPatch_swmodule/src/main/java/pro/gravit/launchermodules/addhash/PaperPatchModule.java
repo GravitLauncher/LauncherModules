@@ -1,20 +1,23 @@
 package pro.gravit.launchermodules.addhash;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import pro.gravit.launcher.modules.*;
-import pro.gravit.launcher.modules.events.PreConfigPhase;
-import pro.gravit.launcher.server.ServerAgent;
-import pro.gravit.utils.Version;
-
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.security.ProtectionDomain;
 import java.util.regex.Pattern;
+
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launcher.server.ServerAgent;
+import pro.gravit.utils.Version;
 
 public final class PaperPatchModule extends LauncherModule {
 

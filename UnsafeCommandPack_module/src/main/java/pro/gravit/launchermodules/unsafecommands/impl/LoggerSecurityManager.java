@@ -1,8 +1,8 @@
 package pro.gravit.launchermodules.unsafecommands.impl;
 
-import pro.gravit.utils.helper.LogHelper;
-
 import java.security.Permission;
+
+import pro.gravit.utils.helper.LogHelper;
 
 public class LoggerSecurityManager extends SecurityManager {
     @Override

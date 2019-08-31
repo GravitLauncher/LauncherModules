@@ -1,6 +1,8 @@
 package pro.gravit.launchermodules.legacysupport;
 
-import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;

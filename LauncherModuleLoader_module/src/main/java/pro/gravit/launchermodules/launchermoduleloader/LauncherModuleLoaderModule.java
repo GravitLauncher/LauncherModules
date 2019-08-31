@@ -1,23 +1,26 @@
 package pro.gravit.launchermodules.launchermoduleloader;
 
-import pro.gravit.launcher.modules.*;
-import pro.gravit.launcher.modules.events.PostInitPhase;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
-import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
-import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
-import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
-
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipInputStream;
+
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
+import pro.gravit.utils.Version;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 public class LauncherModuleLoaderModule extends LauncherModule {
     private transient LaunchServer server;

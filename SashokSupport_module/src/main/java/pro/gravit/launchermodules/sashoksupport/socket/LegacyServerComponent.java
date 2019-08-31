@@ -1,15 +1,15 @@
 package pro.gravit.launchermodules.sashoksupport.socket;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import pro.gravit.launchermodules.sashoksupport.command.LogConnectionsCommand;
 import pro.gravit.launchermodules.sashoksupport.command.RebindCommand;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.components.Component;
 import pro.gravit.utils.helper.CommonHelper;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class LegacyServerComponent extends Component {
     public static boolean registerCommands = false;

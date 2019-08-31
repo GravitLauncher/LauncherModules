@@ -1,6 +1,8 @@
 package pro.gravit.launchermodules.sashoksupport;
 
-import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchserver.auth.handler.AuthHandler;

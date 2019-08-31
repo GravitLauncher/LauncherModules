@@ -2,7 +2,9 @@ package pro.gravit.launchermodules.systemdnotify;
 
 import java.io.IOException;
 
-import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;

@@ -12,7 +12,7 @@ dependencies {
     extC 'org.bouncycastle:bcpkix-jdk15on:1.61'
 }
 jar {
-    manifest.attributes("Main-Class": mainClassName)
+    manifest.attributes("Module-Main-Class": mainClassName)
     from(configurations.extC.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/*"
         exclude "module-info.class"

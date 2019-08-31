@@ -1,44 +1,24 @@
 package pro.gravit.launchermodules.statistics;
 
-import pro.gravit.launcher.modules.Module;
-import pro.gravit.launcher.modules.ModuleContext;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 
-public class ServerStatisticsModule implements Module {
-    public static Version version = new Version(1,0,0);
+public class ServerStatisticsModule extends LauncherModule {
+    public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
     public transient LaunchServer server;
     public final StatisticsManager manager;
 
     public ServerStatisticsModule() {
+    	super(new LauncherModuleInfo("ServerStatistics", version));
         manager = new StatisticsManager();
     }
 
-    @Override
-    public String getName() {
-        return "ServerStatistics";
-    }
-
-    @Override
-    public Version getVersion() {
-        return version;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public void init(ModuleContext context) {
-
-    }
-
-    @Override
-    public void postInit(ModuleContext context) {
-        LaunchServerModuleContext context1 = (LaunchServerModuleContext) context;
-        server = context1.launchServer;
+    public void postInit(LaunchServerPostInitPhase context) {
+        server = context.server;
         manager.loadTime = System.currentTimeMillis();
         server.authHookManager.checkServerHook.registerHook((response, client) -> {
             manager.checkServerNumber++;
@@ -63,13 +43,8 @@ public class ServerStatisticsModule implements Module {
         server.commandHandler.registerCommand("stat", new StatCommand(manager));
     }
 
-    @Override
-    public void preInit(ModuleContext context) {
-
-    }
-
-    @Override
-    public void close() throws Exception {
-
-    }
+	@Override
+	public void init(LauncherInitContext initContext) {
+        registerEvent(this::postInit, LaunchServerPostInitPhase.class);
+	}
 }

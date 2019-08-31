@@ -1,14 +1,16 @@
 package pro.gravit.launchermodules.discordrpc;
 
+import java.io.Reader;
+
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.client.ClientLauncher;
 import pro.gravit.launcher.client.events.ClientLauncherInitPhase;
-import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.IOHelper;
-
-import java.io.Reader;
 
 public class ClientModule extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 0, Version.Type.LTS);

@@ -12,11 +12,11 @@ import java.util.Set;
 import com.google.gson.reflect.TypeToken;
 
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.modules.*;
+import pro.gravit.launcher.modules.LauncherInitContext;
+import pro.gravit.launcher.modules.LauncherModule;
+import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.ClosePhase;
-import pro.gravit.launcher.modules.events.PostInitPhase;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.modules.LaunchServerModuleContext;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;

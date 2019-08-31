@@ -1,11 +1,11 @@
 package pro.gravit.launchermodules.sashoksupport.socket.legacy;
 
+import java.io.IOException;
+
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launcher.serialize.SerializeLimits;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
-
-import java.io.IOException;
 
 public final class PingResponse extends Response {
     public PingResponse(LegacyServerComponent component, long id, HInput input, HOutput output) {
