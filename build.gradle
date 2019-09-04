@@ -3,6 +3,11 @@ task bundleZip(type: Zip) {
     destinationDir file("$buildDir")
 }
 
+if (!project.tasks.findByName('assemble')) {
+    task assemble {
+    }
+}
+
 if (!project.tasks.findByName('build')) {
     task build {
     }
@@ -46,4 +51,5 @@ configure(subprojects.findAll { it.name.endsWith('_lmodule') }) {
     }
 }
 
-project.tasks.findByName('build').dependsOn tasks.bundleZip
+project.tasks.findByName('assemble').dependsOn tasks.bundleZip
+project.tasks.findByName('build').dependsOn project.tasks.findByName('assemble')
