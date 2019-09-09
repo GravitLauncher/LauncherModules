@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.addhash;
+package pro.gravit.launchermodules.paperpatch;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
