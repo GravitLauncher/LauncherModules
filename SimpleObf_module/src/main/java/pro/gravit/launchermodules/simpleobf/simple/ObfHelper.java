@@ -2,8 +2,6 @@ package pro.gravit.launchermodules.simpleobf.simple;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.IOError;
-import java.io.IOException;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
@@ -20,6 +18,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import pro.gravit.launchserver.asm.NodeUtils;
+
 public class ObfHelper {
 	public static final MethodNode INDY_SPEC;
 	public static final MethodNode INDY_STAT;
@@ -27,12 +27,7 @@ public class ObfHelper {
 	public static final MethodNode СHECK_CLAZZ;
 
 	static {
-		final ClassNode node = new ClassNode();
-		try {
-			new ClassReader(ObfHelper.class.getName()).accept(node, ClassReader.EXPAND_FRAMES | ClassReader.SKIP_DEBUG);
-		} catch (final IOException e) {
-			throw new IOError(e);
-		}
+		final ClassNode node = NodeUtils.forClass(ObfHelper.class, ClassReader.SKIP_DEBUG | ClassReader.EXPAND_FRAMES);
 		MethodNode iSt = null, iVr = null, iSp = null, iCh = null;
 		for (final MethodNode m : node.methods) {
 			if (!m.name.startsWith("bootstrap"))
