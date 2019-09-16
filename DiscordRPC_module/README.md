@@ -9,5 +9,4 @@
       "largeText": "projectname.ml",    /--- Основной текст ---/
       "smallText": "servername"   /--- Дополнительный текст ---/
       
-
 + Дополнительные настройки: В конфиге прогуарда добавить club.minnced.discord.rpc.** в keeppackagenames и keep class
