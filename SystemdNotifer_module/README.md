@@ -1,9 +1,10 @@
 + Описание: Служит для правильного порядка загрузки лаунчсервера с systemd. Необязателен, вместо systemd можно использовать cron.
 + Конфигурация:   
+
                   [Unit]
                   Description=LaunchServer    /--- Описание юнита ---/
                   After=network.target
-
+                  
                   [Service]
                   WorkingDirectory=/home/launchserver/    /--- Рабочий каталог ---/
                   Type=notify
