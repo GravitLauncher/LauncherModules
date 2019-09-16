@@ -35,6 +35,7 @@ public class ModuleImpl extends LauncherModule {
         public boolean simpleIndy = true;
         public boolean stripNOP = true;
         public boolean certCheck = false;
+		public boolean trollObf = true;
     }
 
     public Path configFile = null;

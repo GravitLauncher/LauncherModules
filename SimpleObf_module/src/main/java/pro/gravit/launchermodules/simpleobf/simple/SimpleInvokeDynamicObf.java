@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOError;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Locale;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Handle;
@@ -14,6 +15,8 @@ import org.objectweb.asm.Type;
 
 import pro.gravit.launchermodules.simpleobf.Processor;
 import pro.gravit.launchermodules.simpleobf.utils.RandomHelper;
+import pro.gravit.launchserver.asm.ClassMetadataReader;
+import pro.gravit.launchserver.asm.NodeUtils;
 
 public class SimpleInvokeDynamicObf implements Processor {
 	/*
@@ -53,6 +56,7 @@ public class SimpleInvokeDynamicObf implements Processor {
 	private Handle staticD;
 
 	private Handle virtualD;
+	private final ClassMetadataReader r;
 
 	@Override
 	public ClassVisitor process(final ClassVisitor v) {
@@ -129,7 +133,7 @@ public class SimpleInvokeDynamicObf implements Processor {
 					@Override
 					public void visitMethodInsn(final int opcode, final String owner, final String name,
 							final String descriptor, final boolean isInterface) {
-						if (!name.equals("<init>"))
+						if (!name.equals("<init>") && NodeUtils.annots(owner, name, r).stream().map(e -> e.desc.toLowerCase(Locale.US)).noneMatch(e -> e.contains("caller")))
 							switch (opcode) {
 							case Opcodes.INVOKESTATIC:
 								mv.visitInvokeDynamicInsn(defObf(name, owner), descriptor, staticD, new Object[0]);
@@ -153,5 +157,9 @@ public class SimpleInvokeDynamicObf implements Processor {
 				};
 			}
 		};
+	}
+	
+	public SimpleInvokeDynamicObf(ClassMetadataReader r) {
+		this.r = r;
 	}
 }

@@ -20,6 +20,7 @@ import org.objectweb.asm.tree.ClassNode;
 import pro.gravit.launchermodules.simpleobf.simple.NOPRemover;
 import pro.gravit.launchermodules.simpleobf.simple.SimpleCertCheck;
 import pro.gravit.launchermodules.simpleobf.simple.SimpleInvokeDynamicObf;
+import pro.gravit.launchermodules.simpleobf.simple.TrollObf;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.asm.ClassMetadataReader;
 import pro.gravit.launchserver.asm.SafeClassWriter;
@@ -53,10 +54,11 @@ public class SimpleObfTask implements LauncherBuildTask {
     public static void apply(Path inputFile, Path addFile, ZipOutputStream output, LaunchServer srv, ModuleImpl i, Predicate<ZipEntry> excluder) throws IOException {
     	List<Transformer> aTrans = new ArrayList<>();
     	List<Processor> aProc = new ArrayList<>();
-    	if (i.config.stripNOP) aTrans.add(new NOPRemover());
-    	if (i.certCheck && i.config.certCheck) aTrans.add(new SimpleCertCheck());
-    	if (i.config.simpleIndy) aProc.add(new SimpleInvokeDynamicObf());
     	try (ClassMetadataReader reader = new ClassMetadataReader()) {
+        	if (i.config.stripNOP) aTrans.add(new NOPRemover());
+        	if (i.certCheck && i.config.certCheck) aTrans.add(new SimpleCertCheck());
+        	if (i.config.simpleIndy) aProc.add(new SimpleInvokeDynamicObf(reader));
+        	if (i.config.trollObf) aTrans.add(new TrollObf());
             reader.getCp().add(new JarFile(inputFile.toFile()));
             List<JarFile> libs = srv.launcherBinary.coreLibs.stream().map(e -> {
                 try {
