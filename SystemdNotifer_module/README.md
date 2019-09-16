@@ -15,5 +15,6 @@
 
       ExecStart=/usr/bin/screen -DmS launchserver /usr/bin/java -Xmx128M -javaagent:LaunchServer.jar -jar   LaunchServer.jar    /--- Команда для старта ---/
       ExecStop=/usr/bin/screen -p 0 -S launchserver -X eval 'stuff "stop"\015'    /--- Команда для остановки ---/
+      
       [Install]
       WantedBy=multi-user.target
