@@ -74,6 +74,7 @@ public class SimpleObfTask implements LauncherBuildTask {
                     throw new RuntimeException(e1);
                 }
             }).collect(Collectors.toList()));
+            reader.getCp().addAll(libs);
             try (ZipInputStream input = IOHelper.newZipInput(addFile)) {
                 ZipEntry e = input.getNextEntry();
                 while (e != null) {
