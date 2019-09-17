@@ -4,6 +4,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 
@@ -17,7 +18,7 @@ public class ServerStatisticsModule extends LauncherModule {
         manager = new StatisticsManager();
     }
 
-    public void postInit(LaunchServerPostInitPhase context) {
+    public void postInit(LaunchServerFullInitEvent context) {
         server = context.server;
         manager.loadTime = System.currentTimeMillis();
         server.authHookManager.checkServerHook.registerHook((response, client) -> {
@@ -45,6 +46,6 @@ public class ServerStatisticsModule extends LauncherModule {
 
 	@Override
 	public void init(LauncherInitContext initContext) {
-        registerEvent(this::postInit, LaunchServerPostInitPhase.class);
+        registerEvent(this::postInit, LaunchServerFullInitEvent.class);
 	}
 }
