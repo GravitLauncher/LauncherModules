@@ -1,20 +1,7 @@
-def mainClassName = "pro.gravit.launchermodules.jarsigner.ModuleImpl"
+def mainClassName = "pro.gravit.launchermodules.startscreen.ModuleImpl"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
-
-configurations {
-    extC
-    compileOnly.extendsFrom extC
-}
-
-dependencies {
-    extC 'org.bouncycastle:bcpkix-jdk15on:1.61'
-}
 jar {
     manifest.attributes("Module-Main-Class": mainClassName)
-    from(configurations.extC.collect { it.isDirectory() ? it : zipTree(it) }) {
-        exclude "META-INF/*"
-        exclude "module-info.class"
-    }
 }
