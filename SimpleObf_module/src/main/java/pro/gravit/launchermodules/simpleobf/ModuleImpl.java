@@ -9,6 +9,7 @@ import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launchserver.binary.tasks.AdditionalFixesApplyTask;
+import pro.gravit.launchserver.binary.tasks.AttachJarsTask;
 import pro.gravit.launchserver.binary.tasks.TaskUtil;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -60,7 +61,7 @@ public class ModuleImpl extends LauncherModule {
             }
         }
         certCheck = event.server.modulesManager.containsModule("JarSigner");
-        TaskUtil.add(event.server.launcherBinary.tasks, t -> t instanceof AdditionalFixesApplyTask, new SimpleObfTask(event.server, this));
+        TaskUtil.add(event.server.launcherBinary.tasks, t -> t instanceof AttachJarsTask, new SimpleObfTask(event.server, this));
     }
 
 
