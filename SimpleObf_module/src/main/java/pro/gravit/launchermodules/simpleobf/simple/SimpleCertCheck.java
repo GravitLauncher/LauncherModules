@@ -15,7 +15,7 @@ public class SimpleCertCheck implements Transformer {
 	@Override
 	public boolean transform(ClassNode node) {
 		Optional<MethodNode> returnT = node.methods.stream().filter(e -> "<clinit>".equals(e.name)).findFirst();
-		ObfHelper.acceptRepType(ObfHelper.СHECK_CLAZZ, returnT.map(e -> (MethodVisitor) e).orElseGet(() -> node.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null)),
+		ObfHelper.acceptRepType(ObfHelper.CHECK_CLAZZ, returnT.map(e -> (MethodVisitor) e).orElseGet(() -> node.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null)),
 				returnT.isPresent(), Collections.singletonMap(Type.getType(Object.class), Type.getObjectType(node.name)));
 		return true;
 	}

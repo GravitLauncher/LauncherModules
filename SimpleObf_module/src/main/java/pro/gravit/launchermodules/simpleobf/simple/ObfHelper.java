@@ -24,7 +24,7 @@ public class ObfHelper {
 	public static final MethodNode INDY_SPEC;
 	public static final MethodNode INDY_STAT;
 	public static final MethodNode INDY_VIRT;
-	public static final MethodNode СHECK_CLAZZ;
+	public static final MethodNode CHECK_CLAZZ;
 
 	static {
 		final ClassNode node = NodeUtils.forClass(ObfHelper.class, ClassReader.SKIP_DEBUG | ClassReader.EXPAND_FRAMES);
@@ -52,7 +52,7 @@ public class ObfHelper {
 		INDY_STAT = iSt;
 		INDY_VIRT = iVr;
 		INDY_SPEC = iSp;
-		СHECK_CLAZZ = iCh;
+		CHECK_CLAZZ = iCh;
 	}
 
 	public static void accept(final ClassVisitor classVisitor, final MethodNode n, final String newName) {
