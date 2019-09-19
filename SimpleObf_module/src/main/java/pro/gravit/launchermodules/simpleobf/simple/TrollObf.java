@@ -60,6 +60,7 @@ public class TrollObf implements Transformer {
 				default:
 					break;
 				}
+				n.maxStack+=16;
 				n.instructions.insert(i, l);
 			}
 		}

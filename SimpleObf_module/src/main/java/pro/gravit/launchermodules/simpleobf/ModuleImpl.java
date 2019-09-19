@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launchserver.binary.tasks.AdditionalFixesApplyTask;
 import pro.gravit.launchserver.binary.tasks.AttachJarsTask;
 import pro.gravit.launchserver.binary.tasks.TaskUtil;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
