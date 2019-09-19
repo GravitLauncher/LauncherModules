@@ -108,7 +108,7 @@ public class SimpleObfTask implements LauncherBuildTask {
         ClassNode cn = new ClassNode();
         new ClassReader(bytes).accept(cn, 0);
         trans.forEach(t -> t.transform(cn));
-        ClassWriter c = new SafeClassWriter(reader, 0);
+        ClassWriter c = new SafeClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         ClassVisitor cw = c;
         for (Processor p : proc) {
         	ClassVisitor tmp = p.process(cw);
