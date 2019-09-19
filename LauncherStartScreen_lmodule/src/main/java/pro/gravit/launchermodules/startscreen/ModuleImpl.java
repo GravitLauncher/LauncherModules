@@ -6,6 +6,7 @@ import pro.gravit.launcher.client.events.ClientGuiPhase;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -21,6 +22,11 @@ public class ModuleImpl extends LauncherModule {
 
 	@Override
 	public void init(LauncherInitContext initContext) {
+		registerEvent(this::preInit, PreConfigPhase.class);
+        registerEvent(this::finish, ClientGuiPhase.class);
+	}
+	public void preInit(PreConfigPhase phase)
+	{
 		try {
 			screen = SplashScreen.getSplashScreen();
 			screen.setImageURL(IOHelper.getResourceURL("runtime/splash.png"));
@@ -29,7 +35,6 @@ public class ModuleImpl extends LauncherModule {
 		} catch (Throwable e) {
 			LogHelper.error(e);
 		}
-        registerEvent(this::finish, ClientGuiPhase.class);
 	}
 	public void finish(ClientGuiPhase context) {
 		if (screen != null)
