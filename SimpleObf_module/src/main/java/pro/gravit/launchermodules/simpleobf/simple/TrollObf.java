@@ -22,14 +22,6 @@ public class TrollObf implements Transformer {
 					l.add(new InsnNode(Opcodes.DUP));
 					l.add(new InsnNode(Opcodes.POP));
 					break;
-				case 2:
-					l.add(new InsnNode(Opcodes.DUP));
-					l.add(new InsnNode(Opcodes.POP));
-					l.add(new InsnNode(Opcodes.DUP));
-					l.add(new InsnNode(Opcodes.DUP));
-					l.add(new InsnNode(Opcodes.POP));
-					l.add(new InsnNode(Opcodes.POP));
-					break;
 				default:
 					break;
 				}
