@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import pro.gravit.launcher.ClientPermissions;
+import pro.gravit.launcher.request.auth.AuthRequest;
+import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.MySQLSourceConfig;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
@@ -23,17 +25,18 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
     private boolean usePermission;
 
     @Override
-    public AuthProviderResult auth(String login, String password, String ip) throws SQLException, AuthException {
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
+        if(!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         try (Connection c = mySQLHolder.getConnection()) {
             PreparedStatement s = c.prepareStatement(query);
-            String[] replaceParams = {"login", login, "password", password, "ip", ip};
+            String[] replaceParams = {"login", login, "password", ((AuthPlainPassword) password).password, "ip", ip};
             for (int i = 0; i < queryParams.length; i++)
                 s.setString(i + 1, CommonHelper.replace(queryParams[i], replaceParams));
 
             // Execute SQL query
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
-                return set.next() ? BCrypt.checkpw(password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : srv.config.permissionsHandler.getPermissions(set.getString(2))) : authError(message) : authError(message);
+                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : srv.config.permissionsHandler.getPermissions(set.getString(2))) : authError(message) : authError(message);
             }
         }
     }

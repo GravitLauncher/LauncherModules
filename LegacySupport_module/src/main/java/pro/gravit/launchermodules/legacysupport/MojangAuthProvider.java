@@ -9,6 +9,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import pro.gravit.launcher.request.auth.AuthRequest;
+import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
+import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 import pro.gravit.utils.HTTPRequest;
@@ -46,8 +49,9 @@ public final class MojangAuthProvider extends AuthProvider {
     }
 
     @Override
-    public AuthProviderResult auth(String login, String password, String ip) throws Exception {
-        mojangAuth mojangAuth = new mojangAuth(login, password);
+    public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
+        if(!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
+        mojangAuth mojangAuth = new mojangAuth(login, ((AuthPlainPassword) password).password);
         JsonElement request = gson.toJsonTree(mojangAuth);
 
         // Verify there's no error
