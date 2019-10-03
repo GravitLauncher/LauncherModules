@@ -41,6 +41,7 @@ class DiscordRPC {
             }
         }, "RPC");
         thr.setDaemon(true);
+        thr.setPriority(Integer.MIN_VALUE);
         thr.start();
     }
 }
