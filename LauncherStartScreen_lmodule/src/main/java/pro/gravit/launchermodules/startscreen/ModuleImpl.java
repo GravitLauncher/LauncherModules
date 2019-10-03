@@ -4,6 +4,8 @@ import java.awt.GraphicsEnvironment;
 
 import javax.imageio.ImageIO;
 
+import pro.gravit.launcher.LauncherEngine;
+import pro.gravit.launcher.client.ClientModuleManager;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -29,6 +31,7 @@ public class ModuleImpl extends LauncherModule {
 	}
 	public void preInit(PreConfigPhase phase)
 	{
+		if (LauncherEngine.modulesManager instanceof ClientModuleManager) return;
 		try {
 			if (!GraphicsEnvironment.isHeadless()) screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL("runtime/splash.png")));
 		} catch (Throwable e) {
