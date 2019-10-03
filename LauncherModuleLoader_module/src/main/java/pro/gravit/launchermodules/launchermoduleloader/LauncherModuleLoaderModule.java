@@ -72,10 +72,10 @@ public class LauncherModuleLoaderModule extends LauncherModule {
                 LogHelper.error(e);
             }
         }
-        HashSet<String> fileList = new HashSet<>();
-        fileList.add("META-INF/MANIFEST.MF");
         server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
         server.buildHookManager.registerHook((buildContext) -> {
+            HashSet<String> fileList = new HashSet<>(buildContext.fileList);
+            fileList.add("META-INF/MANIFEST.MF");
             for(Path file : module_jars)
             {
                 try {
