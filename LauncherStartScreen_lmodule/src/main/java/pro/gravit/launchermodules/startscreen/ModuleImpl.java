@@ -5,7 +5,6 @@ import java.awt.GraphicsEnvironment;
 import javax.imageio.ImageIO;
 
 import pro.gravit.launcher.LauncherEngine;
-import pro.gravit.launcher.client.ClientModuleManager;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
