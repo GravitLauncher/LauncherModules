@@ -13,6 +13,7 @@ public class ImageDisplay implements Closeable {
 	public ImageDisplay(BufferedImage img)
     {
         frame = new JFrame();
+        frame.setUndecorated(true);
         frame.setLayout(new FlowLayout());
         JLabel lbl = new JLabel();
         lbl.setIcon(new ImageIcon(img));
