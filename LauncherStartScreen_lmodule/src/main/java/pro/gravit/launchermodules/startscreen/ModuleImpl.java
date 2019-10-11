@@ -31,7 +31,7 @@ public class ModuleImpl extends LauncherModule {
 	}
 	public void preInit(PreConfigPhase phase)
 	{
-		if (LauncherEngine.modulesManager instanceof ClientModuleManager) return;
+		if (LauncherEngine.IS_CLIENT.get()) return;
 		try {
 			if (!GraphicsEnvironment.isHeadless()) screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL("runtime/splash.png")));
 		} catch (Throwable e) {
