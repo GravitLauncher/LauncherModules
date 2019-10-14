@@ -16,7 +16,7 @@ class DiscordRPC {
         presence.startTimestamp = System.currentTimeMillis() / 1000;
         presence.details = conf.firstLine;
         presence.state = conf.secondLine;
-        // Лишние чеки на null но так было в примере который мне дали. Трогать говно не буду ибо багнутое и так.
+        //Ниче не лишнее, так надо
         if(conf.largeKey != null) {
             presence.largeImageKey = conf.largeKey;
         }
@@ -35,6 +35,7 @@ class DiscordRPC {
         Thread thr = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 lib.Discord_RunCallbacks();
+                new Timer().scheduleAtFixedRate(new Task(), 0, 5000);
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ignored) {}
