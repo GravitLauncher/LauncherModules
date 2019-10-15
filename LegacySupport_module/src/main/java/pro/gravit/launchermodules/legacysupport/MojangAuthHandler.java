@@ -77,7 +77,7 @@ public class MojangAuthHandler extends AuthHandler {
         } catch (IllegalStateException ignore) {
             //Ignored
         }
-        return returnSuccess;
+        return true;
     }
 
     @Override
