@@ -61,13 +61,7 @@ public final class MojangTextureProvider extends TextureProvider {
         }
 
         try {
-            // TODO Don't query UUID by username if using mojang auth handler (not implemented yet)
-            URL uuidURL = new URL("https://api.mojang.com/users/profiles/minecraft/" + IOHelper.urlEncode(username));
-            JsonObject uuidResponse = HTTPRequest.jsonRequest(Launcher.gsonManager.gson.toJsonTree(new EmptyObject()), uuidURL).getAsJsonObject();
-            if (uuidResponse == null) {
-                throw new IllegalArgumentException("Empty UUID response");
-            }
-            String uuidResolved = uuidResponse.get("id").getAsString();
+            String uuidResolved = uuid.toString();
 
             // Obtain player profile
             URL profileURL = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidResolved);

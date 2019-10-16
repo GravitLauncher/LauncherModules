@@ -27,6 +27,7 @@ public class ModuleImpl extends LauncherModule {
         public String algo = "JKS";
         public String keyalias = "mykey";
         public String pass = "pass";
+        public String signAlgo = "SHA256WITHRSA";
     }
 
     public Path configFile = null;

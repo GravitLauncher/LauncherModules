@@ -131,6 +131,8 @@ public class SignerJar implements AutoCloseable {
 
     private final String keyAlias;
 
+    private final String signAlgo;
+
     private final String password;
     private final Map<String, String> manifestAttributes;
     private String manifestHash;
@@ -142,16 +144,17 @@ public class SignerJar implements AutoCloseable {
 
     /**
      * Constructor.
-     *
-     * @param out         the output stream to write JAR data to
+     *  @param out         the output stream to write JAR data to
      * @param keyStore    the key store to load given key from
      * @param keyAlias    the name of the key in the store, this key is used to sign the JAR
+     * @param signAlgo
      * @param keyPassword the password to access the key
      */
-    public SignerJar(OutputStream out, KeyStore keyStore, String keyAlias, String keyPassword) {
+    public SignerJar(OutputStream out, KeyStore keyStore, String keyAlias, String signAlgo, String keyPassword) {
         zos = new ZipOutputStream(out);
         this.keyStore = keyStore;
         this.keyAlias = keyAlias;
+        this.signAlgo = signAlgo;
         password = keyPassword;
 
         manifestAttributes = new LinkedHashMap<>();
@@ -269,7 +272,7 @@ public class SignerJar implements AutoCloseable {
         Store certStore = new JcaCertStore(certChain);
         Certificate cert = keyStore.getCertificate(keyAlias);
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, password != null ? password.toCharArray() : null);
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256WITHRSA").setProvider("BC").build(privateKey);
+        ContentSigner signer = new JcaContentSignerBuilder(signAlgo).setProvider("BC").build(privateKey);
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         DigestCalculatorProvider dcp = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
         SignerInfoGenerator sig = new JcaSignerInfoGeneratorBuilder(dcp).build(signer, (X509Certificate) cert);
