@@ -31,7 +31,7 @@ public class SignJarTask implements LauncherBuildTask {
         Path toRet = srv.launcherBinary.nextPath("signed");
         try (SignerJar output = new SignerJar(IOHelper.newOutput(toRet),
                 SignerJar.getStore(new File(impl.config.key).toPath(), impl.config.storepass, impl.config.algo),
-                impl.config.keyalias, impl.config.pass);
+                impl.config.keyalias, impl.config.signAlgo, impl.config.pass);
              JarInputStream input = new JarInputStream(IOHelper.newInput(inputFile))) {
             ZipEntry e = input.getNextEntry();
             while (e != null) {

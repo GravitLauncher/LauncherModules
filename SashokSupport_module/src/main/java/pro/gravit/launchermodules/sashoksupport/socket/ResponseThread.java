@@ -64,10 +64,10 @@ public final class ResponseThread implements Runnable {
             session = input.readLong();
             sessions.updateClient(session);
         }
-        if (!keyModulus.equals(server.privateKey.getModulus())) {
-            output.writeBoolean(false);
-            throw new IOException(String.format("#%d Key modulus mismatch", session));
-        }
+        //if (!keyModulus.equals(server.privateKey.getModulus())) {
+        //    output.writeBoolean(false);
+        //    throw new IOException(String.format("#%d Key modulus mismatch", session));
+        //}
         // Read request type
         int type = input.readVarInt();
         if (!handler.onHandshake(session, type)) {
