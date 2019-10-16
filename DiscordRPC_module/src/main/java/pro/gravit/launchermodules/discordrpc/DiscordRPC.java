@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.discordrpc;
 
+import java.util.Timer;
+
 import com.google.gson.Gson;
 
 import club.minnced.discord.rpc.DiscordEventHandlers;
@@ -8,6 +10,8 @@ import pro.gravit.utils.helper.CommonHelper;
 
 class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
+	static Thread thr;
+	static Timer timer;
     static void onConfig(Config conf) {
         club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
         DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -32,15 +36,16 @@ class DiscordRPC {
 
         lib.Discord_UpdatePresence(presence);
 
-        Thread thr = new Thread(() -> {
+        thr = new Thread(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 lib.Discord_RunCallbacks();
-                new Timer().scheduleAtFixedRate(new Task(), 0, 5000);
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ignored) {}
             }
         }, "RPC");
+        timer = new Timer(true);
+        timer.scheduleAtFixedRate(new Task(), 0, 5000);
         thr.setDaemon(true);
         thr.setPriority(Integer.MIN_VALUE);
         thr.start();
