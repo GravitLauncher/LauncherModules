@@ -1,7 +1,6 @@
 package pro.gravit.launchermodules.sashoksupport.socket;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -14,7 +13,6 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.manangers.SessionManager;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
-import pro.gravit.utils.helper.SecurityHelper;
 
 public final class ResponseThread implements Runnable {
     class Handshake {
@@ -27,14 +25,12 @@ public final class ResponseThread implements Runnable {
         }
     }
 
-    private final LaunchServer server;
     private final Socket socket;
 
     private final SessionManager sessions;
     private final ServerSocketHandler handler;
 
     public ResponseThread(LaunchServer server, ServerSocketHandler handler, Socket socket, SessionManager sessionManager) throws SocketException {
-        this.server = server;
         this.socket = socket;
         sessions = sessionManager;
         // Fix socket flags
@@ -58,8 +54,6 @@ public final class ResponseThread implements Runnable {
 
             } else
                 throw new IOException("Invalid Handshake");
-        // Verify key modulus
-        BigInteger keyModulus = input.readBigInteger(SecurityHelper.RSA_KEY_LENGTH + 1);
         if (!legacy) {
             session = input.readLong();
             sessions.updateClient(session);

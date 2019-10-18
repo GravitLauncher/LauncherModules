@@ -17,7 +17,6 @@ import pro.gravit.launcher.LauncherAPI;
 import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchserver.auth.texture.TextureProvider;
 import pro.gravit.utils.HTTPRequest;
-import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.VerifyHelper;
 
