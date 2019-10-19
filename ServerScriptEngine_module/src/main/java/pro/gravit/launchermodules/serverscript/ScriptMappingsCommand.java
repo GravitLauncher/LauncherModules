@@ -22,7 +22,7 @@ public class ScriptMappingsCommand extends Command {
     }
 
     @Override
-    public void invoke(String... args) throws Exception {
+    public void invoke(String... args) {
         for (Map.Entry<String, String> e : ServerScriptEngineModule.scriptEngine.mappings.entrySet()) {
             if (!e.getValue().startsWith("pro.gravit")) continue; //Отсекаем библиотеки
             LogHelper.info("%s mapped to %s", e.getValue(), e.getKey());

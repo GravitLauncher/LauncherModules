@@ -15,9 +15,9 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 public final class ResponseThread implements Runnable {
-    class Handshake {
-        int type;
-        long session;
+    static class Handshake {
+        final int type;
+        final long session;
 
         public Handshake(int type, long session) {
             this.type = type;

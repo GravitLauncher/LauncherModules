@@ -10,7 +10,7 @@ import pro.gravit.utils.command.BaseCommandCategory;
 import pro.gravit.utils.command.CommandHandler;
 
 public class UnsafeCommandsModule extends LauncherModule {
-    public static Version version = new Version(1, 0, 0);
+    public static final Version version = new Version(1, 0, 0);
 
     public UnsafeCommandsModule() {
         super(new LauncherModuleInfo("UnsafeCommands", version));

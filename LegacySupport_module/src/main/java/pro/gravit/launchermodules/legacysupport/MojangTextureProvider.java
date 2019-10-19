@@ -21,7 +21,7 @@ import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.VerifyHelper;
 
 public final class MojangTextureProvider extends TextureProvider {
-    public class EmptyObject {
+    public static class EmptyObject {
 
     }
 

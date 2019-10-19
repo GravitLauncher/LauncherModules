@@ -17,7 +17,7 @@ import pro.gravit.utils.HTTPRequest;
 import pro.gravit.utils.helper.LogHelper;
 
 public class MojangAuthHandler extends AuthHandler {
-    public HashMap<String, UUID> usernameToUUID = new HashMap<>();
+    public final HashMap<String, UUID> usernameToUUID = new HashMap<>();
     public static URL joinServer;
     private static final Gson gson = new Gson();
     boolean returnSuccess = true;
@@ -31,7 +31,7 @@ public class MojangAuthHandler extends AuthHandler {
     }
 
     @Override
-    public UUID auth(AuthProviderResult authResult) throws IOException {
+    public UUID auth(AuthProviderResult authResult) {
         if (authResult instanceof MojangAuthProviderResult) {
             MojangAuthProviderResult result = (MojangAuthProviderResult) authResult;
             usernameToUUID.put(result.username, result.uuid);
@@ -41,16 +41,16 @@ public class MojangAuthHandler extends AuthHandler {
     }
 
     @Override
-    public UUID checkServer(String username, String serverID) throws IOException {
+    public UUID checkServer(String username, String serverID) {
         return null;
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 
-    public class mojangJoinServerRequest {
+    public static class mojangJoinServerRequest {
         public MojangAuthProvider.mojangAgent agent;
         public String accessToken;
         public String selectedProfile;
@@ -81,12 +81,12 @@ public class MojangAuthHandler extends AuthHandler {
     }
 
     @Override
-    public UUID usernameToUUID(String username) throws IOException {
+    public UUID usernameToUUID(String username) {
         return usernameToUUID.get(username);
     }
 
     @Override
-    public String uuidToUsername(UUID uuid) throws IOException {
+    public String uuidToUsername(UUID uuid) {
         for (Map.Entry<String, UUID> entry : usernameToUUID.entrySet()) {
             if (entry.getValue().equals(uuid)) return entry.getKey();
         }

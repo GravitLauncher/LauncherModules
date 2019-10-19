@@ -31,7 +31,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent((e) -> { server = e.server; }, LaunchServerInitPhase.class);
+        registerEvent((e) -> server = e.server, LaunchServerInitPhase.class);
         registerEvent(this::postInit, LaunchServerPostInitPhase.class);
     }
 
@@ -58,8 +58,8 @@ public class LauncherModuleLoaderModule extends LauncherModule {
         }
     }
 
-    public List<String> module_class = new ArrayList<>();
-    public List<Path> module_jars = new ArrayList<>();
+    public final List<String> module_class = new ArrayList<>();
+    public final List<Path> module_jars = new ArrayList<>();
     public Path modules_dir;
 
     public void postInit(LaunchServerPostInitPhase phase) {

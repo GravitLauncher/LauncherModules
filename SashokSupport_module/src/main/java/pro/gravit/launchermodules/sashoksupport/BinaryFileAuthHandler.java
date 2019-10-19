@@ -107,7 +107,7 @@ public final class BinaryFileAuthHandler extends AuthHandler {
     public String fileTmp;
 
 
-    public boolean offlineUUIDs = false;
+    public final boolean offlineUUIDs = false;
     // Instance
     private final SecureRandom random = SecurityHelper.newRandom();
 

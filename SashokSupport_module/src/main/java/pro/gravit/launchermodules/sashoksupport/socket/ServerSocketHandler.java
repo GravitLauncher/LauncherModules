@@ -42,7 +42,7 @@ public final class ServerSocketHandler implements Runnable, AutoCloseable {
 
     public final SessionManager sessionManager;
     private final AtomicLong idCounter = new AtomicLong(0L);
-    public static int LEGACY_LAUNCHER_MAGIC = Launcher.PROTOCOL_MAGIC_LEGACY - 2;
+    public static final int LEGACY_LAUNCHER_MAGIC = Launcher.PROTOCOL_MAGIC_LEGACY - 2;
 
     private volatile Listener listener;
 

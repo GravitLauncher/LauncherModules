@@ -11,7 +11,7 @@ public class StatisticsManager {
     public int fullAuthNumber;
 
     long loadTime;
-    private Timer timer = new Timer("StatisticManager", true);
+    private final Timer timer = new Timer("StatisticManager", true);
 
     public StatisticsManager() {
         TimerTask task = new TimerTask() {

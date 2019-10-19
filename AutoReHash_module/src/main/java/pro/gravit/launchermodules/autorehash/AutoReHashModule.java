@@ -46,7 +46,7 @@ public class AutoReHashModule extends LauncherModule {
         }
         Runnable task = () -> {
             try {
-                while (true) {
+                while (!Thread.interrupted()) {
                     WatchKey key = watchService.take();
                     for (WatchEvent<?> event : key.pollEvents()) {
                     	LogHelper.info("Changed " + (event.context() != null ? event.context().toString() : "unknown") + " kind " + event.kind().name());

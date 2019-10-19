@@ -37,7 +37,7 @@ public final class PaperPatchModule extends LauncherModule {
             private Pattern pattern = Pattern.compile("net/minecraft/server/[^/]+/MinecraftServer");
 
             @Override
-            public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+            public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) {
                 Pattern pattern = this.pattern;
                 if (pattern != null && pattern.matcher(className).matches()) {
                     this.pattern = null;
@@ -74,7 +74,7 @@ public final class PaperPatchModule extends LauncherModule {
                     return cw.toByteArray();
                 }
                 return classfileBuffer;
-            };
+            }
         };
         instrumentation.addTransformer(transformer, false);
     }

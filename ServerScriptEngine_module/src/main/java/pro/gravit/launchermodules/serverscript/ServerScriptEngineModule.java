@@ -8,7 +8,7 @@ import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
 public class ServerScriptEngineModule extends LauncherModule {
-    public static Version version = new Version(1, 1, 0);
+    public static final Version version = new Version(1, 1, 0);
     public static ServerScriptEngine scriptEngine;
 
     public ServerScriptEngineModule() {

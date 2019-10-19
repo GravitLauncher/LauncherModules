@@ -30,9 +30,9 @@ import java.util.Arrays;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class PHPass {
-    private static String itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    private int iterationCountLog2;
-    private SecureRandom randomGen;
+    private static final String itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private final int iterationCountLog2;
+    private final SecureRandom randomGen;
 
     public PHPass(int iterationCountLog2) {
         if (iterationCountLog2 < 4 || iterationCountLog2 > 31) {

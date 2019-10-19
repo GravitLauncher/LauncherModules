@@ -26,8 +26,8 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 public class AutoSaveSessionsModule extends LauncherModule {
-    public static String FILENAME = "sessions.json";
-    public static boolean isClearSessionsBeforeSave = true;
+    public static final String FILENAME = "sessions.json";
+    public static final boolean isClearSessionsBeforeSave = true;
     public Path file;
 	private LaunchServer srv;
 

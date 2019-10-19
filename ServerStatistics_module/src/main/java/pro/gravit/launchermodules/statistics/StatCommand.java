@@ -21,7 +21,7 @@ public class StatCommand extends Command {
     }
 
     @Override
-    public void invoke(String... args) throws Exception {
+    public void invoke(String... args) {
         LogHelper.info(formatAverage("joinServer", manager.joinServerNumber, manager.loadTime));
         LogHelper.info(formatAverage("checkServer", manager.checkServerNumber, manager.loadTime));
 

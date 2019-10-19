@@ -24,7 +24,7 @@ public final class MySQLPhpHashAuthProvider extends AuthProvider {
     private String message;
     private String[] queryParams;
     private boolean usePermission;
-    private int passIterationCountLog2 = 8; // default
+    private final int passIterationCountLog2 = 8; // default
     private transient PHPass pass;
 
     @Override

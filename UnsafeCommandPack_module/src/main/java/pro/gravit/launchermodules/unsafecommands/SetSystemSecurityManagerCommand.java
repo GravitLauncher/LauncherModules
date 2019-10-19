@@ -23,17 +23,16 @@ public class SetSystemSecurityManagerCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 1);
-        if(args[0].equals("allow"))
-        {
-            System.setSecurityManager(new AllowSecurityManager());
-        }
-        else if(args[0].equals("logger"))
-        {
-            System.setSecurityManager(new LoggerSecurityManager());
-        }
-        else if(args[0].equals("system"))
-        {
-            System.setSecurityManager(new SecurityManager());
+        switch (args[0]) {
+            case "allow":
+                System.setSecurityManager(new AllowSecurityManager());
+                break;
+            case "logger":
+                System.setSecurityManager(new LoggerSecurityManager());
+                break;
+            case "system":
+                System.setSecurityManager(new SecurityManager());
+                break;
         }
     }
 }

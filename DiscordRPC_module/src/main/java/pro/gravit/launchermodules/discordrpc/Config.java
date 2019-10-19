@@ -17,9 +17,9 @@ public class Config {
 	@SerializedName("secondLine")
     public String secondLine = "Ник: %user%";
 	@SerializedName("largeKey")
-    public String largeKey = "large.png";
+    public final String largeKey = "large.png";
 	@SerializedName("smallKey")
-    public String smallKey = "small.png";
+    public final String smallKey = "small.png";
 	@SerializedName("largeText")
     public String largeText = "Everything";
 	@SerializedName("smallText")

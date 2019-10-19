@@ -43,9 +43,9 @@ public final class MojangAuthProvider extends AuthProvider {
             agent.version = 1;
         }
 
-        public mojangAgent agent;
-        public String username;
-        public String password;
+        public final mojangAgent agent;
+        public final String username;
+        public final String password;
     }
 
     @Override
