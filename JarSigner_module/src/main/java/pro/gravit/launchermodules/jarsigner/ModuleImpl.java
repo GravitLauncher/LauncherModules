@@ -22,12 +22,12 @@ public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(0, 1, 0, 0, Version.Type.LTS);
 
     public static class Config {
-        public final String key = "myPathToKey";
-        public final String storepass = "pass";
-        public final String algo = "JKS";
-        public final String keyalias = "mykey";
-        public final String pass = "pass";
-        public final String signAlgo = "SHA256WITHRSA";
+        public String key = "myPathToKey";
+        public String storepass = "pass";
+        public String algo = "JKS";
+        public String keyalias = "mykey";
+        public String pass = "pass";
+        public String signAlgo = "SHA256WITHRSA";
     }
 
     public Path configFile = null;
@@ -39,7 +39,7 @@ public class ModuleImpl extends LauncherModule {
     }
 
     public void finish(LaunchServerPostInitPhase context) {
-        configFile = context.server.modulesManager.getConfigManager().getModuleConfig("jar-signing");
+        configFile = context.server.modulesManager.getConfigManager().getModuleConfig("JarSigner");
         if (IOHelper.exists(configFile)) {
             try (Reader reader = IOHelper.newReader(configFile)) {
                 config = Launcher.gsonManager.configGson.fromJson(reader, Config.class);

@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.jarsigner;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
 import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,14 +34,10 @@ public class SignJarTask implements LauncherBuildTask {
                 SignerJar.getStore(new File(impl.config.key).toPath(), impl.config.storepass, impl.config.algo),
                 impl.config.keyalias, impl.config.signAlgo, impl.config.pass);
              JarInputStream input = new JarInputStream(IOHelper.newInput(inputFile))) {
+            input.getManifest().getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
             ZipEntry e = input.getNextEntry();
+
             while (e != null) {
-                if ("META-INF/MANIFEST.MF".equals(e.getName()) || "/META-INF/MANIFEST.MF".equals(e.getName())) {
-                    Manifest m = new Manifest(input);
-                    m.getMainAttributes().forEach((a, b) -> output.addManifestAttribute(a.toString(), b.toString()));
-                    e = input.getNextEntry();
-                    continue;
-                }
                 output.addFileContents(e, input);
                 e = input.getNextEntry();
             }
