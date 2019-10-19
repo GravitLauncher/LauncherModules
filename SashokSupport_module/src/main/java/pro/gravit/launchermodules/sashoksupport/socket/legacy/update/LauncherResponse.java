@@ -1,14 +1,14 @@
 package pro.gravit.launchermodules.sashoksupport.socket.legacy.update;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launcher.serialize.SerializeLimits;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.Response;
 import pro.gravit.utils.helper.IOHelper;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 public final class LauncherResponse extends Response {
 

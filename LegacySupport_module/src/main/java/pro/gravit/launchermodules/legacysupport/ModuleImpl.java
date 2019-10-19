@@ -15,7 +15,7 @@ public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
 
     public ModuleImpl() {
-        super( new LauncherModuleInfo("LegacySupport", version));
+        super(new LauncherModuleInfo("LegacySupport", version));
     }
 
     public void preInit(PreConfigPhase preConfigPhase) {
@@ -34,10 +34,8 @@ public class ModuleImpl extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preInit, PreConfigPhase.class);
-        if(initContext != null)
-        {
-            if(initContext instanceof LaunchServerInitContext)
-            {
+        if (initContext != null) {
+            if (initContext instanceof LaunchServerInitContext) {
                 preInit(new PreConfigPhase());
             }
         }

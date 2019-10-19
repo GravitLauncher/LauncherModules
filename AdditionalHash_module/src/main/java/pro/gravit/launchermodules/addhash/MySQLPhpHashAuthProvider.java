@@ -1,12 +1,6 @@
 package pro.gravit.launchermodules.addhash;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import com.github.wolf480pl.phpass.PHPass;
-
 import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
@@ -17,6 +11,11 @@ import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.SecurityHelper;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public final class MySQLPhpHashAuthProvider extends AuthProvider {
     private MySQLSourceConfig mySQLHolder;
@@ -29,7 +28,7 @@ public final class MySQLPhpHashAuthProvider extends AuthProvider {
 
     @Override
     public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
-        if(!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
+        if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         try (Connection c = mySQLHolder.getConnection()) {
             PreparedStatement s = c.prepareStatement(query);
             String[] replaceParams = {"login", login, "password", ((AuthPlainPassword) password).password, "ip", ip};
@@ -46,7 +45,7 @@ public final class MySQLPhpHashAuthProvider extends AuthProvider {
 
     @Override
     public void init(LaunchServer srv) {
-    	super.init(srv);
+        super.init(srv);
         pass = new PHPass(passIterationCountLog2);
     }
 

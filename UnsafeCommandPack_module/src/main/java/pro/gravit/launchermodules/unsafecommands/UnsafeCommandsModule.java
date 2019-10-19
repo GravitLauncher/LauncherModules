@@ -27,10 +27,8 @@ public class UnsafeCommandsModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::init, LaunchServerInitPhase.class);
-        if(initContext != null)
-        {
-            if(initContext instanceof LaunchServerInitContext)
-            {
+        if (initContext != null) {
+            if (initContext instanceof LaunchServerInitContext) {
                 init(new LaunchServerInitPhase(((LaunchServerInitContext) initContext).server));
             }
         }

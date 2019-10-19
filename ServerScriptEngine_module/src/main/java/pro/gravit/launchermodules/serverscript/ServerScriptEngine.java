@@ -1,20 +1,19 @@
 package pro.gravit.launchermodules.serverscript;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
-
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JarHelper;
 import pro.gravit.utils.helper.LogHelper;
+
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Map;
 
 public class ServerScriptEngine {
     public final ScriptEngine engine = CommonHelper.newScriptEngine();

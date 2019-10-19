@@ -1,13 +1,13 @@
 package pro.gravit.launchermodules.sashoksupport.socket.legacy.update;
 
-import java.io.IOException;
-
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.Response;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.SecurityHelper;
+
+import java.io.IOException;
 
 public final class LegacyLauncherResponse extends Response {
 

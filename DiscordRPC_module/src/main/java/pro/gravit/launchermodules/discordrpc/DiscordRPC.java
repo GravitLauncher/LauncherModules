@@ -1,17 +1,17 @@
 package pro.gravit.launchermodules.discordrpc;
 
-import java.util.Timer;
-
-import com.google.gson.Gson;
-
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRichPresence;
+import com.google.gson.Gson;
 import pro.gravit.utils.helper.CommonHelper;
+
+import java.util.Timer;
 
 class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
-	static Thread thr;
-	static Timer timer;
+    static Thread thr;
+    static Timer timer;
+
     static void onConfig(Config conf) {
         club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
         DiscordEventHandlers handlers = new DiscordEventHandlers();
@@ -21,16 +21,16 @@ class DiscordRPC {
         presence.details = conf.firstLine;
         presence.state = conf.secondLine;
         //Ниче не лишнее, так надо
-        if(conf.largeKey != null) {
+        if (conf.largeKey != null) {
             presence.largeImageKey = conf.largeKey;
         }
-        if(conf.smallKey != null) {
+        if (conf.smallKey != null) {
             presence.smallImageKey = conf.smallKey;
         }
-        if(conf.largeKey != null && conf.largeText != null){
+        if (conf.largeKey != null && conf.largeText != null) {
             presence.largeImageText = conf.largeText;
         }
-        if(conf.smallKey != null && conf.smallText != null){
+        if (conf.smallKey != null && conf.smallText != null) {
             presence.smallImageText = conf.smallText;
         }
 
@@ -41,7 +41,8 @@ class DiscordRPC {
                 lib.Discord_RunCallbacks();
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
         }, "RPC");
         timer = new Timer(true);

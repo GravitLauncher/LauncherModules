@@ -37,7 +37,7 @@ configure(subprojects.findAll { it.name.endsWith('_swmodule') }) {
         compileOnly project(':ServerWrapper')
     }
     shadowJar {
-        relocate 'io.netty', 'pro.gravit.repackage.io.netty'   
+        relocate 'io.netty', 'pro.gravit.repackage.io.netty'
     }
 }
 
@@ -46,7 +46,7 @@ configure(subprojects.findAll { it.name.endsWith('_lmodule') }) {
         compileOnly project(':Launcher')
     }
     shadowJar {
-        relocate 'org.objectweb.asm', 'pro.gravit.repackage.org.objectweb.asm'    
+        relocate 'org.objectweb.asm', 'pro.gravit.repackage.org.objectweb.asm'
         relocate 'io.netty', 'pro.gravit.repackage.io.netty'
     }
 }

@@ -1,16 +1,6 @@
 package pro.gravit.launchermodules.autosavesessions;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.google.gson.reflect.TypeToken;
-
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -25,19 +15,28 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
+
 public class AutoSaveSessionsModule extends LauncherModule {
     public static final String FILENAME = "sessions.json";
     public static final boolean isClearSessionsBeforeSave = true;
     public Path file;
-	private LaunchServer srv;
+    private LaunchServer srv;
 
     public AutoSaveSessionsModule() {
-        super(new LauncherModuleInfo("AutoSaveSessions", new Version(1,1,0)));
+        super(new LauncherModuleInfo("AutoSaveSessions", new Version(1, 1, 0)));
     }
 
     public void close(ClosePhase closePhase) {
         if (isClearSessionsBeforeSave) {
-        	srv.sessionManager.garbageCollection();
+            srv.sessionManager.garbageCollection();
         }
         Set<Client> clientSet = srv.sessionManager.getSessions();
         try (Writer writer = IOHelper.newWriter(file)) {
@@ -54,23 +53,19 @@ public class AutoSaveSessionsModule extends LauncherModule {
         registerEvent(this::init, LaunchServerInitPhase.class);
         registerEvent(this::postInit, LaunchServerFullInitEvent.class);
         registerEvent(this::close, ClosePhase.class);
-        if(initContext != null)
-        {
-            if(initContext instanceof LaunchServerInitContext)
-            {
+        if (initContext != null) {
+            if (initContext instanceof LaunchServerInitContext) {
                 srv = ((LaunchServerInitContext) initContext).server;
                 postInit(null);
             }
         }
     }
 
-    public void init(LaunchServerInitPhase initPhase)
-    {
+    public void init(LaunchServerInitPhase initPhase) {
         srv = initPhase.server;
     }
 
-    public void postInit(LaunchServerFullInitEvent postInitPhase)
-    {
+    public void postInit(LaunchServerFullInitEvent postInitPhase) {
         Path configDir = modulesConfigManager.getModuleConfigDir("AutoSaveSessions");
         if (!IOHelper.isDir(configDir)) {
             try {

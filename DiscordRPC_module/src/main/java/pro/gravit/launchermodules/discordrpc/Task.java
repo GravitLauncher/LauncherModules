@@ -14,8 +14,8 @@ public class Task extends TimerTask {
         Set<Thread> threads = Thread.getAllStackTraces().keySet();
         List<String> names = new ArrayList<>();
         threads.forEach(t -> names.add(t.getName()));
-        if(!names.contains("main")){
-        	club.minnced.discord.rpc.DiscordRPC.INSTANCE.Discord_Shutdown();
+        if (!names.contains("main")) {
+            club.minnced.discord.rpc.DiscordRPC.INSTANCE.Discord_Shutdown();
             if (DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
         }
     }

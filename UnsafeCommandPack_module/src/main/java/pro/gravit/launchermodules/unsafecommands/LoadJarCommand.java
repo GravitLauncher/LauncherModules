@@ -1,13 +1,13 @@
 package pro.gravit.launchermodules.unsafecommands;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.jar.JarFile;
-
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.StarterAgent;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.LogHelper;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.jar.JarFile;
 
 public class LoadJarCommand extends Command {
     public LoadJarCommand(LaunchServer server) {

@@ -1,10 +1,5 @@
 package pro.gravit.launchermodules.jarsigner;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Path;
-
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -14,11 +9,16 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Path;
+
 public class ModuleImpl extends LauncherModule {
-	public ModuleImpl() {
-		super(new LauncherModuleInfo("JarSigner", version, Integer.MIN_VALUE+200, new String[0]));
-	}
-	
+    public ModuleImpl() {
+        super(new LauncherModuleInfo("JarSigner", version, Integer.MIN_VALUE + 200, new String[0]));
+    }
+
     public static final Version version = new Version(0, 1, 0, 0, Version.Type.LTS);
 
     public static class Config {
@@ -33,11 +33,12 @@ public class ModuleImpl extends LauncherModule {
     public Path configFile = null;
     public Config config = null;
 
-	@Override
-	public void init(LauncherInitContext initContext) {
+    @Override
+    public void init(LauncherInitContext initContext) {
         registerEvent(this::finish, LaunchServerPostInitPhase.class);
-	}
-	public void finish(LaunchServerPostInitPhase context) {
+    }
+
+    public void finish(LaunchServerPostInitPhase context) {
         configFile = context.server.modulesManager.getConfigManager().getModuleConfig("jar-signing");
         if (IOHelper.exists(configFile)) {
             try (Reader reader = IOHelper.newReader(configFile)) {

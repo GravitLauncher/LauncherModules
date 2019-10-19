@@ -1,9 +1,5 @@
 package pro.gravit.launchermodules.sashoksupport.socket.legacy;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.request.RequestType;
 import pro.gravit.launcher.serialize.HInput;
@@ -12,6 +8,10 @@ import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LauncherResponse;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LegacyLauncherResponse;
 import pro.gravit.utils.helper.LogHelper;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Response {
     @FunctionalInterface

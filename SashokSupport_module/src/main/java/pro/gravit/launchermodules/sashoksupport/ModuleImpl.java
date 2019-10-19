@@ -33,10 +33,8 @@ public class ModuleImpl extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preInit, PreConfigPhase.class);
-        if(initContext != null)
-        {
-            if(initContext instanceof LaunchServerInitContext)
-            {
+        if (initContext != null) {
+            if (initContext instanceof LaunchServerInitContext) {
                 preInit(new PreConfigPhase());
             }
         }

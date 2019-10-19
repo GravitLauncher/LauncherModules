@@ -4,20 +4,20 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 repositories {
-	jcenter()
+    jcenter()
 }
 
 dependencies {
     compileOnly project(':Launcher')
     compileOnly project(':LaunchServer')
-	compile('club.minnced:java-discord-rpc:2.0.2') {
-		exclude group: 'net.java.dev.jna'
-	}
+    compile('club.minnced:java-discord-rpc:2.0.2') {
+        exclude group: 'net.java.dev.jna'
+    }
 }
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName)
     from {
-		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-	}
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }

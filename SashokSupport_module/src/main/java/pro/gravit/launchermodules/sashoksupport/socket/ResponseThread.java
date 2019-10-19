@@ -1,9 +1,5 @@
 package pro.gravit.launchermodules.sashoksupport.socket;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.net.SocketException;
-
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.serialize.HInput;
@@ -13,6 +9,10 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.manangers.SessionManager;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketException;
 
 public final class ResponseThread implements Runnable {
     static class Handshake {
@@ -105,12 +105,12 @@ public final class ResponseThread implements Runnable {
 
             // Start response
             try {
-                    respond(handshake.type, input, output, handshake.session);
-                } catch (RequestException e) {
-                    LogHelper.subDebug(String.format("#%d Request error: %s", handshake.session, e.getMessage()));
-                    if (e.getMessage() == null) LogHelper.error(e);
-                    output.writeString(e.getMessage(), 0);
-                }
+                respond(handshake.type, input, output, handshake.session);
+            } catch (RequestException e) {
+                LogHelper.subDebug(String.format("#%d Request error: %s", handshake.session, e.getMessage()));
+                if (e.getMessage() == null) LogHelper.error(e);
+                output.writeString(e.getMessage(), 0);
+            }
         } catch (Exception e) {
             savedError = e;
         } finally {

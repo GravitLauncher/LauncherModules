@@ -13,7 +13,7 @@ public class ServerStatisticsModule extends LauncherModule {
     public final StatisticsManager manager;
 
     public ServerStatisticsModule() {
-    	super(new LauncherModuleInfo("ServerStatistics", version));
+        super(new LauncherModuleInfo("ServerStatistics", version));
         manager = new StatisticsManager();
     }
 
@@ -43,8 +43,8 @@ public class ServerStatisticsModule extends LauncherModule {
         server.commandHandler.registerCommand("stat", new StatCommand(manager));
     }
 
-	@Override
-	public void init(LauncherInitContext initContext) {
+    @Override
+    public void init(LauncherInitContext initContext) {
         registerEvent(this::postInit, LaunchServerFullInitEvent.class);
-	}
+    }
 }

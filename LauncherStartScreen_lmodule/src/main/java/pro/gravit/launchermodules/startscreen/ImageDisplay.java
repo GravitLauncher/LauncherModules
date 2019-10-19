@@ -1,17 +1,14 @@
 package pro.gravit.launchermodules.startscreen;
 
-import java.awt.FlowLayout;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.Closeable;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 public class ImageDisplay implements Closeable {
     private final JFrame frame;
 
-	public ImageDisplay(BufferedImage img)
-    {
+    public ImageDisplay(BufferedImage img) {
         frame = new JFrame();
         frame.setUndecorated(true);
         frame.setLayout(new FlowLayout());
@@ -24,8 +21,8 @@ public class ImageDisplay implements Closeable {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
-	@Override
-	public void close() {
-		frame.setVisible(false);
-	}
+    @Override
+    public void close() {
+        frame.setVisible(false);
+    }
 }

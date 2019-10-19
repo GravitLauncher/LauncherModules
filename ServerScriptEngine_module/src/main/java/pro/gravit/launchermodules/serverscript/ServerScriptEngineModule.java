@@ -25,10 +25,8 @@ public class ServerScriptEngineModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::postInit, LaunchServerFullInitEvent.class);
-        if(initContext != null)
-        {
-            if(initContext instanceof LaunchServerInitContext)
-            {
+        if (initContext != null) {
+            if (initContext instanceof LaunchServerInitContext) {
                 postInit(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
             }
         }

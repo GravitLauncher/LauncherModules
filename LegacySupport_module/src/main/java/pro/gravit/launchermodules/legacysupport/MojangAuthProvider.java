@@ -1,20 +1,19 @@
 package pro.gravit.launchermodules.legacysupport;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 import pro.gravit.utils.HTTPRequest;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 public final class MojangAuthProvider extends AuthProvider {
     private static final Pattern UUID_REGEX = Pattern.compile("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})");
@@ -50,7 +49,7 @@ public final class MojangAuthProvider extends AuthProvider {
 
     @Override
     public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws Exception {
-        if(!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
+        if (!(password instanceof AuthPlainPassword)) throw new AuthException("This password type not supported");
         mojangAuth mojangAuth = new mojangAuth(login, ((AuthPlainPassword) password).password);
         JsonElement request = gson.toJsonTree(mojangAuth);
 
