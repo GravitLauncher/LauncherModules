@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.LauncherAPI;
 import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchserver.auth.texture.TextureProvider;
 import pro.gravit.utils.HTTPRequest;
@@ -24,7 +23,6 @@ public final class MojangTextureProvider extends TextureProvider {
 
     }
 
-    @LauncherAPI
     public static final long CACHE_DURATION_MS = VerifyHelper.verifyLong(
             Long.parseLong(System.getProperty("launcher.mysql.cacheDurationHours", Integer.toString(24))),
             VerifyHelper.L_NOT_NEGATIVE, "launcher.mysql.cacheDurationHours can't be < 0") * 60L * 60L * 1000L;
