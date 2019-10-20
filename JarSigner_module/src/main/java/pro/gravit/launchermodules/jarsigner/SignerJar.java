@@ -1,26 +1,14 @@
 package pro.gravit.launchermodules.jarsigner;
 
-import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.*;
-import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.DigestCalculatorProvider;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.bouncycastle.util.Store;
 import pro.gravit.utils.helper.IOHelper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Path;
-import java.security.*;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
@@ -44,81 +32,14 @@ import java.util.zip.ZipOutputStream;
  * </pre>
  */
 public class SignerJar implements AutoCloseable {
-    /**
-     * Helper output stream that also sends the data to the given {@link com.google.common.hash.Hasher}.
-     */
-    private static class HashingOutputStream extends OutputStream {
-        private final OutputStream out;
-        private final MessageDigest hasher;
 
-        public HashingOutputStream(OutputStream out, MessageDigest hasher) {
-            this.out = out;
-            this.hasher = hasher;
-        }
-
-        @Override
-        public void close() throws IOException {
-            out.close();
-        }
-
-        @Override
-        public void flush() throws IOException {
-            out.flush();
-        }
-
-        @Override
-        public void write(byte[] b) throws IOException {
-            out.write(b);
-            hasher.update(b);
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            out.write(b, off, len);
-            hasher.update(b, off, len);
-        }
-
-        @Override
-        public void write(int b) throws IOException {
-            out.write(b);
-            hasher.update((byte) b);
-        }
-    }
-
-    private static final String MANIFEST_FN = "META-INF/MANIFEST.MF";
+	private static final String MANIFEST_FN = "META-INF/MANIFEST.MF";
     private static final String SIG_FN = "META-INF/SIGNUMO.SF";
-
     private static final String SIG_RSA_FN = "META-INF/SIGNUMO.RSA";
-
-    private static final String hashFunctionName = "SHA-256";
-
-    public static KeyStore getStore(Path file, String storepass, String algo) throws IOException {
-        try {
-            KeyStore st = KeyStore.getInstance(algo);
-            st.load(IOHelper.newInput(file), storepass != null ? storepass.toCharArray() : null);
-            return st;
-        } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private static MessageDigest hasher() {
-        try {
-            return MessageDigest.getInstance(hashFunctionName);
-        } catch (NoSuchAlgorithmException e) {
-            return null;
-        }
-    }
+	private static final String DIGEST_HASH = SignHelper.hashFunctionName + "-Digest";
 
     private final ZipOutputStream zos;
 
-    private final KeyStore keyStore;
-
-    private final String keyAlias;
-
-    private final String signAlgo;
-
-    private final String password;
     private final Map<String, String> manifestAttributes;
     private String manifestHash;
     private String manifestMainHash;
@@ -126,6 +47,7 @@ public class SignerJar implements AutoCloseable {
     private final Map<String, String> fileDigests;
 
     private final Map<String, String> sectionDigests;
+	private final Supplier<CMSSignedDataGenerator> gen;
 
     /**
      * Constructor.
@@ -136,13 +58,9 @@ public class SignerJar implements AutoCloseable {
      * @param signAlgo
      * @param keyPassword the password to access the key
      */
-    public SignerJar(OutputStream out, KeyStore keyStore, String keyAlias, String signAlgo, String keyPassword) {
-        zos = new ZipOutputStream(out);
-        this.keyStore = keyStore;
-        this.keyAlias = keyAlias;
-        this.signAlgo = signAlgo;
-        password = keyPassword;
-
+    public SignerJar(ZipOutputStream out, Supplier<CMSSignedDataGenerator> gen) {
+        zos = out;
+        this.gen = gen;
         manifestAttributes = new LinkedHashMap<>();
         fileDigests = new LinkedHashMap<>();
         sectionDigests = new LinkedHashMap<>();
@@ -158,12 +76,7 @@ public class SignerJar implements AutoCloseable {
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     public void addFileContents(String filename, byte[] contents) throws IOException {
-        zos.putNextEntry(new ZipEntry(filename));
-        zos.write(contents);
-        zos.closeEntry();
-
-        String hashCode64 = Base64.getEncoder().encodeToString(hasher().digest(contents));
-        fileDigests.put(filename, hashCode64);
+    	addFileContents(filename, new ByteArrayInputStream(contents));
     }
 
     /**
@@ -176,13 +89,7 @@ public class SignerJar implements AutoCloseable {
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     public void addFileContents(String filename, InputStream contents) throws IOException {
-        zos.putNextEntry(new ZipEntry(filename));
-        byte[] arr = IOHelper.toByteArray(contents);
-        zos.write(arr);
-        zos.closeEntry();
-
-        String hashCode64 = Base64.getEncoder().encodeToString(hasher().digest(arr));
-        fileDigests.put(filename, hashCode64);
+    	addFileContents(IOHelper.newZipEntry(filename), contents);
     }
 
     /**
@@ -195,12 +102,7 @@ public class SignerJar implements AutoCloseable {
      * @throws NullPointerException if any of the arguments is {@code null}
      */
     public void addFileContents(ZipEntry entry, byte[] contents) throws IOException {
-        zos.putNextEntry(entry);
-        zos.write(contents);
-        zos.closeEntry();
-
-        String hashCode64 = Base64.getEncoder().encodeToString(hasher().digest(contents));
-        fileDigests.put(entry.getName(), hashCode64);
+    	addFileContents(entry, new ByteArrayInputStream(contents));
     }
 
     /**
@@ -214,12 +116,10 @@ public class SignerJar implements AutoCloseable {
      */
     public void addFileContents(ZipEntry entry, InputStream contents) throws IOException {
         zos.putNextEntry(entry);
-        byte[] arr = IOHelper.toByteArray(contents);
-        zos.write(arr);
+        SignHelper.HashingOutputStream out = new SignHelper.HashingNonClosingOutputStream(zos, SignHelper.hasher());
+        IOHelper.transfer(contents, out);
         zos.closeEntry();
-
-        String hashCode64 = Base64.getEncoder().encodeToString(hasher().digest(arr));
-        fileDigests.put(entry.getName(), hashCode64);
+        fileDigests.put(entry.getName(), Base64.getEncoder().encodeToString(out.digest()));
     }
 
     /**
@@ -245,26 +145,6 @@ public class SignerJar implements AutoCloseable {
     public void close() throws IOException {
         finish();
         zos.close();
-    }
-
-    /**
-     * Creates the beast that can actually sign the data.
-     */
-    private CMSSignedDataGenerator createSignedDataGenerator() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-
-        List<Certificate> certChain = new ArrayList<>(Arrays.asList(keyStore.getCertificateChain(keyAlias)));
-        @SuppressWarnings("rawtypes")
-        Store certStore = new JcaCertStore(certChain);
-        Certificate cert = keyStore.getCertificate(keyAlias);
-        PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, password != null ? password.toCharArray() : null);
-        ContentSigner signer = new JcaContentSignerBuilder(signAlgo).setProvider("BC").build(privateKey);
-        CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
-        DigestCalculatorProvider dcp = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
-        SignerInfoGenerator sig = new JcaSignerInfoGeneratorBuilder(dcp).build(signer, (X509Certificate) cert);
-        generator.addSignerInfoGenerator(sig);
-        generator.addCertificates(certStore);
-        return generator;
     }
 
 
@@ -301,7 +181,7 @@ public class SignerJar implements AutoCloseable {
         manifest.write(o);
         byte[] ob = o.toByteArray();
         ob = Arrays.copyOfRange(ob, emptyLen, ob.length);
-        return Base64.getEncoder().encodeToString(hasher().digest(ob));
+        return Base64.getEncoder().encodeToString(SignHelper.hasher().digest(ob));
     }
 
     /**
@@ -310,37 +190,16 @@ public class SignerJar implements AutoCloseable {
     private String hashMainSection(Attributes attributes) throws IOException {
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().putAll(attributes);
-        MessageDigest hasher = hasher();
-        SignerJar.HashingOutputStream o = new SignerJar.HashingOutputStream(new OutputStream() {
-            @Override
-            public String toString() {
-                return "NullOutputStream";
-            }
-
-            /** Discards the specified byte array. */
-            @Override
-            public void write(byte[] b) {
-            }
-
-            /** Discards the specified byte array. */
-            @Override
-            public void write(byte[] b, int off, int len) {
-            }
-
-            /** Discards the specified byte. */
-            @Override
-            public void write(int b) {
-            }
-        }, hasher);
+        SignHelper.HashingOutputStream o = new SignHelper.HashingNonClosingOutputStream(SignHelper.NULL, SignHelper.hasher());
         manifest.write(o);
-        return Base64.getEncoder().encodeToString(hasher.digest());
+        return Base64.getEncoder().encodeToString(o.digest());
     }
 
     /**
      * Returns the CMS signed data.
      */
     private byte[] signSigFile(byte[] sigContents) throws Exception {
-        CMSSignedDataGenerator gen = createSignedDataGenerator();
+        CMSSignedDataGenerator gen = this.gen.get();
         CMSTypedData cmsData = new CMSProcessableByteArray(sigContents);
         CMSSignedData signedData = gen.generate(cmsData, true);
         return signedData.getEncoded();
@@ -353,7 +212,7 @@ public class SignerJar implements AutoCloseable {
      * @throws java.io.IOException
      */
     private void writeManifest() throws IOException {
-        zos.putNextEntry(new ZipEntry(MANIFEST_FN));
+        zos.putNextEntry(IOHelper.newZipEntry(MANIFEST_FN));
         Manifest man = new Manifest();
 
         // main section
@@ -364,7 +223,7 @@ public class SignerJar implements AutoCloseable {
             mainAttributes.put(new Attributes.Name(entry.getKey()), entry.getValue());
 
         // individual files sections
-        Attributes.Name digestAttr = new Attributes.Name(hashFunctionName + "-Digest");
+        Attributes.Name digestAttr = new Attributes.Name(DIGEST_HASH);
         for (Map.Entry<String, String> entry : fileDigests.entrySet()) {
             Attributes attributes = new Attributes();
             man.getEntries().put(entry.getKey(), attributes);
@@ -372,12 +231,11 @@ public class SignerJar implements AutoCloseable {
             sectionDigests.put(entry.getKey(), hashEntrySection(entry.getKey(), attributes));
         }
 
-        MessageDigest hasher = hasher();
-        OutputStream out = new SignerJar.HashingOutputStream(zos, hasher);
+        SignHelper.HashingOutputStream out = new SignHelper.HashingNonClosingOutputStream(zos, SignHelper.hasher());
         man.write(out);
         zos.closeEntry();
 
-        manifestHash = Base64.getEncoder().encodeToString(hasher.digest());
+        manifestHash = Base64.getEncoder().encodeToString(out.digest());
         manifestMainHash = hashMainSection(man.getMainAttributes());
     }
 
@@ -387,16 +245,16 @@ public class SignerJar implements AutoCloseable {
      * @return the contents of the file as bytes
      */
     private byte[] writeSigFile() throws IOException {
-        zos.putNextEntry(new ZipEntry(SIG_FN));
+        zos.putNextEntry(IOHelper.newZipEntry(SIG_FN));
         Manifest man = new Manifest();
         // main section
         Attributes mainAttributes = man.getMainAttributes();
         mainAttributes.put(Attributes.Name.SIGNATURE_VERSION, "1.0");
-        mainAttributes.put(new Attributes.Name(hashFunctionName + "-Digest-Manifest"), manifestHash);
-        mainAttributes.put(new Attributes.Name(hashFunctionName + "-Digest-Manifest-Main-Attributes"), manifestMainHash);
+        mainAttributes.put(new Attributes.Name(DIGEST_HASH + "-Manifest"), manifestHash);
+        mainAttributes.put(new Attributes.Name(DIGEST_HASH + "-Manifest-Main-Attributes"), manifestMainHash);
 
         // individual files sections
-        Attributes.Name digestAttr = new Attributes.Name(hashFunctionName + "-Digest");
+        Attributes.Name digestAttr = new Attributes.Name(DIGEST_HASH);
         for (Map.Entry<String, String> entry : sectionDigests.entrySet()) {
             Attributes attributes = new Attributes();
             man.getEntries().put(entry.getKey(), attributes);
@@ -418,7 +276,7 @@ public class SignerJar implements AutoCloseable {
      * @throws RuntimeException    if the signing failed
      */
     private void writeSignature(byte[] sigFile) throws IOException {
-        zos.putNextEntry(new ZipEntry(SIG_RSA_FN));
+        zos.putNextEntry(IOHelper.newZipEntry(SIG_RSA_FN));
         try {
             byte[] signature = signSigFile(sigFile);
             zos.write(signature);
