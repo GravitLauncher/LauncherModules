@@ -18,8 +18,8 @@ public class ImageDisplay implements Closeable {
         JLabel lbl = new JLabel();
         lbl.setIcon(new ImageIcon(img));
         frame.add(lbl);
-        frame.setLocationRelativeTo(null);
         frame.setSize(img.getWidth(), img.getHeight());
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
