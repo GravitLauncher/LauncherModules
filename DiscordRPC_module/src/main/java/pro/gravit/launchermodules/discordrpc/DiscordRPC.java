@@ -9,8 +9,8 @@ import java.util.Timer;
 
 class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
+	static club.minnced.discord.rpc.DiscordRPC lib;
     static Thread thr;
-    static Timer timer;
 
     static void onConfig(Config conf) {
         club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
@@ -41,12 +41,12 @@ class DiscordRPC {
                 lib.Discord_RunCallbacks();
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException ignored) {
+                } catch (InterruptedException e) {
+					e.printStackTrace();
                 }
             }
         }, "RPC");
-        timer = new Timer(true);
-        timer.scheduleAtFixedRate(new Task(), 0, 5000);
+        new Timer().scheduleAtFixedRate(new Task(), 0, 5000);
         thr.setDaemon(true);
         thr.setPriority(Integer.MIN_VALUE);
         thr.start();
