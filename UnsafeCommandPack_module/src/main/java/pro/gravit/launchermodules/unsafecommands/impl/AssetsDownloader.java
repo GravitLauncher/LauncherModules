@@ -20,10 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
-import pro.gravit.launcher.downloader.ListDownloader;
 import pro.gravit.launcher.downloader.ListDownloader.DownloadTask;
-import pro.gravit.launcher.profiles.ClientProfile;
-import pro.gravit.launcher.profiles.ClientProfile.Version;
 import pro.gravit.utils.helper.IOHelper;
 
 public class AssetsDownloader {
