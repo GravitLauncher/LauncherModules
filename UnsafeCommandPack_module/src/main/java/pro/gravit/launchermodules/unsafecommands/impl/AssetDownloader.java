@@ -23,7 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import pro.gravit.launcher.downloader.ListDownloader.DownloadTask;
 import pro.gravit.utils.helper.IOHelper;
 
-public class AssetsDownloader {
+public class AssetDownloader {
 	public static final class AssetIndex {
 
 		@SerializedName("virtual")
@@ -160,6 +160,6 @@ public class AssetsDownloader {
 		return applies;
 	}
 
-	private AssetsDownloader() {
+	private AssetDownloader() {
 	}
 }
