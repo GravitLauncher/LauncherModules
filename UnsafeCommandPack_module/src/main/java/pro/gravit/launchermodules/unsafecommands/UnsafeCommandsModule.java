@@ -22,6 +22,7 @@ public class UnsafeCommandsModule extends LauncherModule {
         category.registerCommand("registerComponent", new RegisterComponentCommand(initPhase.server));
         category.registerCommand("setSecurityManager", new SetSystemSecurityManagerCommand(initPhase.server));
         category.registerCommand("newDownloadAsset", new NewDownloadAssetCommand(initPhase.server));
+        category.registerCommand("sendAuth", new SendAuthCommand(initPhase.server));
         initPhase.server.commandHandler.registerCategory(new CommandHandler.Category(category, "Unsafe"));
     }
 
