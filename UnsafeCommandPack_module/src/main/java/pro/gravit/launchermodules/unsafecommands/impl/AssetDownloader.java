@@ -131,7 +131,7 @@ public class AssetDownloader {
 	public static String getBase() {
 		return "https://resources.download.minecraft.net/";
 	}
-
+	/*
 	public static List<DownloadTask> listAssets(Path loc, String ver) throws IOException {
 		List<DownloadTask> applies = new ArrayList<>();
 		String dIndex = "indexes/" + ver + ".json";
@@ -158,6 +158,7 @@ public class AssetDownloader {
 			}
 		return applies;
 	}
+	*/
 
 	private AssetDownloader() {
 	}

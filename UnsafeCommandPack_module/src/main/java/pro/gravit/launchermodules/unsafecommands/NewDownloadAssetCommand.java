@@ -38,7 +38,7 @@ public class NewDownloadAssetCommand extends Command {
         Files.createDirectory(assetDir);
 
         LogHelper.subInfo("Getting asset index, it may take some time");
-        List<DownloadTask> applies = AssetDownloader.listAssets(assetDir, version);
+        //List<DownloadTask> applies = AssetDownloader.listAssets(assetDir, version);
         // Download required asset
         LogHelper.subInfo("Downloading asset, it may take some time");
         //TODO: Replace
