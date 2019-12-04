@@ -5,6 +5,9 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.google.gson.Gson;
 import pro.gravit.utils.helper.CommonHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 
 class DiscordRPC {
@@ -42,11 +45,11 @@ class DiscordRPC {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
-					e.printStackTrace();
+                	break;
                 }
             }
+            lib.Discord_Shutdown();
         }, "RPC");
-        new Timer().scheduleAtFixedRate(new Task(), 0, 5000);
         thr.setDaemon(true);
         thr.setPriority(Integer.MIN_VALUE);
         thr.start();
