@@ -5,11 +5,6 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.google.gson.Gson;
 import pro.gravit.utils.helper.CommonHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-
 class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
 	static club.minnced.discord.rpc.DiscordRPC lib;
