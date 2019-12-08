@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.patcher;
 
 import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,8 +39,11 @@ public abstract class UnsafePatcher {
     public void processFile(Path file, Path tempFile, boolean testMode) throws IOException
     {
         processFile(file, tempFile);
+        if(Files.exists(tempFile))
         if(testMode)
+        {
             Files.delete(tempFile);
+        }
         else
         {
             Files.delete(file);
@@ -48,6 +52,7 @@ public abstract class UnsafePatcher {
     }
     public void processFile(Path path, Path tempFile) throws IOException
     {
+        LogHelper.debug("Process file %s", path.toString());
         if(path.toFile().getName().endsWith(".jar")) processJar(path, tempFile);
         else if(path.toFile().getName().endsWith(".class")) processClass(path, tempFile);
     }

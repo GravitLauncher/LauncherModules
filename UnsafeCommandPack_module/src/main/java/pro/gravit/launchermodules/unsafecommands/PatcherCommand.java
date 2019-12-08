@@ -51,5 +51,9 @@ public class PatcherCommand extends Command {
         {
             patcher.processFile(target, tempFile, testMode);
         }
+        else if(IOHelper.isDir(target))
+        {
+            patcher.processDir(target, tempFile, testMode);
+        }
     }
 }
