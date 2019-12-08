@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.utils.HTTPRequest;
+import pro.gravit.launcher.HTTPRequest;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;

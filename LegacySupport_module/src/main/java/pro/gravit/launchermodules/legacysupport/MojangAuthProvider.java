@@ -8,7 +8,7 @@ import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.utils.HTTPRequest;
+import pro.gravit.launcher.HTTPRequest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
