@@ -8,6 +8,7 @@ import pro.gravit.utils.helper.IOHelper;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,14 @@ public class PatcherCommand extends Command {
         if(patcher == null)
         {
             Class<? extends UnsafePatcher> clazz = (Class<? extends UnsafePatcher>) Class.forName(name);
-            patcher = clazz.newInstance();
+            String[] real_args = Arrays.copyOfRange(args, 3, Integer.MAX_VALUE);
+            try {
+                patcher = clazz.getConstructor(String[].class).newInstance((Object) real_args);
+            } catch (NoSuchMethodException e)
+            {
+                patcher = clazz.newInstance();
+            }
+
         }
         if(!IOHelper.exists(target))
             throw new IllegalStateException("Target path not exist");
