@@ -155,7 +155,7 @@ public class AssetDownloader {
 		if (index != null)
 			for (AssetObject assetObject : index.objects.values()) {
 				String dest = assetObject.getLocation();
-				applies.add(new AsyncDownloader.SizedFile("objects/" + dest, dest, assetObject.size));
+				applies.add(new AsyncDownloader.SizedFile(dest, "objects/" + dest, assetObject.size));
 			}
 		return applies;
 	}
