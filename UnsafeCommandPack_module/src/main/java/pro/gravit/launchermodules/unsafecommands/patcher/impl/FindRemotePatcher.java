@@ -4,17 +4,13 @@ import org.objectweb.asm.*;
 import pro.gravit.launchermodules.unsafecommands.patcher.ClassTransformerPatcher;
 import pro.gravit.utils.helper.LogHelper;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 public class FindRemotePatcher extends ClassTransformerPatcher {
     @Override
     public ClassVisitor getVisitor(ClassReader reader, ClassWriter cw) {
-        return new ClassVisitor(Opcodes.ASM5) {
+        return new ClassVisitor(Opcodes.ASM7) {
             @Override
             public MethodVisitor visitMethod(int access, String methodName, String descriptor, String signature, String[] exceptions) {
-                return new MethodVisitor(Opcodes.ASM5) {
+                return new MethodVisitor(Opcodes.ASM7) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                         if(opcode == Opcodes.INVOKEVIRTUAL &&  "java/net/URL".equals(owner) && "openConnection".equals(name)) {

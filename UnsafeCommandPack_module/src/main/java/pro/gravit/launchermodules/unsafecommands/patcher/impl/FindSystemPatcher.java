@@ -12,10 +12,10 @@ public class FindSystemPatcher extends ClassTransformerPatcher {
     public static List<String> noTriggeredMethodsCL = new ArrayList<>();
     @Override
     public ClassVisitor getVisitor(ClassReader reader, ClassWriter cw) {
-        return new ClassVisitor(Opcodes.ASM5) {
+        return new ClassVisitor(Opcodes.ASM7) {
             @Override
             public MethodVisitor visitMethod(int access, String methodName, String descriptor, String signature, String[] exceptions) {
-                return new MethodVisitor(Opcodes.ASM5) {
+                return new MethodVisitor(Opcodes.ASM7) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                         if(opcode == Opcodes.INVOKESTATIC && ( ("java/lang/System".equals(owner) && !noTriggeredMethods.contains(name)) || ("java/lang/ClassLoader".equals(owner) && !noTriggeredMethodsCL.contains(name)))) {

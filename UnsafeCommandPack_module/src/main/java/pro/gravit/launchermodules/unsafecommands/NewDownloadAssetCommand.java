@@ -4,7 +4,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.AssetDownloader;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
@@ -38,12 +43,16 @@ public class NewDownloadAssetCommand extends Command {
         Files.createDirectory(assetDir);
 
         LogHelper.subInfo("Getting asset index, it may take some time");
-        //List<DownloadTask> applies = AssetDownloader.listAssets(assetDir, version);
+        List<AsyncDownloader.SizedFile> applies = AssetDownloader.listAssets(assetDir, version);
         // Download required asset
         LogHelper.subInfo("Downloading asset, it may take some time");
-        //TODO: Replace
-        //new ListDownloader().download(AssetDownloader.getBase(), applies, assetDir, (f, d, t) -> { }, (e) -> { });
-        LogHelper.subInfo("Asset successfully downloaded: '%s'", dirName);
+        AsyncDownloader d = new AsyncDownloader();
+        ExecutorService e = Executors.newFixedThreadPool(4);
+        CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), AssetDownloader.getBase(), assetDir, e)).thenAccept((v) -> {
+            LogHelper.subInfo("Asset successfully downloaded: '%s'", dirName);
+        });
+        e.awaitTermination(4, TimeUnit.HOURS);
+        e.shutdown();
         // Finished
         server.syncUpdatesDir(Collections.singleton(dirName));
     }

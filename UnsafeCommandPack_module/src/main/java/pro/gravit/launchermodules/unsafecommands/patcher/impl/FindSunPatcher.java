@@ -11,7 +11,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
     public static List<String> noTriggeredMethods = new ArrayList<>();
     @Override
     public ClassVisitor getVisitor(ClassReader reader, ClassWriter cw) {
-        return new ClassVisitor(Opcodes.ASM5) {
+        return new ClassVisitor(Opcodes.ASM7) {
             @Override
             public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
                 if(value instanceof String && isUnsafe((String) value)) {
@@ -22,7 +22,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
 
             @Override
             public MethodVisitor visitMethod(int access, String methodName, String descriptor, String signature, String[] exceptions) {
-                return new MethodVisitor(Opcodes.ASM5) {
+                return new MethodVisitor(Opcodes.ASM7) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                         if(owner != null && isUnsafe(owner)) {

@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
+import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.utils.helper.IOHelper;
 
 public class AssetDownloader {
@@ -131,9 +132,9 @@ public class AssetDownloader {
 	public static String getBase() {
 		return "https://resources.download.minecraft.net/";
 	}
-	/*
-	public static List<DownloadTask> listAssets(Path loc, String ver) throws IOException {
-		List<DownloadTask> applies = new ArrayList<>();
+
+	public static List<AsyncDownloader.SizedFile> listAssets(Path loc, String ver) throws IOException {
+		List<AsyncDownloader.SizedFile> applies = new ArrayList<>();
 		String dIndex = "indexes/" + ver + ".json";
 		String assetsURL = gainAssetsURL(ver);
 		Path indexPath = loc.resolve(dIndex);
@@ -154,11 +155,10 @@ public class AssetDownloader {
 		if (index != null)
 			for (AssetObject assetObject : index.objects.values()) {
 				String dest = assetObject.getLocation();
-				applies.add(new DownloadTask("objects/" + dest, dest, 0));
+				applies.add(new AsyncDownloader.SizedFile("objects/" + dest, dest, assetObject.size));
 			}
 		return applies;
 	}
-	*/
 
 	private AssetDownloader() {
 	}
