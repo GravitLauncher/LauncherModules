@@ -55,7 +55,7 @@ public class FetchClientCommand extends Command {
         AsyncDownloader d = new AsyncDownloader();
         ExecutorService e = Executors.newFixedThreadPool(4);
         List<AsyncDownloader.SizedFile> applies = info.libraries.stream().map(y -> new AsyncDownloader.SizedFile(y.url.replace("https://libraries\\.minecraft\\.net/", ""), y.path, y.size)).collect(Collectors.toList());
-        CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), AssetDownloader.getBase(), clientDir.resolve("libraries"), e)).thenAccept((v) -> {
+        CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), "https://libraries.minecraft.net/", clientDir.resolve("libraries"), e)).thenAccept((v) -> {
             LogHelper.subInfo("Client libraries successfully downloaded: '%s'", dirName);
         });
         IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
