@@ -8,7 +8,10 @@ import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindSystemPatcher;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -50,14 +53,18 @@ public class PatcherCommand extends Command {
         if(patcher == null)
         {
             Class<? extends UnsafePatcher> clazz = (Class<? extends UnsafePatcher>) Class.forName(name);
-            String[] real_args = Arrays.copyOfRange(args, 3, Integer.MAX_VALUE);
             try {
-                patcher = clazz.getConstructor(String[].class).newInstance((Object) real_args);
-            } catch (NoSuchMethodException e)
+                String[] real_args = Arrays.copyOfRange(args, 3, Integer.MAX_VALUE);
+                patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments(Arrays.asList(real_args));
+            } catch (Throwable e)
             {
-                patcher = clazz.newInstance();
+            	LogHelper.dev(LogHelper.toString(e));
+            	try {
+            		patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments();
+            	} catch (Throwable t) {
+            		throw (InstantiationException) new InstantiationException().initCause(t);
+            	}
             }
-
         }
         if(!IOHelper.exists(target))
             throw new IllegalStateException("Target path not exist");
