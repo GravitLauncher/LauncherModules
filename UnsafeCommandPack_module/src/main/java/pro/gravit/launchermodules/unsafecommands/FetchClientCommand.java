@@ -54,25 +54,26 @@ public class FetchClientCommand extends Command {
         LogHelper.subInfo("Downloading client, it may take some time");
         AsyncDownloader d = new AsyncDownloader();
         ExecutorService e = Executors.newFixedThreadPool(4);
-        List<AsyncDownloader.SizedFile> applies = info.libraries.stream().map(y -> new AsyncDownloader.SizedFile(y.url.replace("https://libraries\\.minecraft\\.net/", ""), y.path, y.size)).collect(Collectors.toList());
-        CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), "https://libraries.minecraft.net/", clientDir.resolve("libraries"), e)).thenAccept((v) -> {
-            LogHelper.subInfo("Client libraries successfully downloaded: '%s'", dirName);
+        List<AsyncDownloader.SizedFile> applies = info.libraries.stream().map(y -> new AsyncDownloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
+        CompletableFuture<Void> f = CompletableFuture.allOf(d.runDownloadListSimple(d.sortFiles(applies, 4), "", clientDir.resolve("libraries"), e)).thenAccept((v) -> {
+            LogHelper.subInfo("Client libraries successfully downloaded!");
         });
         IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
-        LogHelper.subInfo("Downloaded client jar");
-        e.awaitTermination(4, TimeUnit.HOURS);
-        e.shutdown();
-        LogHelper.subInfo("Downloading natives!");
+        LogHelper.subInfo("Downloaded client jar!");
         fetchNatives(clientDir.resolve("natives"), info.natives);
         LogHelper.subInfo("Natives downloaded!");
         LogHelper.subInfo("Client downloaded!");
+        f.get();
+        e.awaitTermination(4, TimeUnit.HOURS);
+        e.shutdown();
+        e.awaitTermination(4, TimeUnit.HOURS);
         // Finished
         server.syncUpdatesDir(Collections.singleton(dirName));
     }
 
 	private void fetchNatives(Path resolve, List<Artifact> natives) {
 		for (Artifact a : natives) {
-			try (ZipInputStream z = IOHelper.newZipInput(new URL(a.name))) {
+			try (ZipInputStream z = IOHelper.newZipInput(new URL(a.url))) {
                 ZipEntry e = z.getNextEntry();
                 while (e != null) {
                 	if (!e.isDirectory() && !e.getName().startsWith("META-INF") && !e.getName().startsWith("/META-INF")) {
