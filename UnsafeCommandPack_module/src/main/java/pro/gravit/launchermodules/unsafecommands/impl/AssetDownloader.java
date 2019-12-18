@@ -14,7 +14,6 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -63,66 +62,13 @@ public class AssetDownloader {
 		}
 	}
 
-	public static class DownloadInfo {
-		@SerializedName("totalSize")
-		public long totalSize;
-		@SerializedName("url")
-		public String url;
-		@SerializedName("sha1")
-		public String sha1;
-		@SerializedName("size")
-		public int size;
-		@SerializedName("id")
-		public String id;
-
-		public DownloadInfo() {
-			this("", "");
-		}
-
-		public DownloadInfo(String id, String url) {
-			this(id, url, null);
-		}
-
-		public DownloadInfo(String id, String url, String sha1) {
-			this(id, url, sha1, 0);
-		}
-
-		public DownloadInfo(String id, String url, String sha1, int size) {
-			this(id, url, sha1, size, 0);
-		}
-
-		public DownloadInfo(String id, String url, String sha1, int size, long totalSize) {
-			this.url = url;
-			this.sha1 = sha1;
-			this.size = size;
-			this.id = id;
-			this.totalSize = totalSize;
-		}
-	}
-
 	private static final Gson GSON = new GsonBuilder().setLenient().create();
 
 	public static String gainAssetsURL(String mc) throws IOException {
 		try {
-			String workURL = null;
-			JsonObject obj = GSON.fromJson(
-					IOHelper.request(new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json")),
-					JsonObject.class);
-			if (obj.has("versions") && obj.get("versions").isJsonArray())
-				for (JsonElement el : obj.get("versions").getAsJsonArray())
-					if (el != null && el.isJsonObject()) {
-						JsonElement ver = el.getAsJsonObject().get("id");
-						if (ver != null && ver.isJsonPrimitive() && ver.getAsJsonPrimitive().isString()
-								&& mc.equals(ver.getAsJsonPrimitive().getAsString())
-								&& el.getAsJsonObject().has("url") && el.getAsJsonObject().get("url").isJsonPrimitive()
-								&& el.getAsJsonObject().get("url").getAsJsonPrimitive().isString())
-							workURL = el.getAsJsonObject().get("url").getAsString();
-					}
-			if (workURL != null) {
-				obj = GSON.fromJson(IOHelper.request(new URL(workURL)), JsonObject.class);
-				if (obj.has("assetIndex") && obj.get("assetIndex").isJsonObject())
-					return GSON.fromJson(obj.get("assetIndex"), DownloadInfo.class).url;
-			}
+			JsonObject obj = ClientDownloader.gainClient(mc);
+			if (obj.has("assetIndex") && obj.getAsJsonObject("assetIndex").has("url"))
+				return obj.getAsJsonObject("assetIndex").get("url").getAsString();
 			throw new IOException("Assets not found");
 		} catch (JsonSyntaxException | MalformedURLException e) {
 			throw new RuntimeException(e);
