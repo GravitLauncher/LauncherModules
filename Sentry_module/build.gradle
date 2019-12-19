@@ -1,0 +1,12 @@
+def mainClassName = "ru.zaxar163.sentrys.ModuleImpl"
+
+dependencies {
+    compile('io.sentry:sentry:1.7.28') {
+        exclude group: 'org.slf4j'
+    }
+}
+
+jar {
+	manifest.attributes("Module-Main-Class": mainClassName)
+}
+
