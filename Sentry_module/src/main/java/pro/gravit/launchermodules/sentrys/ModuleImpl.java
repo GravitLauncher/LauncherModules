@@ -1,11 +1,13 @@
-package ru.zaxar163.sentrys;
+package pro.gravit.launchermodules.sentrys;
 
 import pro.gravit.utils.Version;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import io.sentry.Sentry;
 import pro.gravit.launcher.modules.LauncherInitContext;
@@ -22,6 +24,15 @@ public class ModuleImpl extends LauncherModule {
 		super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE-200, new String[0]));
 	}
 
+	private static final Gson GSON_P = new GsonBuilder().setPrettyPrinting().setLenient().create();
+	
+	public Config c = null;
+	
+	public static class Config {
+		String dsn = "YOUR_DSN";
+		boolean captureAll = false;
+	}
+	
 	@Override
 	public void init(LauncherInitContext initContext) {
 		registerEvent(this::preInit, PreConfigPhase.class);
@@ -29,10 +40,16 @@ public class ModuleImpl extends LauncherModule {
 	public void preInit(PreConfigPhase phase)
 	{
 		try {
-			Sentry.init(IOHelper.decode(IOHelper.read(Paths.get("sentry.cfg"))));
-			Map<String, String> conf = Arrays.stream(IOHelper.decode(IOHelper.read(Paths.get("sentrymodule.cfg"))).split("\n")).filter(e -> e != null).map (e -> e.trim()).filter(e -> !e.isEmpty() && !e.startsWith("#")).map(e -> e.split("=")).filter(e -> e.length > 1).collect(Collectors.toMap(e -> e[0], e -> e[1]));
-			LogHelper.addExcCallback(Sentry::capture);
-			if (conf.getOrDefault("captureAll", "false").equalsIgnoreCase("true"))
+			Path p = Paths.get("sentry.json");
+			if (Files.isReadable(p)) {
+				c = GSON_P.fromJson(IOHelper.decode(IOHelper.read(p)), Config.class);
+			} else {
+				Files.deleteIfExists(p);
+				c = new Config();
+				IOHelper.write(p, IOHelper.encode(GSON_P.toJson(c, Config.class)));
+			}
+			Sentry.init(c.dsn);
+			if (c.captureAll)
 				LogHelper.addOutput(Sentry::capture, LogHelper.OutputTypes.PLAIN);
 		} catch (Throwable e) {
 			LogHelper.error(e);

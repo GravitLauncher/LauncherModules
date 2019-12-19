@@ -1,9 +1,10 @@
-def mainClassName = "ru.zaxar163.sentryl.ModuleImpl"
+def mainClassName = "pro.gravit.launchermodules.ModuleImpl"
 
 dependencies {
     compile('io.sentry:sentry:1.7.28') {
         exclude group: 'org.slf4j'
     }
+    compileOnly project(':Launcher')
 }
 
 jar {

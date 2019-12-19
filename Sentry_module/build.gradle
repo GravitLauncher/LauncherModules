@@ -1,4 +1,4 @@
-def mainClassName = "ru.zaxar163.sentrys.ModuleImpl"
+def mainClassName = "pro.gravit.launchermodules.sentrys.ModuleImpl"
 
 dependencies {
     compile('io.sentry:sentry:1.7.28') {
