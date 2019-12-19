@@ -54,7 +54,6 @@ public class ModuleImpl extends LauncherModule {
                 LogHelper.error(e);
             }
         });
-        config = modulesConfigManager.getModuleConfig("DiscordRPC");
     }
 
     public static void main(String[] args) {

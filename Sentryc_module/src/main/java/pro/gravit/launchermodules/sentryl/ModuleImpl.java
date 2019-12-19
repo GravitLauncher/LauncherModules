@@ -30,8 +30,7 @@ public class ModuleImpl extends LauncherModule {
 
     public void postInit(LaunchServerPostInitPhase phase) {
         LaunchServer context = phase.server;
-
-        config = modulesConfigManager.getModuleConfig("SentryModule");
+        config = context.modulesManager.getConfigManager().getModuleConfig(this.getModuleInfo().name, "SentryModuleConfig");
         Config.getOrCreate(config);
         context.buildHookManager.registerClientModuleClass("pro.gravit.launchermodules.sentryl.ClientModule");
         context.buildHookManager.registerHook(ctx -> {

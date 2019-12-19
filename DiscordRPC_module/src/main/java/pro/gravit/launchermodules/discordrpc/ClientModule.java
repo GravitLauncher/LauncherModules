@@ -34,15 +34,16 @@ public class ClientModule extends LauncherModule {
         try {
             String title = Launcher.profile.getTitle();
             String nick = ClientLauncher.playerProfile.username;
-            Reader r = IOHelper.newReader(ClientModule.class.getResource("/rpc.config.json"));
-            Config c = Config.read(r);
+            Config c;
+            try (Reader r = IOHelper.newReader(ClientModule.class.getResource("/rpc.config.json"))) {
+            	c = Config.read(r);
+            }
             c.firstLine = replace(c.firstLine, nick, title);
             c.secondLine = replace(c.secondLine, nick, title);
             c.largeText = replace(c.largeText, nick, title);
             c.smallText = replace(c.smallText, nick, title);
             DiscordRPC.onConfig(c);
-
-        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
 
         }
     }
