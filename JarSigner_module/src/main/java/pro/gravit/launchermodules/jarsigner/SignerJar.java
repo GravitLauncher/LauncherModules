@@ -132,6 +132,7 @@ public class SignerJar implements AutoCloseable {
     private final String keyAlias;
 
     private final String password;
+    private final String signAlgo;
     private final Map<String, String> manifestAttributes;
     private String manifestHash;
     private String manifestMainHash;
@@ -148,11 +149,12 @@ public class SignerJar implements AutoCloseable {
      * @param keyAlias    the name of the key in the store, this key is used to sign the JAR
      * @param keyPassword the password to access the key
      */
-    public SignerJar(OutputStream out, KeyStore keyStore, String keyAlias, String keyPassword) {
+    public SignerJar(OutputStream out, KeyStore keyStore, String keyAlias, String keyPassword, String signAlgo) {
         zos = new ZipOutputStream(out);
         this.keyStore = keyStore;
         this.keyAlias = keyAlias;
         password = keyPassword;
+        this.signAlgo = signAlgo;
 
         manifestAttributes = new LinkedHashMap<>();
         fileDigests = new LinkedHashMap<>();
@@ -269,7 +271,7 @@ public class SignerJar implements AutoCloseable {
         Store certStore = new JcaCertStore(certChain);
         Certificate cert = keyStore.getCertificate(keyAlias);
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(keyAlias, password != null ? password.toCharArray() : null);
-        ContentSigner signer = new JcaContentSignerBuilder("SHA256WITHRSA").setProvider("BC").build(privateKey);
+        ContentSigner signer = new JcaContentSignerBuilder(signAlgo).setProvider("BC").build(privateKey);
         CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
         DigestCalculatorProvider dcp = new JcaDigestCalculatorProviderBuilder().setProvider("BC").build();
         SignerInfoGenerator sig = new JcaSignerInfoGeneratorBuilder(dcp).build(signer, (X509Certificate) cert);
@@ -353,7 +355,7 @@ public class SignerJar implements AutoCloseable {
     private byte[] signSigFile(byte[] sigContents) throws Exception {
         CMSSignedDataGenerator gen = createSignedDataGenerator();
         CMSTypedData cmsData = new CMSProcessableByteArray(sigContents);
-        CMSSignedData signedData = gen.generate(cmsData, true);
+        CMSSignedData signedData = gen.generate(cmsData, false);
         return signedData.getEncoded();
     }
 
