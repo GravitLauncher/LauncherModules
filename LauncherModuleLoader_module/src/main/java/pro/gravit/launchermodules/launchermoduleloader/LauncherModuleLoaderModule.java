@@ -4,6 +4,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
@@ -69,21 +70,17 @@ public class LauncherModuleLoaderModule extends LauncherModule {
             }
         }
         server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
-        server.buildHookManager.registerHook((buildContext) -> {
-            HashSet<String> fileList = new HashSet<>(buildContext.fileList);
-            fileList.add("META-INF/MANIFEST.MF");
+        MainBuildTask mainTask = server.launcherBinary.getTaskByClass(MainBuildTask.class).get();
+        mainTask.preBuildHook.registerHook((buildContext) -> {
+            buildContext.clientModules.addAll(module_class);
             for (Path file : module_jars) {
-                try {
-                    buildContext.data.reader.getCp().add(new JarFile(file.toFile()));
-                } catch (IOException e) {
-                    LogHelper.error(e);
-                }
+                buildContext.readerClassPath.add(new JarFile(file.toFile()));
+            }
+        });
+        mainTask.postBuildHook.registerHook((buildContext) -> {
+            for (Path file : module_jars) {
                 LogHelper.debug("Put %s launcher module", file.toString());
-                try (ZipInputStream input = new ZipInputStream(IOHelper.newInput(file))) {
-                    buildContext.pushJarFile(input, fileList);
-                } catch (IOException e) {
-                    LogHelper.error(e);
-                }
+                buildContext.pushJarFile(file, (e) -> false, (e) -> true);
             }
         });
         try {
@@ -95,13 +92,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
 
     public void syncModules() throws IOException {
         module_jars.clear();
-        for (String s : module_class) {
-            server.buildHookManager.unregisterClientModuleClass(s);
-        }
         module_class.clear();
         IOHelper.walk(modules_dir, new ModulesVisitor(), false);
-        for (String s : module_class) {
-            server.buildHookManager.registerClientModuleClass(s);
-        }
     }
 }

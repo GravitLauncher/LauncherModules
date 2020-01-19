@@ -1,10 +1,12 @@
 package pro.gravit.launchermodules.discordrpc;
 
 import org.objectweb.asm.Type;
+import pro.gravit.launcher.config.JsonConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
@@ -30,29 +32,21 @@ public class ModuleImpl extends LauncherModule {
 
     public void postInit(LaunchServerPostInitPhase phase) {
         LaunchServer context = phase.server;
-    	config = context.modulesManager.getConfigManager().getModuleConfig(this.getModuleInfo().name, "DiscordRPCConfig");
-    	Config.getOrCreate(config);
-        context.buildHookManager.registerClientModuleClass("pro.gravit.launchermodules.discordrpc.ClientModule");
-        context.buildHookManager.registerHook(ctx -> {
-            try (ZipInputStream in = IOHelper.newZipInput(IOHelper.getCodeSource(ModuleImpl.class))) {
-                ctx.data.reader.getCp().add(new JarFile(IOHelper.getCodeSource(ModuleImpl.class).toFile()));
-                ctx.output.putNextEntry(IOHelper.newZipEntry("rpc.config.json"));
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                Writer w = new OutputStreamWriter(baos, IOHelper.UNICODE_CHARSET);
-                Config.getOrCreate(config).write(w);
-                w.flush();
-                ctx.output.write(baos.toByteArray());
-                JarHelper.zipWalk(in, (i, e) -> {
-                    if (!e.getName().startsWith("META-INF") && !e.getName().startsWith(keepClass)) {
-                        ctx.output.putNextEntry(IOHelper.newZipEntry(e));
-                        IOHelper.transfer(i, ctx.output);
-                        ctx.fileList.add(e.getName());
-                    }
-                });
-                ctx.fileList.add("rpc.config.json");
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
+        JsonConfigurable<Config> configurable = modulesConfigManager.getConfigurable(Config.class, moduleInfo.name, "DiscordRPCConfig");
+        try {
+            configurable.loadConfig();
+        } catch (IOException e) {
+            LogHelper.error(e);
+            return;
+        }
+        MainBuildTask mainTask = context.launcherBinary.getTaskByClass(MainBuildTask.class).get();
+        mainTask.preBuildHook.registerHook(ctx -> {
+            ctx.clientModules.add("pro.gravit.launchermodules.discordrpc.ClientModule");
+            ctx.readerClassPath.add(new JarFile(IOHelper.getCodeSource(ModuleImpl.class).toFile()));
+        });
+        mainTask.postBuildHook.registerHook(ctx -> {
+            ctx.pushJarFile(IOHelper.getCodeSource(ModuleImpl.class), (e) -> e.getName().startsWith("META-INF"), (e) -> true);
+            ctx.pushBytes("rpc.config.json", configurable.toJsonString().getBytes(IOHelper.UNICODE_CHARSET));
         });
     }
 
