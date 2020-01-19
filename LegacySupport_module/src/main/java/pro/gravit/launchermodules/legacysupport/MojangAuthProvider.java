@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.legacysupport;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launchserver.auth.AuthException;
@@ -69,7 +70,7 @@ public final class MojangAuthProvider extends AuthProvider {
         String launcherToken = response.get("clientToken").getAsString();
 
         // We're done
-        return new MojangAuthProviderResult(username, accessToken, uuid, launcherToken, srv);
+        return new MojangAuthProviderResult(username, accessToken, uuid, launcherToken);
     }
 
     @Override
