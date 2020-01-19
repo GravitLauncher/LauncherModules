@@ -42,7 +42,7 @@ public class SendAuthCommand extends Command {
         AuthResponse.ConnectTypes type = AuthResponse.ConnectTypes.valueOf(args[3]);
         AuthProviderPair pair = server.config.getAuthProviderPair(args[2]);
 
-        ClientPermissions permissions = args.length > 4 ? new ClientPermissions(Long.parseLong(args[4])) : server.config.permissionsHandler.getPermissions(username);
+        ClientPermissions permissions = args.length > 4 ? new ClientPermissions(Long.parseLong(args[4])) : ClientPermissions.DEFAULT;
 
         UUID clientUUID;
         String accessToken = SecurityHelper.randomStringToken();

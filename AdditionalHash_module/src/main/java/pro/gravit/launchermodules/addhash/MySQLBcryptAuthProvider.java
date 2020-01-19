@@ -21,7 +21,6 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
     private String query;
     private String message;
     private String[] queryParams;
-    private boolean usePermission;
 
     @Override
     public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
@@ -35,7 +34,7 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
             // Execute SQL query
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
-                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), usePermission ? new ClientPermissions(set.getLong(3)) : srv.config.permissionsHandler.getPermissions(set.getString(2))) : authError(message) : authError(message);
+                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), new ClientPermissions(set.getLong(3))) : authError(message) : authError(message);
             }
         }
     }
