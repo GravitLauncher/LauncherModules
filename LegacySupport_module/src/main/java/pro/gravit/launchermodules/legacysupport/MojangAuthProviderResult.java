@@ -1,6 +1,5 @@
 package pro.gravit.launchermodules.legacysupport;
 
-import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 
 import java.util.UUID;

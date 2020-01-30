@@ -10,16 +10,11 @@ import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.JarHelper;
 import pro.gravit.utils.helper.LogHelper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.file.Path;
 import java.util.jar.JarFile;
-import java.util.zip.ZipInputStream;
 
 public class ModuleImpl extends LauncherModule {
     private static final String keepClass = Type.getInternalName(ModuleImpl.class);
@@ -45,7 +40,7 @@ public class ModuleImpl extends LauncherModule {
             ctx.readerClassPath.add(new JarFile(IOHelper.getCodeSource(ModuleImpl.class).toFile()));
         });
         mainTask.postBuildHook.registerHook(ctx -> {
-            ctx.pushJarFile(IOHelper.getCodeSource(ModuleImpl.class), (e) -> e.getName().startsWith("META-INF"), (e) -> true);
+            ctx.pushJarFile(IOHelper.getCodeSource(ModuleImpl.class), (e) -> e.getName().startsWith("META-INF") || e.getName().startsWith(keepClass), (e) -> true);
             ctx.pushBytes("rpc.config.json", configurable.toJsonString().getBytes(IOHelper.UNICODE_CHARSET));
         });
     }

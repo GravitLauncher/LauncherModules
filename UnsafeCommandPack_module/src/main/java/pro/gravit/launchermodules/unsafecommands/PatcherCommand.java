@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands;
 
 import pro.gravit.launchermodules.unsafecommands.patcher.UnsafePatcher;
+import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindDefineClassPatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindPacketHackPatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindRemotePatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindSunPatcher;
@@ -43,7 +44,7 @@ public class PatcherCommand extends Command {
             patchers.put("findRemote", new FindRemotePatcher());
             patchers.put("findSun", new FindSunPatcher());
             patchers.put("findPacketHack", new FindPacketHackPatcher());
-            
+            patchers.put("findDefineClass", new FindDefineClassPatcher());
         }
         verifyArgs(args, 3);
         String name = args[0];
