@@ -9,8 +9,13 @@ import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static pro.gravit.utils.helper.CommonHelper.newThread;
 
@@ -19,6 +24,14 @@ public class AutoReHashModule extends LauncherModule {
     private WatchService watchService;
     private volatile boolean changed = false;
     private Timer timer;
+    private final Set<String> dirs = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    private static Deque<String> toPath(Iterable<Path> path) {
+        Deque<String> result = new LinkedList<>();
+        for (Path pe : path)
+            result.add(pe.toString());
+        return result;
+    }
 
     public AutoReHashModule() {
         super(new LauncherModuleInfo("AutoReHashModule", version));
@@ -30,7 +43,7 @@ public class AutoReHashModule extends LauncherModule {
     }
 
     public void finish(LaunchServerPostInitPhase context) {
-        Path updates = Paths.get(context.server.dir.toString(), "updates");
+        Path updates = context.server.updatesDir;
         try {
             watchService = FileSystems.getDefault().newWatchService();
             updates.register(watchService, StandardWatchEventKinds.ENTRY_CREATE,
@@ -43,28 +56,40 @@ public class AutoReHashModule extends LauncherModule {
             try {
                 while (!Thread.interrupted()) {
                     WatchKey key = watchService.take();
+                    Path watchDir = (Path) key.watchable();
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        LogHelper.info("Changed " + (event.context() != null ? event.context().toString() : "unknown") + " kind " + event.kind().name());
-                        changed = true;
+                        if (event.kind().equals(StandardWatchEventKinds.OVERFLOW))
+                            continue; 
+                        Path path = watchDir.resolve((Path) event.context());
+                        LogHelper.info("Changed " + updates.relativize(path) + " kind " + event.kind().name());
+                        String stringPath = toPath(updates.relativize(path)).peekFirst();
+                        if (stringPath != null) {
+                        	LogHelper.debug("To sync (may be file): " + stringPath);
+                            if (Files.isDirectory(updates.resolve(stringPath))) {
+                            	dirs.add(stringPath);
+                            	changed = true;
+                            }
+                        }
                     }
                     key.reset();
                 }
             } catch (InterruptedException e) {
-                LogHelper.error(e.toString());
+            	return;
             }
         };
         Thread thread = newThread("ReHashing", true, task);
         thread.start();
-        timer = new Timer(true);
+        timer = new Timer("ReHashTimer", true);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (changed) {
                     try {
-                        context.server.syncUpdatesDir(null);
+                        context.server.syncUpdatesDir(dirs);
                     } catch (IOException e) {
                         LogHelper.error(e);
                     }
+                    dirs.clear();
                     changed = false;
                 }
             }
