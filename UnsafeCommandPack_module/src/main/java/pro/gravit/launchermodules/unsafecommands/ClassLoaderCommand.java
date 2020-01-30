@@ -57,7 +57,7 @@ public class ClassLoaderCommand extends Command {
     }
     public URL[] getURL(String s)
     {
-        String[] splits = s.split(":");
+        String[] splits = s.split(";");
         return Arrays.stream(splits).map((e) -> {
             try {
                 return new URL(e);

@@ -14,7 +14,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import pro.gravit.launcher.AsyncDownloader;
-import pro.gravit.launchermodules.unsafecommands.impl.AssetDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader.Artifact;
 import pro.gravit.launchserver.LaunchServer;
@@ -62,12 +61,12 @@ public class FetchClientCommand extends Command {
         LogHelper.subInfo("Downloaded client jar!");
         fetchNatives(clientDir.resolve("natives"), info.natives);
         LogHelper.subInfo("Natives downloaded!");
-        LogHelper.subInfo("Client downloaded!");
         f.get();
         e.awaitTermination(4, TimeUnit.HOURS);
         e.shutdown();
         e.awaitTermination(4, TimeUnit.HOURS);
         // Finished
+        LogHelper.subInfo("Client downloaded!");
         server.syncUpdatesDir(Collections.singleton(dirName));
     }
 

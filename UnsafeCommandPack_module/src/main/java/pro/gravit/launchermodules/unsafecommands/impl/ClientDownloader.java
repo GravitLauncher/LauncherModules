@@ -58,7 +58,7 @@ public class ClientDownloader {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static ClientInfo getClient(String ver) throws IOException {
 		JsonObject obj = gainClient(ver);
 		JsonArray libraries = obj.getAsJsonArray("libraries");
