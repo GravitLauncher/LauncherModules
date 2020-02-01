@@ -9,7 +9,7 @@ import pro.gravit.utils.Version;
 
 public class AddHashModule extends LauncherModule {
     private static boolean registred = false;
-    public static final Version version = new Version(1, 0, 2, 1, Version.Type.LTS);
+    public static final Version version = new Version(1, 0, 2, 1, Version.Type.STABLE);
 
     public AddHashModule() {
         super(new LauncherModuleInfo("AddHash", version));

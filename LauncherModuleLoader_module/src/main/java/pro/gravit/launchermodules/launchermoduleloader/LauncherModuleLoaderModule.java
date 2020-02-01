@@ -25,7 +25,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
     private transient LaunchServer server;
 
     public LauncherModuleLoaderModule() {
-        super(new LauncherModuleInfo("LauncherModuleLoader", new Version(1, 1, 0)));
+        super(new LauncherModuleInfo("LauncherModuleLoader", new Version(1, 1, 0, 1, Version.Type.LTS)));
     }
 
     @Override

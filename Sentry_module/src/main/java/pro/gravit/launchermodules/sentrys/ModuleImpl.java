@@ -18,7 +18,7 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 public class ModuleImpl extends LauncherModule {
-    public static final Version version = new Version(0, 1, 0, 0, Version.Type.LTS);
+    public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
 
 	public ModuleImpl() {
 		super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE-200, new String[0]));

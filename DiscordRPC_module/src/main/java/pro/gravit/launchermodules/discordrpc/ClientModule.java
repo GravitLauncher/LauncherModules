@@ -13,7 +13,7 @@ import pro.gravit.utils.helper.IOHelper;
 import java.io.Reader;
 
 public class ClientModule extends LauncherModule {
-    public static final Version version = new Version(1, 1, 0, 0, Version.Type.LTS);
+    public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
 
     public ClientModule() {
         super(new LauncherModuleInfo("DiscordRPC", version));

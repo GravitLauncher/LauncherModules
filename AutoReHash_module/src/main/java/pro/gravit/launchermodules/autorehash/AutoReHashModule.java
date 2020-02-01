@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static pro.gravit.utils.helper.CommonHelper.newThread;
 
 public class AutoReHashModule extends LauncherModule {
-    public static final Version version = new Version(1, 0, 0);
+    public static final Version version = new Version(1, 0, 0, 1, Version.Type.STABLE);
     private WatchService watchService;
     private volatile boolean changed = false;
     private Timer timer;

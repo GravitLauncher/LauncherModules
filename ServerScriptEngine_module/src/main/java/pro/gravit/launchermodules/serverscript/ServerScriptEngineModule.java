@@ -6,9 +6,10 @@ import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
+import pro.gravit.utils.Version.Type;
 
 public class ServerScriptEngineModule extends LauncherModule {
-    public static final Version version = new Version(1, 1, 0);
+    public static final Version version = new Version(1, 1, 0, 1, Type.BETA);
     public static ServerScriptEngine scriptEngine;
 
     public ServerScriptEngineModule() {

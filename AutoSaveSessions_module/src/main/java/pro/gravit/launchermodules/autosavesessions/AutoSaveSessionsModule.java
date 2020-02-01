@@ -31,7 +31,7 @@ public class AutoSaveSessionsModule extends LauncherModule {
     private LaunchServer srv;
 
     public AutoSaveSessionsModule() {
-        super(new LauncherModuleInfo("AutoSaveSessions", new Version(1, 1, 0)));
+        super(new LauncherModuleInfo("AutoSaveSessions", new Version(1, 1, 0, 1, Version.Type.LTS)));
     }
 
     public void close(ClosePhase closePhase) {

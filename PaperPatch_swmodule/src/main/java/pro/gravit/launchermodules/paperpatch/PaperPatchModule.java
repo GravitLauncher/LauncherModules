@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public final class PaperPatchModule extends LauncherModule {
 
-    private static final Version VERSION = new Version(1, 0, 0);
+    private static final Version VERSION = new Version(1, 0, 0, 1, Version.Type.EXPERIMENTAL);
 
     public PaperPatchModule() {
         super(new LauncherModuleInfo("PaperSpigotPatch", VERSION));

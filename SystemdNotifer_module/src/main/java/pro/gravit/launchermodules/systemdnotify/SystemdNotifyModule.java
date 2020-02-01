@@ -10,7 +10,7 @@ import pro.gravit.utils.helper.LogHelper;
 import java.io.IOException;
 
 public class SystemdNotifyModule extends LauncherModule {
-    public static final Version version = new Version(1, 0, 0);
+    public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
 
     public SystemdNotifyModule() {
         super(new LauncherModuleInfo("SystemdNotifer", version));

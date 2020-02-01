@@ -8,7 +8,7 @@ import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.utils.Version;
 
 public class ServerStatisticsModule extends LauncherModule {
-    public static final Version version = new Version(1, 0, 0, 0, Version.Type.LTS);
+    public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public transient LaunchServer server;
     public final StatisticsManager manager;
 

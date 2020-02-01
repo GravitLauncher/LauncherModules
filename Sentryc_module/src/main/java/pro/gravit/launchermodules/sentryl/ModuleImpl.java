@@ -18,7 +18,7 @@ import java.util.jar.JarFile;
 
 public class ModuleImpl extends LauncherModule {
     private static final String keepClass = Type.getInternalName(ModuleImpl.class);
-    public static final Version version = new Version(1, 1, 0, 0, Version.Type.LTS);
+    public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
     public Path config;
 
     public ModuleImpl() {
