@@ -1,6 +1,6 @@
 task bundleZip(type: Zip) {
-    archiveName 'modules.zip'
-    destinationDir file("$buildDir")
+    archiveFileName = 'modules.zip'
+    destinationDirectory = file("$buildDir")
 }
 
 if (!project.tasks.findByName('assemble')) {

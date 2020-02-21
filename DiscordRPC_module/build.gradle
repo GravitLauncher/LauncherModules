@@ -9,7 +9,6 @@ repositories {
 
 dependencies {
     compileOnly project(':Launcher')
-    compileOnly project(':LaunchServer')
     compile('club.minnced:java-discord-rpc:2.0.2') {
         exclude group: 'net.java.dev.jna'
     }
@@ -17,7 +16,4 @@ dependencies {
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName)
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
 }
