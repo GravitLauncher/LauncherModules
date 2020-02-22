@@ -18,7 +18,7 @@ subprojects {
 
     shadowJar {
         classifier = null
-        configurations = [project.configurations.runtime]
+        configurations = [project.configurations.runtimeClasspath]
         exclude 'module-info.class'
     }
 
