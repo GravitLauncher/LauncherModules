@@ -18,7 +18,7 @@ subprojects {
 
     shadowJar {
         classifier = null
-        configurations = [project.configurations.runtimeClasspath]
+        configurations = [project.configurations.api/*runtimeClasspath*/]
         exclude 'module-info.class'
     }
 
@@ -28,13 +28,13 @@ subprojects {
 
 configure(subprojects.findAll { it.name.endsWith('_module') }) {
     dependencies {
-        compileOnly project(':LaunchServer')
+        implementation project(':LaunchServer')
     }
 }
 
 configure(subprojects.findAll { it.name.endsWith('_swmodule') }) {
     dependencies {
-        compileOnly project(':ServerWrapper')
+        implementation project(':ServerWrapper')
     }
     shadowJar {
         relocate 'io.netty', 'pro.gravit.repackage.io.netty'
@@ -43,7 +43,7 @@ configure(subprojects.findAll { it.name.endsWith('_swmodule') }) {
 
 configure(subprojects.findAll { it.name.endsWith('_lmodule') }) {
     dependencies {
-        compileOnly project(':Launcher')
+        implementation project(':Launcher')
     }
     shadowJar {
         relocate 'org.objectweb.asm', 'pro.gravit.repackage.org.objectweb.asm'

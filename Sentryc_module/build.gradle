@@ -7,7 +7,7 @@ dependencies {
     api('io.sentry:sentry:1.7.28') {
         exclude group: 'org.slf4j'
     }
-    compileOnly project(':Launcher')
+    implementation project(':Launcher')
 }
 
 jar {
