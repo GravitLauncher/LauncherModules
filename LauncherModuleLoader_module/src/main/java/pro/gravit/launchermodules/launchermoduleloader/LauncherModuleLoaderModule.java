@@ -86,7 +86,7 @@ public class LauncherModuleLoaderModule extends LauncherModule {
                                             JarHelper.getClassFromJar(entity.moduleConfigClass, file)
                                     );
                                     Path configPath = modulesConfigManager.getModuleConfig(moduleInfo.name, entity.moduleConfigName);
-                                    Object defaultConfig = MethodHandles.publicLookup().findStatic(clazz, "getDefault", MethodType.methodType(clazz)).invoke();
+                                    Object defaultConfig = MethodHandles.publicLookup().findStatic(clazz, "getDefault", MethodType.methodType(Object.class)).invoke();
                                     Object targetConfig;
                                     if(!Files.exists(configPath))
                                     {

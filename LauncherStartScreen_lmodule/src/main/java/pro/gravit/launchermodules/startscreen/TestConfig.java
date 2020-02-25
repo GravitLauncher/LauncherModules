@@ -7,7 +7,7 @@ public class TestConfig {
     public String testProp;
     @LauncherInject(value = "modules.startscreen.testintprop")
     public int testIntProp;
-    public static TestConfig getDefault()
+    public static Object getDefault()
     {
         TestConfig config = new TestConfig();
         config.testProp = "My Little prop";
