@@ -18,7 +18,7 @@ subprojects {
 
     shadowJar {
         classifier = null
-        configurations = [project.configurations.api/*runtimeClasspath*/]
+        configurations = [project.configurations.runtimeClasspath] //TODO: Zaxar163 check this
         exclude 'module-info.class'
     }
 
