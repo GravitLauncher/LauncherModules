@@ -1,0 +1,22 @@
+def mainClassName = "pro.gravit.launchermodules.discordrpc.ClientModule"
+def configClassName = "pro.gravit.launchermodules.discordrpc.Config"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation project(':Launcher')
+    compile('club.minnced:java-discord-rpc:2.0.2') {
+        exclude group: 'net.java.dev.jna'
+    }
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName,
+                        "Module-Config-Class": configClassName,
+                        "Module-Config-Name": "DiscordRPC")
+}

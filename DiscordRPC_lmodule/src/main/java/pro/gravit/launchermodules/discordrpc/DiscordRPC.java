@@ -9,27 +9,28 @@ class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
 	static club.minnced.discord.rpc.DiscordRPC lib;
     static Thread thr;
+    static DiscordRichPresence presence;
 
-    static void onConfig(Config conf) {
-        club.minnced.discord.rpc.DiscordRPC lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
+    static void onConfig(String appId, String firstLine, String secondLine, String largeKey, String smallKey, String largeText, String smallText) {
+        lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
         DiscordEventHandlers handlers = new DiscordEventHandlers();
-        lib.Discord_Initialize(conf.appId, handlers, true, "");
-        DiscordRichPresence presence = new DiscordRichPresence();
+        lib.Discord_Initialize(appId, handlers, true, "");
+        presence = new DiscordRichPresence();
         presence.startTimestamp = System.currentTimeMillis() / 1000;
-        presence.details = conf.firstLine;
-        presence.state = conf.secondLine;
+        presence.details = firstLine;
+        presence.state = secondLine;
         //Ниче не лишнее, так надо
-        if (conf.largeKey != null) {
-            presence.largeImageKey = conf.largeKey;
+        if (largeKey != null) {
+            presence.largeImageKey = largeKey;
         }
-        if (conf.smallKey != null) {
-            presence.smallImageKey = conf.smallKey;
+        if (smallKey != null) {
+            presence.smallImageKey = smallKey;
         }
-        if (conf.largeKey != null && conf.largeText != null) {
-            presence.largeImageText = conf.largeText;
+        if (largeKey != null && largeText != null) {
+            presence.largeImageText = largeText;
         }
-        if (conf.smallKey != null && conf.smallText != null) {
-            presence.smallImageText = conf.smallText;
+        if (smallKey != null && smallText != null) {
+            presence.smallImageText = smallText;
         }
 
         lib.Discord_UpdatePresence(presence);
@@ -46,7 +47,6 @@ class DiscordRPC {
             lib.Discord_Shutdown();
         }, "RPC");
         thr.setDaemon(true);
-        thr.setPriority(Integer.MIN_VALUE);
         thr.start();
     }
 }
