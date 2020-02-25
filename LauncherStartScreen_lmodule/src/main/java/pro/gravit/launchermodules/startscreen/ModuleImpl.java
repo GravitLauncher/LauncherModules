@@ -25,6 +25,8 @@ public class ModuleImpl extends LauncherModule {
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preInit, ClientPreGuiPhase.class);
         registerEvent(this::finish, ClientGuiPhase.class);
+        TestConfig config = new TestConfig();
+        LogHelper.debug("S: %s I: %d", config.testProp, config.testIntProp);
     }
 
     public void preInit(ClientPreGuiPhase phase) {

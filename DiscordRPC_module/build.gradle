@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     implementation project(':Launcher')
-    api('club.minnced:java-discord-rpc:2.0.2') {
+    compile('club.minnced:java-discord-rpc:2.0.2') {
         exclude group: 'net.java.dev.jna'
     }
 }
