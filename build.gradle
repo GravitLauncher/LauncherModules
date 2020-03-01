@@ -17,8 +17,9 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
 
     shadowJar {
+        duplicatesStrategy = 'EXCLUDE'
         classifier = null
-        configurations = [project.configurations.runtime] //TODO: Zaxar163 check this
+        configurations = [project.configurations.runtimeClasspath]
         exclude 'module-info.class'
     }
 
@@ -28,13 +29,13 @@ subprojects {
 
 configure(subprojects.findAll { it.name.endsWith('_module') }) {
     dependencies {
-        implementation project(':LaunchServer')
+        compileOnly project(':LaunchServer')
     }
 }
 
 configure(subprojects.findAll { it.name.endsWith('_swmodule') }) {
     dependencies {
-        implementation project(':ServerWrapper')
+        compileOnly project(':ServerWrapper')
     }
     shadowJar {
         relocate 'io.netty', 'pro.gravit.repackage.io.netty'
@@ -43,7 +44,7 @@ configure(subprojects.findAll { it.name.endsWith('_swmodule') }) {
 
 configure(subprojects.findAll { it.name.endsWith('_lmodule') }) {
     dependencies {
-        implementation project(':Launcher')
+        compileOnly project(':Launcher')
     }
     shadowJar {
         relocate 'org.objectweb.asm', 'pro.gravit.repackage.org.objectweb.asm'

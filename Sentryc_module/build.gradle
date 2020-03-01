@@ -4,10 +4,10 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 dependencies {
-    compile('io.sentry:sentry:1.7.28') {
+    api('io.sentry:sentry:1.7.28') {
         exclude group: 'org.slf4j'
     }
-    implementation project(':Launcher')
+    compileOnly project(':Launcher')
 }
 
 jar {
