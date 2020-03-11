@@ -55,8 +55,11 @@ public class PatcherCommand extends Command {
         {
             Class<? extends UnsafePatcher> clazz = (Class<? extends UnsafePatcher>) Class.forName(name);
             try {
-                String[] real_args = Arrays.copyOfRange(args, 3, Integer.MAX_VALUE);
-                patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments(Arrays.asList(real_args));
+                String[] real_args = Arrays.copyOfRange(args, 3, args.length);
+                if (real_args.length > 0)
+                    patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class, String[].class)).asFixedArity().invoke(real_args);
+                else
+                    patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invoke();
             } catch (Throwable e)
             {
             	LogHelper.dev(LogHelper.toString(e));
