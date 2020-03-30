@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.startscreen;
 
+import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
 import pro.gravit.launcher.modules.LauncherInitContext;
@@ -31,7 +32,7 @@ public class ModuleImpl extends LauncherModule {
 
     public void preInit(ClientPreGuiPhase phase) {
         try {
-            if (!GraphicsEnvironment.isHeadless())
+            if (!GraphicsEnvironment.isHeadless() && !LauncherEngine.IS_CLIENT.get())
                 screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL("runtime/splash.png")));
         } catch (Throwable e) {
             LogHelper.error(e);
