@@ -77,7 +77,7 @@ public class ClientModule extends LauncherModule {
         if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
         isClosed = true;
     }
-    private boolean isClosed = false;
+    public static boolean isClosed = false;
     private void exitByStartClient(ClientProcessBuilderParamsWrittedEvent event)
     {
         if(isClosed) return;
