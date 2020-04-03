@@ -29,7 +29,7 @@ public class RequestEventWatcher implements ClientWebSocketService.EventHandler 
                 }
                 if(c.altAuthorizedSecondLine != null)
                 {
-                    DiscordRPC.presence.state = DiscordRPC.parameters.replace(c.altAuthorizedFirstLine);
+                    DiscordRPC.presence.state = DiscordRPC.parameters.replace(c.altAuthorizedSecondLine);
                     needUpdate = true;
                 }
                 if(needUpdate)
