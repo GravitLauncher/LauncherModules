@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.discordrpc;
 
 import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
 import pro.gravit.launcher.client.events.client.ClientProcessBuilderParamsWrittedEvent;
@@ -24,7 +25,7 @@ public class ClientModule extends LauncherModule {
     public void init(LauncherInitContext initContext) {
 
         registerEvent(this::clientInit, ClientProcessLaunchEvent.class);
-        registerEvent(this::launcherInit, ClientPreGuiPhase.class);
+        registerEvent(this::launcherInit, ClientEngineInitPhase.class);
         registerEvent(this::exitHandler, ClientExitPhase.class);
         registerEvent(this::exitByStartClient, ClientProcessBuilderParamsWrittedEvent.class);
     }
@@ -53,7 +54,7 @@ public class ClientModule extends LauncherModule {
         }).start();
     }
 
-    private void launcherInit(ClientPreGuiPhase phase)
+    private void launcherInit(ClientEngineInitPhase phase)
     {
         CommonHelper.newThread("Discord RPC Thread", true, () -> {
             try {
