@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.discordrpc;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
+import pro.gravit.launcher.client.events.client.ClientProcessBuilderParamsWrittedEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessLaunchEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -25,6 +26,7 @@ public class ClientModule extends LauncherModule {
         registerEvent(this::clientInit, ClientProcessLaunchEvent.class);
         registerEvent(this::launcherInit, ClientPreGuiPhase.class);
         registerEvent(this::exitHandler, ClientExitPhase.class);
+        registerEvent(this::exitByStartClient, ClientProcessBuilderParamsWrittedEvent.class);
     }
 
     private String replace(String src, String nick, String title) {
@@ -41,7 +43,8 @@ public class ClientModule extends LauncherModule {
                 DiscordRPC.parameters.minecraftVersion = phase.params.profile.getVersion().name;
                 Config c = new Config();
                 DiscordRPC.onConfig(c.appId, c.firstLine, c.secondLine, c.largeKey, c.smallKey, c.largeText, c.smallText);
-                Request.service.registerEventHandler(new RequestEventWatcher(true));
+                RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
+                Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);
             } catch (Throwable e) {
                 LogHelper.error(e);
             }
@@ -55,7 +58,8 @@ public class ClientModule extends LauncherModule {
                 Config c = new Config();
                 if(!c.useAlt) return;
                 DiscordRPC.onConfig(c.altAppId, c.altFirstLine, c.altSecondLine, c.altLargeKey, c.altSmallKey, c.altLargeText, c.altSmallText);
-                Request.service.registerEventHandler(new RequestEventWatcher(false));
+                RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);
+                Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);
             } catch (Throwable e) {
                 LogHelper.error(e);
             }
@@ -63,8 +67,25 @@ public class ClientModule extends LauncherModule {
     }
     private void exitHandler(ClientExitPhase phase)
     {
+        if(isClosed) return;
         if(DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
         if(DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
+        if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
+        isClosed = true;
+    }
+    private boolean isClosed = false;
+    private void exitByStartClient(ClientProcessBuilderParamsWrittedEvent event)
+    {
+        if(isClosed) return;
+        try {
+            if(DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
+            if(DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
+            if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
+            isClosed = true;
+        } catch (Throwable ignored)
+        {
+
+        }
     }
 
     public static void main(String[] args) {

@@ -5,6 +5,7 @@ import pro.gravit.launcher.request.WebSocketEvent;
 import pro.gravit.launcher.request.websockets.ClientWebSocketService;
 
 public class RequestEventWatcher implements ClientWebSocketService.EventHandler {
+    public static RequestEventWatcher INSTANCE;
     public final boolean isClientInstance;
 
     public RequestEventWatcher(boolean isClientInstance) {
