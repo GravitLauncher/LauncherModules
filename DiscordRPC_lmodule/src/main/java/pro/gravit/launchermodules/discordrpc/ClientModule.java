@@ -15,7 +15,7 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class ClientModule extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
-
+    public static Config config;
     public ClientModule() {
         super(new LauncherModuleInfo("DiscordRPC", version));
     }
@@ -41,7 +41,9 @@ public class ClientModule extends LauncherModule {
                 DiscordRPC.parameters.userUUID = phase.params.playerProfile.uuid.toString();
                 DiscordRPC.parameters.profileName = phase.params.profile.getTitle();
                 DiscordRPC.parameters.minecraftVersion = phase.params.profile.getVersion().name;
-                Config c = new Config();
+                DiscordRPC.parameters.profileNameMapped = DiscordParametersReplacer.mappedProfileName(phase.params.profile.getTitle(), phase.params.profile.getUUID());
+                config = new Config();
+                Config c = config;
                 DiscordRPC.onConfig(c.appId, c.firstLine, c.secondLine, c.largeKey, c.smallKey, c.largeText, c.smallText);
                 RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
                 Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);
@@ -55,7 +57,8 @@ public class ClientModule extends LauncherModule {
     {
         CommonHelper.newThread("Discord RPC Thread", true, () -> {
             try {
-                Config c = new Config();
+                config = new Config();
+                Config c = config;
                 if(!c.useAlt) return;
                 DiscordRPC.onConfig(c.altAppId, c.altFirstLine, c.altSecondLine, c.altLargeKey, c.altSmallKey, c.altLargeText, c.altSmallText);
                 RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);

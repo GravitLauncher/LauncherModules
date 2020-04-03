@@ -22,10 +22,10 @@ public class DiscordRPC {
         presence.state = parameters.replace(secondLine);
         //Ниче не лишнее, так надо
         if (largeKey != null) {
-            presence.largeImageKey = parameters.replace(largeKey).toLowerCase();
+            presence.largeImageKey = parameters.replace(largeKey).toLowerCase().replaceAll(" ", "_");
         }
         if (smallKey != null) {
-            presence.smallImageKey = parameters.replace(smallKey).toLowerCase();
+            presence.smallImageKey = parameters.replace(smallKey).toLowerCase().replaceAll(" ", "_");
         }
         if (largeKey != null && largeText != null) {
             presence.largeImageText = parameters.replace(largeText);

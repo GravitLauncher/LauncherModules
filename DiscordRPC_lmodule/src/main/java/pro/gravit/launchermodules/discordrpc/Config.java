@@ -8,6 +8,8 @@ import pro.gravit.utils.helper.LogHelper;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Config {
     @LauncherInject(value = "modules.discordrpc.appid")
@@ -44,6 +46,8 @@ public class Config {
     public String altLargeText;
     @LauncherInject(value = "modules.discordrpc.altsmalltext")
     public String altSmallText;
+    @LauncherInject(value = "modules.discordrpc.profilenamekeymappings")
+    public Map<String, String> profileNameKeyMappings;
 
     public static Object getDefault()
     {
@@ -65,6 +69,7 @@ public class Config {
         config.altSmallKey = "small";
         config.altLargeText = "Everything";
         config.altSmallText = "Everything";
+        config.profileNameKeyMappings = new HashMap<>();
         return config;
     }
 }
