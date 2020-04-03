@@ -1,11 +1,10 @@
 package pro.gravit.launchermodules.discordrpc;
 
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.client.ClientLauncher;
 import pro.gravit.launcher.client.events.ClientExitPhase;
-import pro.gravit.launcher.client.events.ClientGuiPhase;
-import pro.gravit.launcher.client.events.ClientLauncherInitPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
+import pro.gravit.launcher.client.events.client.ClientProcessBuilderPreLaunchEvent;
+import pro.gravit.launcher.client.events.client.ClientProcessLaunchEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
@@ -26,7 +25,7 @@ public class ClientModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
 
-        registerEvent(this::clientInit, ClientLauncherInitPhase.class);
+        registerEvent(this::clientInit, ClientProcessLaunchEvent.class);
         registerEvent(this::launcherInit, ClientPreGuiPhase.class);
         registerEvent(this::exitHandler, ClientExitPhase.class);
     }
@@ -36,11 +35,11 @@ public class ClientModule extends LauncherModule {
         return CommonHelper.replace(src, "user", nick, "profile", title);
     }
 
-    private void clientInit(ClientLauncherInitPhase phase) {
+    private void clientInit(ClientProcessLaunchEvent phase) {
         CommonHelper.newThread("Discord RPC Thread", true, () -> {
             try {
                 String title = Launcher.profile.getTitle();
-                String nick = ClientLauncher.playerProfile.username;
+                String nick = ""; //TODO
                 Config c = new Config();
                 c.firstLine = replace(c.firstLine, nick, title);
                 c.secondLine = replace(c.secondLine, nick, title);
