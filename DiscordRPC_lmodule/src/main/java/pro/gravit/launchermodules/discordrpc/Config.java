@@ -32,6 +32,10 @@ public class Config {
     public String altFirstLine;
     @LauncherInject(value = "modules.discordrpc.altsecondline")
     public String altSecondLine;
+    @LauncherInject(value = "modules.discordrpc.altauthorizedfirstline")
+    public String altAuthorizedFirstLine;
+    @LauncherInject(value = "modules.discordrpc.altauthorizedsecondline")
+    public String altAuthorizedSecondLine;
     @LauncherInject(value = "modules.discordrpc.altlargekey")
     public String altLargeKey;
     @LauncherInject(value = "modules.discordrpc.altsmallkey")
@@ -45,8 +49,8 @@ public class Config {
     {
         Config config = new Config();
         config.appId = "mySuperApp";
-        config.firstLine = "Играет на %profile%";
-        config.secondLine = "Ник: %user%";
+        config.firstLine = "Играет на %profileName%";
+        config.secondLine = "Ник: %username%";
         config.largeKey = "large";
         config.smallKey = "small";
         config.largeText = "Everything";
@@ -54,7 +58,9 @@ public class Config {
         config.useAlt = true;
         config.altAppId = "mySuperApp";
         config.altFirstLine = "В лаунчере";
-        config.altSecondLine = "Выбирает сервер";
+        config.altSecondLine = "Авторизируется";
+        config.altAuthorizedFirstLine = "В лаунчере";
+        config.altAuthorizedSecondLine = "Ник: %username%";
         config.altLargeKey = "large";
         config.altSmallKey = "small";
         config.altLargeText = "Everything";

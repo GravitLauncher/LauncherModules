@@ -3,17 +3,14 @@ package pro.gravit.launchermodules.discordrpc;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
-import pro.gravit.launcher.client.events.client.ClientProcessBuilderPreLaunchEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessLaunchEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launcher.request.Request;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.CommonHelper;
-import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
-
-import java.io.Reader;
 
 public class ClientModule extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
@@ -38,14 +35,13 @@ public class ClientModule extends LauncherModule {
     private void clientInit(ClientProcessLaunchEvent phase) {
         CommonHelper.newThread("Discord RPC Thread", true, () -> {
             try {
-                String title = Launcher.profile.getTitle();
-                String nick = ""; //TODO
+                DiscordRPC.parameters.username = phase.params.playerProfile.username;
+                DiscordRPC.parameters.userUUID = phase.params.playerProfile.uuid.toString();
+                DiscordRPC.parameters.profileName = phase.params.profile.getTitle();
+                DiscordRPC.parameters.minecraftVersion = phase.params.profile.getVersion().name;
                 Config c = new Config();
-                c.firstLine = replace(c.firstLine, nick, title);
-                c.secondLine = replace(c.secondLine, nick, title);
-                c.largeText = replace(c.largeText, nick, title);
-                c.smallText = replace(c.smallText, nick, title);
                 DiscordRPC.onConfig(c.appId, c.firstLine, c.secondLine, c.largeKey, c.smallKey, c.largeText, c.smallText);
+                Request.service.registerEventHandler(new RequestEventWatcher(true));
             } catch (Throwable e) {
                 LogHelper.error(e);
             }
@@ -59,6 +55,7 @@ public class ClientModule extends LauncherModule {
                 Config c = new Config();
                 if(!c.useAlt) return;
                 DiscordRPC.onConfig(c.altAppId, c.altFirstLine, c.altSecondLine, c.altLargeKey, c.altSmallKey, c.altLargeText, c.altSmallText);
+                Request.service.registerEventHandler(new RequestEventWatcher(false));
             } catch (Throwable e) {
                 LogHelper.error(e);
             }

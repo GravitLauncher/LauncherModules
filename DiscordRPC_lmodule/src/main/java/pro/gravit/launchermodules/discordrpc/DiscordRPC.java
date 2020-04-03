@@ -5,11 +5,12 @@ import club.minnced.discord.rpc.DiscordRichPresence;
 import com.google.gson.Gson;
 import pro.gravit.utils.helper.CommonHelper;
 
-class DiscordRPC {
+public class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
-	static club.minnced.discord.rpc.DiscordRPC lib;
+	public static club.minnced.discord.rpc.DiscordRPC lib;
     static Thread thr;
-    static DiscordRichPresence presence;
+    public static DiscordRichPresence presence;
+    public static DiscordParametersReplacer parameters = new DiscordParametersReplacer();
 
     static void onConfig(String appId, String firstLine, String secondLine, String largeKey, String smallKey, String largeText, String smallText) {
         lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
@@ -17,20 +18,20 @@ class DiscordRPC {
         lib.Discord_Initialize(appId, handlers, true, "");
         presence = new DiscordRichPresence();
         presence.startTimestamp = System.currentTimeMillis() / 1000;
-        presence.details = firstLine;
-        presence.state = secondLine;
+        presence.details = parameters.replace(firstLine);
+        presence.state = parameters.replace(secondLine);
         //Ниче не лишнее, так надо
         if (largeKey != null) {
-            presence.largeImageKey = largeKey;
+            presence.largeImageKey = parameters.replace(largeKey);
         }
         if (smallKey != null) {
-            presence.smallImageKey = smallKey;
+            presence.smallImageKey = parameters.replace(smallKey);
         }
         if (largeKey != null && largeText != null) {
-            presence.largeImageText = largeText;
+            presence.largeImageText = parameters.replace(largeText);
         }
         if (smallKey != null && smallText != null) {
-            presence.smallImageText = smallText;
+            presence.smallImageText = parameters.replace(smallText);
         }
 
         lib.Discord_UpdatePresence(presence);
@@ -48,5 +49,13 @@ class DiscordRPC {
         }, "RPC");
         thr.setDaemon(true);
         thr.start();
+    }
+
+    public static void resetPresence()
+    {
+        if(presence != null)
+        {
+            lib.Discord_UpdatePresence(presence);
+        }
     }
 }
