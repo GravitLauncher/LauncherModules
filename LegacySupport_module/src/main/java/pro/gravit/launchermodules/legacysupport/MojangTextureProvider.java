@@ -77,9 +77,7 @@ public final class MojangTextureProvider extends TextureProvider {
                 JsonObject property0 = property.getAsJsonObject();
                 if (property0.get("name").getAsString().equals("textures")) {
                     byte[] asBytes = Base64.getDecoder().decode(property0.get("value").getAsString());
-                    String asString = new String(asBytes, StandardCharsets.UTF_8);
-                    JsonParser parser = new JsonParser();
-                    texturesProperty = parser.parse(asString).getAsJsonObject();
+                    texturesProperty = JsonParser.parseString(new String(asBytes, StandardCharsets.UTF_8)).getAsJsonObject();
                     break;
                 }
             }
