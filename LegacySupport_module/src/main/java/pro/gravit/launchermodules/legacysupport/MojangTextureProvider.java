@@ -45,6 +45,8 @@ public final class MojangTextureProvider extends TextureProvider {
         return getCached(uuid, username).cloak;
     }
 
+
+
     private CacheData getCached(UUID uuid, String username) {
         CacheData result = cache.get(username);
 
@@ -57,15 +59,15 @@ public final class MojangTextureProvider extends TextureProvider {
         }
 
         try {
-            String uuidResolved = uuid.toString();
+            String uuidResolved = uuid.toString().replaceAll("-", "");
 
             // Obtain player profile
             URL profileURL = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuidResolved);
-            JsonObject profileResponse = HTTPRequest.jsonRequest(Launcher.gsonManager.gson.toJsonTree(new EmptyObject()), profileURL).getAsJsonObject();
+            JsonElement profileResponse = HTTPRequest.jsonRequest(null, "GET", profileURL);
             if (profileResponse == null) {
                 throw new IllegalArgumentException("Empty Mojang response");
             }
-            JsonArray properties = (JsonArray) profileResponse.get("properties");
+            JsonArray properties = (JsonArray) profileResponse.getAsJsonObject().get("properties");
             if (properties == null) {
                 LogHelper.subDebug("No properties");
                 return cache(username, null, null, null);
