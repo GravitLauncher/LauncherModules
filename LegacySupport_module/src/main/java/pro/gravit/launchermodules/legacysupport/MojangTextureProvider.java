@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public final class MojangTextureProvider extends TextureProvider {
     public static class EmptyObject {
-
+        public boolean legacy = true;
     }
 
     public static final long CACHE_DURATION_MS = VerifyHelper.verifyLong(
