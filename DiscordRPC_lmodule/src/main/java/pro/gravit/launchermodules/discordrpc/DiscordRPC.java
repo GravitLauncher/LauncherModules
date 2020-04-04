@@ -45,7 +45,7 @@ public class DiscordRPC {
                 	break;
                 }
             }
-            if(!ClientModule.isClosed)
+            if(!ClientModule.isClosed(false))
                 lib.Discord_Shutdown();
         }, "RPC");
         thr.setDaemon(true);
