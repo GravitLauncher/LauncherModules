@@ -72,20 +72,20 @@ public class ClientModule extends LauncherModule {
     private void exitHandler(ClientExitPhase phase)
     {
         if(isClosed) return;
+        isClosed = true;
         if(DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
         if(DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
         if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
-        isClosed = true;
     }
     public static boolean isClosed = false;
     private void exitByStartClient(ClientProcessBuilderParamsWrittedEvent event)
     {
         if(isClosed) return;
         try {
+            isClosed = true;
             if(DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
             if(DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
             if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
-            isClosed = true;
         } catch (Throwable ignored)
         {
 
