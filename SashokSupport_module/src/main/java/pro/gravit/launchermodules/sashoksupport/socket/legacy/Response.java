@@ -1,10 +1,10 @@
 package pro.gravit.launchermodules.sashoksupport.socket.legacy;
 
 import pro.gravit.launcher.request.RequestException;
-import pro.gravit.launcher.request.RequestType;
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launchermodules.sashoksupport.socket.LegacyServerComponent;
+import pro.gravit.launchermodules.sashoksupport.socket.RequestType;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LauncherResponse;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.update.LegacyLauncherResponse;
 import pro.gravit.utils.helper.LogHelper;
@@ -53,12 +53,6 @@ public abstract class Response {
     protected final void debug(String message) {
         LogHelper.subDebug("#%d %s", session, message);
     }
-
-
-    protected final void debug(String message, Object... args) {
-        debug(String.format(message, args));
-    }
-
 
     public abstract void reply() throws Exception;
 

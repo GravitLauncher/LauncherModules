@@ -5,8 +5,6 @@ import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.serialize.HInput;
 import pro.gravit.launcher.serialize.HOutput;
 import pro.gravit.launchermodules.sashoksupport.socket.legacy.Response;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.manangers.SessionManager;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -16,12 +14,10 @@ import java.net.SocketException;
 
 public final class ResponseThread implements Runnable {
     private final Socket socket;
-    private final SessionManager sessions;
     private final ServerSocketHandler handler;
 
-    public ResponseThread(LaunchServer server, ServerSocketHandler handler, Socket socket, SessionManager sessionManager) throws SocketException {
+    public ResponseThread(ServerSocketHandler handler, Socket socket) throws SocketException {
         this.socket = socket;
-        sessions = sessionManager;
         // Fix socket flags
         IOHelper.setSocketFlags(socket);
         this.handler = handler;
@@ -45,13 +41,7 @@ public final class ResponseThread implements Runnable {
                 throw new IOException("Invalid Handshake");
         if (!legacy) {
             session = input.readLong();
-            sessions.updateClient(session);
         }
-        //if (!keyModulus.equals(server.privateKey.getModulus())) {
-        //    output.writeBoolean(false);
-        //    throw new IOException(String.format("#%d Key modulus mismatch", session));
-        //}
-        // Read request type
         int type = input.readVarInt();
         if (!handler.onHandshake(session, type)) {
             output.writeBoolean(false);

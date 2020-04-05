@@ -1,9 +1,6 @@
 package pro.gravit.launchermodules.sashoksupport.socket;
 
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.managers.GarbageManager;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.manangers.SessionManager;
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -18,9 +15,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public final class ServerSocketHandler implements Runnable, AutoCloseable {
     public static final int LEGACY_LAUNCHER_MAGIC = Launcher.PROTOCOL_MAGIC_LEGACY - 2;
     private static final ThreadFactory THREAD_FACTORY = r -> CommonHelper.newThread("Network Thread", true, r);
-    public final SessionManager sessionManager;
-    // Instance
-    private final LaunchServer server;
     private final AtomicReference<ServerSocket> serverSocket = new AtomicReference<>();
     private final ExecutorService threadPool;
     private final AtomicLong idCounter = new AtomicLong(0L);
@@ -28,19 +22,12 @@ public final class ServerSocketHandler implements Runnable, AutoCloseable {
     public LegacyServerComponent component;
     private volatile Listener listener;
 
-    public ServerSocketHandler(LaunchServer server, LegacyServerComponent component) {
-        this(server, new SessionManager());
-        this.component = component;
-        GarbageManager.registerNeedGC(sessionManager);
-    }
-
-    public ServerSocketHandler(LaunchServer server, SessionManager sessionManager) {
-        this.server = server;
+    public ServerSocketHandler(LegacyServerComponent component) {
         threadPool = new ThreadPoolExecutor(component.threadCoreCount, Integer.MAX_VALUE,
                 component.threadCount, TimeUnit.SECONDS,
                 new SynchronousQueue<>(),
                 THREAD_FACTORY);
-        this.sessionManager = sessionManager;
+        this.component = component;
     }
 
     @Override
@@ -93,7 +80,7 @@ public final class ServerSocketHandler implements Runnable, AutoCloseable {
 
 
                 // Reply in separate thread
-                threadPool.execute(new ResponseThread(server, this, socket, sessionManager));
+                threadPool.execute(new ResponseThread(this, socket));
             }
         } catch (IOException e) {
             // Ignore error after close/rebind

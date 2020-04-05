@@ -6,10 +6,12 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.components.Component;
 import pro.gravit.utils.helper.CommonHelper;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.spec.InvalidKeySpecException;
 
 public class LegacyServerComponent extends Component {
     public static boolean registerCommands = false;
@@ -19,8 +21,9 @@ public class LegacyServerComponent extends Component {
     public int threadCount;
     public String launcherFile;
     public String launcherEXEFile;
-    public transient Path launcher;
-    public transient Path launcherEXE;
+    public String oldRSAPrivateKey;
+    public transient EFileInfo launcher;
+    public transient EFileInfo launcherEXE;
     public transient LaunchServer launchServer;
     public transient ServerSocketHandler handler;
 
@@ -40,9 +43,14 @@ public class LegacyServerComponent extends Component {
 
     @Override
     public void postInit(LaunchServer launchServer) {
-        launcher = Paths.get(launcherFile);
-        launcherEXE = Paths.get(launcherEXEFile);
-        handler = new ServerSocketHandler(launchServer, this);
+        Path key = Paths.get(oldRSAPrivateKey);
+        try {
+            launcher = new EFileInfo(launcherFile, key);
+            launcherEXE = new EFileInfo(launcherEXEFile, key);
+        } catch (IOException | InvalidKeySpecException e) {
+            throw new RuntimeException("Invalid launcher file", e);
+        }
+        handler = new ServerSocketHandler(this);
         CommonHelper.newThread("Legacy Sashok Server", true, handler);
         if (!registerCommands) {
             launchServer.commandHandler.registerCommand("logConnections", new LogConnectionsCommand(launchServer));
