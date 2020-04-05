@@ -16,9 +16,6 @@ public class SystemdNotifyModule extends LauncherModule {
         super(new LauncherModuleInfo("SystemdNotifer", version));
     }
 
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
-    }
 
     public void finish(LaunchServerFullInitEvent event) {
         ProcessBuilder processBuilder = new ProcessBuilder();

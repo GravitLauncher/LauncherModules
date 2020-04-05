@@ -18,9 +18,6 @@ public class ModuleImpl extends LauncherModule {
         super(new LauncherModuleInfo("SashokSupport", version));
     }
 
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
-    }
 
     public void preInit(PreConfigPhase preConfigPhase) {
         if (!registred) {
