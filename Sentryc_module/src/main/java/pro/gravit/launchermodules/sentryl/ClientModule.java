@@ -18,9 +18,6 @@ public class ClientModule extends LauncherModule {
         super(new LauncherModuleInfo("SentryModule", version));
     }
 
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s Launcher.");
-    }
 
     @Override
     public void init(LauncherInitContext initContext) {

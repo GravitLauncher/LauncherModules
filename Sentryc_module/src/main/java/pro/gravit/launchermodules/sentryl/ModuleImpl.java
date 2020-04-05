@@ -25,9 +25,6 @@ public class ModuleImpl extends LauncherModule {
         super(new LauncherModuleInfo("SentryModule", version));
     }
 
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
-    }
 
     public void postInit(LaunchServerPostInitPhase phase) {
         LaunchServer context = phase.server;

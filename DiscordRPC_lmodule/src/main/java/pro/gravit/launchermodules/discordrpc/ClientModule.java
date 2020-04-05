@@ -36,9 +36,6 @@ public class ClientModule extends LauncherModule {
         return ret;
     }
 
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s Launcher.");
-    }
 
     @Override
     public void init(LauncherInitContext initContext) {
