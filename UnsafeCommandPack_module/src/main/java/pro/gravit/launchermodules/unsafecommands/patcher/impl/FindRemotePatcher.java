@@ -13,11 +13,9 @@ public class FindRemotePatcher extends ClassTransformerPatcher {
                 return new MethodVisitor(Opcodes.ASM7) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-                        if(opcode == Opcodes.INVOKEVIRTUAL &&  "java/net/URL".equals(owner) && "openConnection".equals(name)) {
+                        if (opcode == Opcodes.INVOKEVIRTUAL && "java/net/URL".equals(owner) && "openConnection".equals(name)) {
                             LogHelper.info("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
-                        }
-                        else if(opcode == Opcodes.INVOKESPECIAL && "java/net/Socket".equals(owner) && "<init>".equals(name))
-                        {
+                        } else if (opcode == Opcodes.INVOKESPECIAL && "java/net/Socket".equals(owner) && "<init>".equals(name)) {
                             LogHelper.info("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
                         }
                         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
@@ -25,8 +23,7 @@ public class FindRemotePatcher extends ClassTransformerPatcher {
 
                     @Override
                     public void visitLdcInsn(Object value) {
-                        if(value instanceof String && isHttpString((String) value))
-                        {
+                        if (value instanceof String && isHttpString((String) value)) {
                             LogHelper.info("Class %s method %s LDC %s", reader.getClassName(), methodName, value);
                         }
                         super.visitLdcInsn(value);
@@ -35,10 +32,9 @@ public class FindRemotePatcher extends ClassTransformerPatcher {
             }
         };
     }
-    public boolean isHttpString(String value)
-    {
-        if(value.toLowerCase().startsWith("http://")) return true;
-        if(value.toLowerCase().startsWith("https://")) return true;
-        return false;
+
+    public boolean isHttpString(String value) {
+        if (value.toLowerCase().startsWith("http://")) return true;
+        return value.toLowerCase().startsWith("https://");
     }
 }

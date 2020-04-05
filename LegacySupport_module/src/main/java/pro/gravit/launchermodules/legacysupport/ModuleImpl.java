@@ -11,11 +11,15 @@ import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
 public class ModuleImpl extends LauncherModule {
-    private static boolean registred = false;
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
+    private static boolean registred = false;
 
     public ModuleImpl() {
         super(new LauncherModuleInfo("LegacySupport", version));
+    }
+
+    public static void main(String[] args) {
+        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 
     public void preInit(PreConfigPhase preConfigPhase) {
@@ -25,10 +29,6 @@ public class ModuleImpl extends LauncherModule {
             TextureProvider.providers.register("mojang", MojangTextureProvider.class);
             registred = true;
         }
-    }
-
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 
     @Override

@@ -30,33 +30,30 @@ public class ClassLoaderCommand extends Command {
         verifyArgs(args, 3);
         String cmd = args[0];
         String name = args[1];
-        switch (cmd)
-        {
-            case "new":
-            {
+        switch (cmd) {
+            case "new": {
                 UnsafeURLClassLoader.classLoaderMap.put(name, new UnsafeURLClassLoader(getURL(args[2])));
                 break;
             }
-            case "addURL":
-            {
+            case "addURL": {
                 UnsafeURLClassLoader cl = UnsafeURLClassLoader.classLoaderMap.get(name);
-                if(cl == null) throw new NullPointerException(String.format("UnsafeURLClassLoader %s not found", name));
-                for(URL u : getURL(args[2]))
-                {
+                if (cl == null)
+                    throw new NullPointerException(String.format("UnsafeURLClassLoader %s not found", name));
+                for (URL u : getURL(args[2])) {
                     cl.addURL(u);
                 }
             }
-            case "manualDefine":
-            {
+            case "manualDefine": {
                 UnsafeURLClassLoader cl = UnsafeURLClassLoader.classLoaderMap.get(name);
-                if(cl == null) throw new NullPointerException(String.format("UnsafeURLClassLoader %s not found", name));
+                if (cl == null)
+                    throw new NullPointerException(String.format("UnsafeURLClassLoader %s not found", name));
                 byte[] clazzBytes = IOHelper.read(Paths.get(args[2]));
                 cl.rawDefineClass(args.length > 3 ? args[3] : null, clazzBytes, args.length > 4 ? Integer.parseInt(args[4]) : 0, args.length > 5 ? Integer.parseInt(args[5]) : clazzBytes.length);
             }
         }
     }
-    public URL[] getURL(String s)
-    {
+
+    public URL[] getURL(String s) {
         String[] splits = s.split(";");
         return Arrays.stream(splits).map((e) -> {
             try {

@@ -4,14 +4,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class StatisticsManager {
+    private final Timer timer = new Timer("StatisticManager", true);
     public int joinServerNumber;
     public int checkServerNumber;
     public int connectionNumber;
     public int authNumber;
     public int fullAuthNumber;
-
     long loadTime;
-    private final Timer timer = new Timer("StatisticManager", true);
 
     public StatisticsManager() {
         TimerTask task = new TimerTask() {

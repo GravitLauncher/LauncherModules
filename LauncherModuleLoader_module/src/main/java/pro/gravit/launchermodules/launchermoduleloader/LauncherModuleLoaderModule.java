@@ -33,15 +33,9 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 
 public class LauncherModuleLoaderModule extends LauncherModule {
+    public final List<ModuleEntity> launcherModules = new ArrayList<>();
+    public Path modules_dir;
     private transient LaunchServer server;
-    static class ModuleEntity
-    {
-        public Path path;
-        public String moduleMainClass;
-        public String moduleConfigClass;
-        public String moduleConfigName;
-        public Map<String, Object> propertyMap;
-    }
 
     public LauncherModuleLoaderModule() {
         super(new LauncherModuleInfo("LauncherModuleLoader", new Version(1, 1, 0, 1, Version.Type.LTS)));
@@ -53,8 +47,53 @@ public class LauncherModuleLoaderModule extends LauncherModule {
         registerEvent(this::postInit, LaunchServerPostInitPhase.class);
     }
 
+    public void postInit(LaunchServerPostInitPhase phase) {
+        modules_dir = server.dir.resolve("launcher-modules");
+        if (!IOHelper.isDir(modules_dir)) {
+            try {
+                Files.createDirectories(modules_dir);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
+        MainBuildTask mainTask = server.launcherBinary.getTaskByClass(MainBuildTask.class).get();
+        mainTask.preBuildHook.registerHook((buildContext) -> {
+            for (ModuleEntity e : launcherModules) {
+                if (e.propertyMap != null) buildContext.task.properties.putAll(e.propertyMap);
+                buildContext.clientModules.add(e.moduleMainClass);
+                buildContext.readerClassPath.add(new JarFile(e.path.toFile()));
+            }
+        });
+        mainTask.postBuildHook.registerHook((buildContext) -> {
+            for (ModuleEntity e : launcherModules) {
+                LogHelper.debug("Put %s launcher module", e.path.toString());
+                buildContext.pushJarFile(e.path, (en) -> false, (en) -> true);
+            }
+        });
+        try {
+            syncModules();
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
+    }
+
+    public void syncModules() throws IOException {
+        launcherModules.clear();
+        IOHelper.walk(modules_dir, new ModulesVisitor(), false);
+    }
+
+    static class ModuleEntity {
+        public Path path;
+        public String moduleMainClass;
+        public String moduleConfigClass;
+        public String moduleConfigName;
+        public Map<String, Object> propertyMap;
+    }
+
     protected final class ModulesVisitor extends SimpleFileVisitor<Path> {
         private LauncherModuleClassLoader classLoader;
+
         private ModulesVisitor() {
         }
 
@@ -71,46 +110,37 @@ public class LauncherModuleLoaderModule extends LauncherModule {
                         entity.path = file;
                         entity.moduleMainClass = mainClass;
                         entity.moduleConfigClass = attributes.getValue("Module-Config-Class");
-                        if(entity.moduleConfigClass != null)
-                        {
+                        if (entity.moduleConfigClass != null) {
                             entity.moduleConfigName = attributes.getValue("Module-Config-Name");
-                            if(entity.moduleConfigName == null)
-                            {
+                            if (entity.moduleConfigName == null) {
                                 LogHelper.warning("Module-Config-Name in module %s null. Module not configured", file.toString());
-                            }
-                            else
-                            {
+                            } else {
                                 try {
-                                    if(classLoader == null) classLoader = new LauncherModuleClassLoader(LauncherModuleLoaderModule.class.getClassLoader());
+                                    if (classLoader == null)
+                                        classLoader = new LauncherModuleClassLoader(LauncherModuleLoaderModule.class.getClassLoader());
                                     Class<?> clazz = classLoader.rawDefineClass(entity.moduleConfigClass,
                                             JarHelper.getClassFromJar(entity.moduleConfigClass, file)
                                     );
                                     Path configPath = modulesConfigManager.getModuleConfig(moduleInfo.name, entity.moduleConfigName);
                                     Object defaultConfig = MethodHandles.publicLookup().findStatic(clazz, "getDefault", MethodType.methodType(Object.class)).invoke();
                                     Object targetConfig;
-                                    if(!Files.exists(configPath))
-                                    {
+                                    if (!Files.exists(configPath)) {
                                         LogHelper.debug("Write default config for module %s to %s", file.toString(), configPath.toString());
-                                        try(Writer writer = IOHelper.newWriter(configPath))
-                                        {
+                                        try (Writer writer = IOHelper.newWriter(configPath)) {
                                             Launcher.gsonManager.configGson.toJson(defaultConfig, writer);
                                         }
                                         targetConfig = defaultConfig;
-                                    }
-                                    else
-                                    {
-                                        try(Reader reader = IOHelper.newReader(configPath))
-                                        {
+                                    } else {
+                                        try (Reader reader = IOHelper.newReader(configPath)) {
                                             targetConfig = Launcher.gsonManager.configGson.fromJson(reader, clazz);
                                         }
                                     }
                                     Field[] fields = clazz.getFields();
-                                    for(Field field : fields)
-                                    {
-                                        if((field.getModifiers() & Modifier.STATIC) != 0) continue;
+                                    for (Field field : fields) {
+                                        if ((field.getModifiers() & Modifier.STATIC) != 0) continue;
                                         Object obj = field.get(targetConfig);
                                         String configPropertyName = "modules.".concat(entity.moduleConfigName.toLowerCase()).concat(".").concat(field.getName().toLowerCase());
-                                        if(entity.propertyMap == null) entity.propertyMap = new HashMap<>();
+                                        if (entity.propertyMap == null) entity.propertyMap = new HashMap<>();
                                         LogHelper.dev("Property name %s", configPropertyName);
                                         entity.propertyMap.put(configPropertyName, obj);
                                     }
@@ -124,46 +154,5 @@ public class LauncherModuleLoaderModule extends LauncherModule {
                 }
             return super.visitFile(file, attrs);
         }
-    }
-
-    public final List<ModuleEntity> launcherModules = new ArrayList<>();
-    public Path modules_dir;
-
-    public void postInit(LaunchServerPostInitPhase phase) {
-        modules_dir = server.dir.resolve("launcher-modules");
-        if (!IOHelper.isDir(modules_dir)) {
-            try {
-                Files.createDirectories(modules_dir);
-            } catch (IOException e) {
-                LogHelper.error(e);
-            }
-        }
-        server.commandHandler.registerCommand("SyncLauncherModules", new SyncLauncherModulesCommand(this));
-        MainBuildTask mainTask = server.launcherBinary.getTaskByClass(MainBuildTask.class).get();
-        mainTask.preBuildHook.registerHook((buildContext) -> {
-            for(ModuleEntity e : launcherModules)
-            {
-                if(e.propertyMap != null) buildContext.task.properties.putAll(e.propertyMap);
-                buildContext.clientModules.add(e.moduleMainClass);
-                buildContext.readerClassPath.add(new JarFile(e.path.toFile()));
-            }
-        });
-        mainTask.postBuildHook.registerHook((buildContext) -> {
-            for(ModuleEntity e : launcherModules)
-            {
-                LogHelper.debug("Put %s launcher module", e.path.toString());
-                buildContext.pushJarFile(e.path, (en) -> false, (en) -> true);
-            }
-        });
-        try {
-            syncModules();
-        } catch (IOException e) {
-            LogHelper.error(e);
-        }
-    }
-
-    public void syncModules() throws IOException {
-        launcherModules.clear();
-        IOHelper.walk(modules_dir, new ModulesVisitor(), false);
     }
 }

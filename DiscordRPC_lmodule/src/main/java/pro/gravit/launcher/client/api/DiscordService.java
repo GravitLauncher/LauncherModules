@@ -8,12 +8,11 @@ public class DiscordService {
         throw new UnsupportedOperationException();
     }
 
-    public static void apply()
-    {
+    public static void apply() {
         DiscordRPC.resetPresence();
     }
-    public static DiscordRichPresence getDiscordRichPresence()
-    {
+
+    public static DiscordRichPresence getDiscordRichPresence() {
         return DiscordRPC.presence;
     }
 }

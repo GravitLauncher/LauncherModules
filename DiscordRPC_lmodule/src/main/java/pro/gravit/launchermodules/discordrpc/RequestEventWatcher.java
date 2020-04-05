@@ -14,26 +14,21 @@ public class RequestEventWatcher implements ClientWebSocketService.EventHandler 
 
     @Override
     public <T extends WebSocketEvent> boolean eventHandle(T event) {
-        if(event instanceof AuthRequestEvent && ((AuthRequestEvent) event).playerProfile != null)
-        {
+        if (event instanceof AuthRequestEvent && ((AuthRequestEvent) event).playerProfile != null) {
             DiscordRPC.parameters.username = ((AuthRequestEvent) event).playerProfile.username;
             DiscordRPC.parameters.userUUID = ((AuthRequestEvent) event).playerProfile.uuid.toString();
-            if(!isClientInstance)
-            {
+            if (!isClientInstance) {
                 Config c = new Config();
                 boolean needUpdate = false;
-                if(c.altAuthorizedFirstLine != null)
-                {
+                if (c.altAuthorizedFirstLine != null) {
                     DiscordRPC.presence.details = DiscordRPC.parameters.replace(c.altAuthorizedFirstLine);
                     needUpdate = true;
                 }
-                if(c.altAuthorizedSecondLine != null)
-                {
+                if (c.altAuthorizedSecondLine != null) {
                     DiscordRPC.presence.state = DiscordRPC.parameters.replace(c.altAuthorizedSecondLine);
                     needUpdate = true;
                 }
-                if(needUpdate)
-                {
+                if (needUpdate) {
                     DiscordRPC.resetPresence();
                 }
             }

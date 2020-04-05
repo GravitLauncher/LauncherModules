@@ -16,33 +16,17 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class ServerSocketHandler implements Runnable, AutoCloseable {
-    public interface Listener {
-
-        boolean onConnect(InetAddress address);
-
-
-        void onDisconnect(Exception e);
-
-
-        boolean onHandshake(long session, int type);
-    }
-
+    public static final int LEGACY_LAUNCHER_MAGIC = Launcher.PROTOCOL_MAGIC_LEGACY - 2;
     private static final ThreadFactory THREAD_FACTORY = r -> CommonHelper.newThread("Network Thread", true, r);
-
-
-    public volatile boolean logConnections = Boolean.getBoolean("launcher.logConnections");
+    public final SessionManager sessionManager;
     // Instance
     private final LaunchServer server;
     private final AtomicReference<ServerSocket> serverSocket = new AtomicReference<>();
     private final ExecutorService threadPool;
-
-    public final SessionManager sessionManager;
     private final AtomicLong idCounter = new AtomicLong(0L);
-    public static final int LEGACY_LAUNCHER_MAGIC = Launcher.PROTOCOL_MAGIC_LEGACY - 2;
-
-    private volatile Listener listener;
-
+    public volatile boolean logConnections = Boolean.getBoolean("launcher.logConnections");
     public LegacyServerComponent component;
+    private volatile Listener listener;
 
     public ServerSocketHandler(LaunchServer server, LegacyServerComponent component) {
         this(server, new SessionManager());
@@ -118,8 +102,19 @@ public final class ServerSocketHandler implements Runnable, AutoCloseable {
         }
     }
 
-
     public void setListener(Listener listener) {
         this.listener = listener;
+    }
+
+
+    public interface Listener {
+
+        boolean onConnect(InetAddress address);
+
+
+        void onDisconnect(Exception e);
+
+
+        boolean onHandshake(long session, int type);
     }
 }

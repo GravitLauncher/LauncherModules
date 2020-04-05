@@ -17,7 +17,7 @@ public class StaticReplacerPatcher extends ClassTransformerPatcher {
     }
 
     public StaticReplacerPatcher(String[] args) {
-        if(args.length < 4) throw new IllegalArgumentException("Patcher need 4 args");
+        if (args.length < 4) throw new IllegalArgumentException("Patcher need 4 args");
         targetOwnerClass = args[0];
         targetOwnerMethod = args[1];
         replaceOwnerClass = args[2];
@@ -37,8 +37,7 @@ public class StaticReplacerPatcher extends ClassTransformerPatcher {
                 return new MethodVisitor(Opcodes.ASM7) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-                        if(opcode == Opcodes.INVOKESTATIC && owner.equals(targetOwnerClass) && name.equals(targetOwnerMethod))
-                        {
+                        if (opcode == Opcodes.INVOKESTATIC && owner.equals(targetOwnerClass) && name.equals(targetOwnerMethod)) {
                             super.visitMethodInsn(opcode, replaceOwnerClass, replaceOwnerMethod, descriptor, isInterface);
                             LogHelper.debug("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
                         }

@@ -10,6 +10,6 @@ dependencies {
 }
 
 jar {
-	manifest.attributes("Module-Main-Class": mainClassName)
+    manifest.attributes("Module-Main-Class": mainClassName)
 }
 

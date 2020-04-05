@@ -1,11 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands;
 
 import pro.gravit.launchermodules.unsafecommands.patcher.UnsafePatcher;
-import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindDefineClassPatcher;
-import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindPacketHackPatcher;
-import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindRemotePatcher;
-import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindSunPatcher;
-import pro.gravit.launchermodules.unsafecommands.patcher.impl.FindSystemPatcher;
+import pro.gravit.launchermodules.unsafecommands.patcher.impl.*;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
@@ -21,6 +17,7 @@ import java.util.Map;
 
 public class PatcherCommand extends Command {
     public static Map<String, UnsafePatcher> patchers = new HashMap<>();
+
     public PatcherCommand(LaunchServer server) {
         super(server);
     }
@@ -38,8 +35,7 @@ public class PatcherCommand extends Command {
     @Override
     @SuppressWarnings("unchecked")
     public void invoke(String... args) throws Exception {
-        if(patchers.isEmpty())
-        {
+        if (patchers.isEmpty()) {
             patchers.put("findSystem", new FindSystemPatcher());
             patchers.put("findRemote", new FindRemotePatcher());
             patchers.put("findSun", new FindSunPatcher());
@@ -51,8 +47,7 @@ public class PatcherCommand extends Command {
         Path target = Paths.get(args[1]);
         boolean testMode = Boolean.parseBoolean(args[2]);
         UnsafePatcher patcher = patchers.get(name);
-        if(patcher == null)
-        {
+        if (patcher == null) {
             Class<? extends UnsafePatcher> clazz = (Class<? extends UnsafePatcher>) Class.forName(name);
             try {
                 String[] real_args = Arrays.copyOfRange(args, 3, args.length);
@@ -60,25 +55,21 @@ public class PatcherCommand extends Command {
                     patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class, String[].class)).asFixedArity().invoke(real_args);
                 else
                     patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invoke();
-            } catch (Throwable e)
-            {
-            	LogHelper.dev(LogHelper.toString(e));
-            	try {
-            		patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments();
-            	} catch (Throwable t) {
-            		throw (InstantiationException) new InstantiationException().initCause(t);
-            	}
+            } catch (Throwable e) {
+                LogHelper.dev(LogHelper.toString(e));
+                try {
+                    patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments();
+                } catch (Throwable t) {
+                    throw (InstantiationException) new InstantiationException().initCause(t);
+                }
             }
         }
-        if(!IOHelper.exists(target))
+        if (!IOHelper.exists(target))
             throw new IllegalStateException("Target path not exist");
         Path tempFile = server.dir.resolve("build").resolve("patcher.tmp.jar");
-        if(IOHelper.isFile(target))
-        {
+        if (IOHelper.isFile(target)) {
             patcher.processFile(target, tempFile, testMode);
-        }
-        else if(IOHelper.isDir(target))
-        {
+        } else if (IOHelper.isDir(target)) {
             patcher.processDir(target, tempFile, testMode);
         }
     }

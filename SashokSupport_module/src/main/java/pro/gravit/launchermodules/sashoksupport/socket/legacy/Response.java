@@ -14,13 +14,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Response {
-    @FunctionalInterface
-    public interface Factory<R> {
-
-        Response newResponse(LegacyServerComponent component, long id, HInput input, HOutput output);
-    }
-
     private static final Map<Integer, Factory<?>> RESPONSES = new ConcurrentHashMap<>(8);
+    protected final LegacyServerComponent component;
+    protected final HInput input;
+    protected final HOutput output;
+    protected final long session;
+
+
+    protected Response(LegacyServerComponent component, long session, HInput input, HOutput output) {
+        this.component = component;
+        this.input = input;
+        this.output = output;
+        this.session = session;
+    }
 
     public static Response getResponse(int type, LegacyServerComponent component, long session, HInput input, HOutput output) {
         return RESPONSES.get(type).newResponse(component, session, input, output);
@@ -36,30 +42,13 @@ public abstract class Response {
         registerResponse(RequestType.LAUNCHER.getNumber(), LauncherResponse::new);
     }
 
-
     public static void requestError(String message) throws RequestException {
         throw new RequestException(message);
     }
 
-
-    protected final LegacyServerComponent component;
-
-
-    protected final HInput input;
-
-
-    protected final HOutput output;
-
-
-    protected final long session;
-
-    protected Response(LegacyServerComponent component, long session, HInput input, HOutput output) {
-        this.component = component;
-        this.input = input;
-        this.output = output;
-        this.session = session;
+    protected static void writeNoError(HOutput output) throws IOException {
+        output.writeString("", 0);
     }
-
 
     protected final void debug(String message) {
         LogHelper.subDebug("#%d %s", session, message);
@@ -74,7 +63,9 @@ public abstract class Response {
     public abstract void reply() throws Exception;
 
 
-    protected static void writeNoError(HOutput output) throws IOException {
-        output.writeString("", 0);
+    @FunctionalInterface
+    public interface Factory<R> {
+
+        Response newResponse(LegacyServerComponent component, long id, HInput input, HOutput output);
     }
 }

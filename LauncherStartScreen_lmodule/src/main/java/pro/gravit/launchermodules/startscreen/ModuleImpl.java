@@ -13,13 +13,12 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 
 public class ModuleImpl extends LauncherModule {
+    public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
+    public ImageDisplay screen = null;
+
     public ModuleImpl() {
         super(new LauncherModuleInfo("LauncherStartScreen", version, Integer.MAX_VALUE - 200, new String[0]));
     }
-
-    public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
-
-    public ImageDisplay screen = null;
 
     @Override
     public void init(LauncherInitContext initContext) {

@@ -46,25 +46,20 @@ public class SendAuthCommand extends Command {
 
         UUID clientUUID;
         String accessToken = SecurityHelper.randomStringToken();
-        if(pair == null)
-        {
+        if (pair == null) {
             clientUUID = args.length > 5 ? UUID.fromString(args[5]) : UUID.randomUUID();
-        }
-        else
-        {
+        } else {
             clientUUID = pair.handler.auth(new AuthProviderResult(username, accessToken, permissions));
         }
         WebSocketService service = server.nettyServerSocketHandler.nettyServer.service;
         service.channels.forEach((channel -> {
             WebSocketFrameHandler frameHandler = channel.pipeline().get(WebSocketFrameHandler.class);
-            if(frameHandler.getConnectUUID().equals(connectUUID))
-            {
+            if (frameHandler.getConnectUUID().equals(connectUUID)) {
                 Client client = frameHandler.getClient();
-                if(client.isAuth) LogHelper.warning("This client already authorized");
+                if (client.isAuth) LogHelper.warning("This client already authorized");
                 client.isAuth = true;
                 client.username = username;
-                if(pair != null)
-                {
+                if (pair != null) {
                     client.auth_id = args[3];
                     client.auth = pair;
                 }

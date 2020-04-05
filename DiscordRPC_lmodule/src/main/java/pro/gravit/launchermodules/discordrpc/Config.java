@@ -1,13 +1,7 @@
 package pro.gravit.launchermodules.discordrpc;
 
-import com.google.gson.annotations.SerializedName;
 import pro.gravit.launcher.LauncherInject;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +35,7 @@ public class Config {
     @LauncherInject(value = "modules.discordrpc.altlargekey")
     public String altLargeKey;
     @LauncherInject(value = "modules.discordrpc.altsmallkey")
-    public  String altSmallKey;
+    public String altSmallKey;
     @LauncherInject(value = "modules.discordrpc.altlargetext")
     public String altLargeText;
     @LauncherInject(value = "modules.discordrpc.altsmalltext")
@@ -49,8 +43,7 @@ public class Config {
     @LauncherInject(value = "modules.discordrpc.profilenamekeymappings")
     public Map<String, String> profileNameKeyMappings;
 
-    public static Object getDefault()
-    {
+    public static Object getDefault() {
         Config config = new Config();
         config.appId = "mySuperApp";
         config.firstLine = "Играет на %profileName%";
