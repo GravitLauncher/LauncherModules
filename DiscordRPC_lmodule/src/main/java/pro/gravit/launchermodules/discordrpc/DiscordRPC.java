@@ -7,10 +7,10 @@ import pro.gravit.utils.helper.CommonHelper;
 
 public class DiscordRPC {
     static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
-	public static club.minnced.discord.rpc.DiscordRPC lib;
-    static Thread thr;
+    public static club.minnced.discord.rpc.DiscordRPC lib;
     public static DiscordRichPresence presence;
     public static DiscordParametersReplacer parameters = new DiscordParametersReplacer();
+    static Thread thr;
 
     static void onConfig(String appId, String firstLine, String secondLine, String largeKey, String smallKey, String largeText, String smallText) {
         lib = club.minnced.discord.rpc.DiscordRPC.INSTANCE;
@@ -42,20 +42,18 @@ public class DiscordRPC {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
-                	break;
+                    break;
                 }
             }
-            if(!ClientModule.isClosed(false))
+            if (!ClientModule.isClosed(false))
                 lib.Discord_Shutdown();
         }, "RPC");
         thr.setDaemon(true);
         thr.start();
     }
 
-    public static void resetPresence()
-    {
-        if(presence != null)
-        {
+    public static void resetPresence() {
+        if (presence != null) {
             lib.Discord_UpdatePresence(presence);
         }
     }

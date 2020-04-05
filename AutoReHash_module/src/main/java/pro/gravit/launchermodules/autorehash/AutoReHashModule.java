@@ -9,32 +9,27 @@ import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static pro.gravit.utils.helper.CommonHelper.newThread;
 
 public class AutoReHashModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.STABLE);
+    private final Set<String> dirs = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private WatchService watchService;
     private volatile boolean changed = false;
     private Timer timer;
-    private final Set<String> dirs = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    public AutoReHashModule() {
+        super(new LauncherModuleInfo("AutoReHashModule", version));
+    }
 
     private static Deque<String> toPath(Iterable<Path> path) {
         Deque<String> result = new LinkedList<>();
         for (Path pe : path)
             result.add(pe.toString());
         return result;
-    }
-
-    public AutoReHashModule() {
-        super(new LauncherModuleInfo("AutoReHashModule", version));
     }
 
     @Override
@@ -59,22 +54,22 @@ public class AutoReHashModule extends LauncherModule {
                     Path watchDir = (Path) key.watchable();
                     for (WatchEvent<?> event : key.pollEvents()) {
                         if (event.kind().equals(StandardWatchEventKinds.OVERFLOW))
-                            continue; 
+                            continue;
                         Path path = watchDir.resolve((Path) event.context());
                         LogHelper.info("Changed " + updates.relativize(path) + " kind " + event.kind().name());
                         String stringPath = toPath(updates.relativize(path)).peekFirst();
                         if (stringPath != null) {
-                        	LogHelper.debug("To sync (may be file): " + stringPath);
+                            LogHelper.debug("To sync (may be file): " + stringPath);
                             if (Files.isDirectory(updates.resolve(stringPath))) {
-                            	dirs.add(stringPath);
-                            	changed = true;
+                                dirs.add(stringPath);
+                                changed = true;
                             }
                         }
                     }
                     key.reset();
                 }
             } catch (InterruptedException e) {
-            	return;
+                return;
             }
         };
         Thread thread = newThread("ReHashing", true, task);

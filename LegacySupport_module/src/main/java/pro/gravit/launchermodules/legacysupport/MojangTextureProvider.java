@@ -4,10 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.HTTPRequest;
 import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchserver.auth.texture.TextureProvider;
-import pro.gravit.launcher.HTTPRequest;
 import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.VerifyHelper;
 
@@ -19,14 +18,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class MojangTextureProvider extends TextureProvider {
-    public static class EmptyObject {
-        public boolean legacy = true;
-    }
-
     public static final long CACHE_DURATION_MS = VerifyHelper.verifyLong(
             Long.parseLong(System.getProperty("launcher.mysql.cacheDurationHours", Integer.toString(24))),
             VerifyHelper.L_NOT_NEGATIVE, "launcher.mysql.cacheDurationHours can't be < 0") * 60L * 60L * 1000L;
-
     // Instance
     private final Map<String, CacheData> cache = new HashMap<>(1024);
 
@@ -44,8 +38,6 @@ public final class MojangTextureProvider extends TextureProvider {
     public synchronized Texture getSkinTexture(UUID uuid, String username, String client) {
         return getCached(uuid, username).skin;
     }
-
-
 
     private CacheData getCached(UUID uuid, String username) {
         CacheData result = cache.get(username);
@@ -112,6 +104,10 @@ public final class MojangTextureProvider extends TextureProvider {
             cache.put(username, data);
         }
         return data;
+    }
+
+    public static class EmptyObject {
+        public boolean legacy = true;
     }
 
     private static final class CacheData {

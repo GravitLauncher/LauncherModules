@@ -17,6 +17,6 @@ dependencies {
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
-                        "Module-Config-Class": configClassName,
-                        "Module-Config-Name": "DiscordRPC")
+            "Module-Config-Class": configClassName,
+            "Module-Config-Name": "DiscordRPC")
 }

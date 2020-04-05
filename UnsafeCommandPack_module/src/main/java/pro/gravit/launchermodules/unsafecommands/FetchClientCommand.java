@@ -1,5 +1,13 @@
 package pro.gravit.launchermodules.unsafecommands;
 
+import pro.gravit.launcher.AsyncDownloader;
+import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
+import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader.Artifact;
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.command.Command;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
+
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,14 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import pro.gravit.launcher.AsyncDownloader;
-import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
-import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader.Artifact;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 public class FetchClientCommand extends Command {
     protected FetchClientCommand(LaunchServer server) {
@@ -70,19 +70,19 @@ public class FetchClientCommand extends Command {
         server.syncUpdatesDir(Collections.singleton(dirName));
     }
 
-	private void fetchNatives(Path resolve, List<Artifact> natives) {
-		for (Artifact a : natives) {
-			try (ZipInputStream z = IOHelper.newZipInput(new URL(a.url))) {
+    private void fetchNatives(Path resolve, List<Artifact> natives) {
+        for (Artifact a : natives) {
+            try (ZipInputStream z = IOHelper.newZipInput(new URL(a.url))) {
                 ZipEntry e = z.getNextEntry();
                 while (e != null) {
-                	if (!e.isDirectory() && !e.getName().startsWith("META-INF") && !e.getName().startsWith("/META-INF")) {
-                		IOHelper.transfer(z, resolve.resolve(e.getName()));
-                	}
-                	e = z.getNextEntry(); 
+                    if (!e.isDirectory() && !e.getName().startsWith("META-INF") && !e.getName().startsWith("/META-INF")) {
+                        IOHelper.transfer(z, resolve.resolve(e.getName()));
+                    }
+                    e = z.getNextEntry();
                 }
-			} catch (Throwable e) {
-				LogHelper.subWarning(LogHelper.toString(e));
-			}
-		}
-	}
+            } catch (Throwable e) {
+                LogHelper.subWarning(LogHelper.toString(e));
+            }
+        }
+    }
 }

@@ -3,9 +3,9 @@ package pro.gravit.launchermodules.legacysupport;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import pro.gravit.launcher.HTTPRequest;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.launcher.HTTPRequest;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
@@ -16,10 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class MojangAuthHandler extends AuthHandler {
-    public final HashMap<String, UUID> usernameToUUID = new HashMap<>();
-    public static URL joinServer;
     private static final Gson gson = new Gson();
-    boolean returnSuccess = true;
+    public static URL joinServer;
 
     static {
         try {
@@ -28,6 +26,9 @@ public class MojangAuthHandler extends AuthHandler {
             LogHelper.error(e);
         }
     }
+
+    public final HashMap<String, UUID> usernameToUUID = new HashMap<>();
+    boolean returnSuccess = true;
 
     @Override
     public UUID auth(AuthProviderResult authResult) {
@@ -47,13 +48,6 @@ public class MojangAuthHandler extends AuthHandler {
     @Override
     public void close() {
 
-    }
-
-    public static class mojangJoinServerRequest {
-        public MojangAuthProvider.mojangAgent agent;
-        public String accessToken;
-        public String selectedProfile;
-        public String serverId;
     }
 
     @Override
@@ -90,5 +84,12 @@ public class MojangAuthHandler extends AuthHandler {
             if (entry.getValue().equals(uuid)) return entry.getKey();
         }
         return null;
+    }
+
+    public static class mojangJoinServerRequest {
+        public MojangAuthProvider.mojangAgent agent;
+        public String accessToken;
+        public String selectedProfile;
+        public String serverId;
     }
 }

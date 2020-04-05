@@ -2,7 +2,6 @@ package pro.gravit.launchermodules.sentryl;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;

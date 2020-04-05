@@ -15,18 +15,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public final class ResponseThread implements Runnable {
-    static class Handshake {
-        final int type;
-        final long session;
-
-        public Handshake(int type, long session) {
-            this.type = type;
-            this.session = session;
-        }
-    }
-
     private final Socket socket;
-
     private final SessionManager sessions;
     private final ServerSocketHandler handler;
 
@@ -117,6 +106,16 @@ public final class ResponseThread implements Runnable {
             IOHelper.close(socket);
             if (!cancelled)
                 handler.onDisconnect(savedError);
+        }
+    }
+
+    static class Handshake {
+        final int type;
+        final long session;
+
+        public Handshake(int type, long session) {
+            this.type = type;
+            this.session = session;
         }
     }
 }

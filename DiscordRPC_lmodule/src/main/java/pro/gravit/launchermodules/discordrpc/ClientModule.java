@@ -1,9 +1,7 @@
 package pro.gravit.launchermodules.discordrpc;
 
-import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientExitPhase;
-import pro.gravit.launcher.client.events.ClientPreGuiPhase;
 import pro.gravit.launcher.client.events.client.ClientProcessBuilderParamsWrittedEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessLaunchEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
@@ -16,9 +14,30 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class ClientModule extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
+    private static final Object lock = new Object();
     public static Config config;
+    private static volatile boolean isClosed = false;
+
     public ClientModule() {
         super(new LauncherModuleInfo("DiscordRPC", version));
+    }
+
+    /**
+     * @param flag Set closed to true?
+     * @return Current closed.
+     */
+    public static boolean isClosed(boolean flag) {
+        boolean ret;
+        synchronized (lock) {
+            ret = isClosed;
+            if (flag) isClosed = true;
+            lock.notify();
+        }
+        return ret;
+    }
+
+    public static void main(String[] args) {
+        System.err.println("This is module, use with GravitLauncher`s Launcher.");
     }
 
     @Override
@@ -54,13 +73,12 @@ public class ClientModule extends LauncherModule {
         }).start();
     }
 
-    private void launcherInit(ClientEngineInitPhase phase)
-    {
+    private void launcherInit(ClientEngineInitPhase phase) {
         CommonHelper.newThread("Discord RPC Thread", true, () -> {
             try {
                 config = new Config();
                 Config c = config;
-                if(!c.useAlt) return;
+                if (!c.useAlt) return;
                 DiscordRPC.onConfig(c.altAppId, c.altFirstLine, c.altSecondLine, c.altLargeKey, c.altSmallKey, c.altLargeText, c.altSmallText);
                 RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);
                 Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);
@@ -69,43 +87,23 @@ public class ClientModule extends LauncherModule {
             }
         }).start();
     }
-    private void exitHandler(ClientExitPhase phase)
-    {
+
+    private void exitHandler(ClientExitPhase phase) {
         if (isClosed(true)) return;
-        if(DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
-        if(DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
-        if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
+        if (DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
+        if (DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
+        if (RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
     }
-    private static final Object lock = new Object();
-    private static volatile boolean isClosed = false;
-    private void exitByStartClient(ClientProcessBuilderParamsWrittedEvent event)
-    {
+
+    private void exitByStartClient(ClientProcessBuilderParamsWrittedEvent event) {
         if (isClosed(true)) return;
         try {
-            if(DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
-            if(DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
-            if(RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
-        } catch (Throwable ignored)
-        {
+            if (DiscordRPC.thr != null) DiscordRPC.thr.interrupt();
+            if (DiscordRPC.lib != null) DiscordRPC.lib.Discord_Shutdown();
+            if (RequestEventWatcher.INSTANCE != null)
+                Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
+        } catch (Throwable ignored) {
         }
-    }
-
-    /**
-     * @param flag Set closed to true?
-     * @return Current closed.
-     */
-    public static boolean isClosed(boolean flag) {
-        boolean ret;
-        synchronized(lock) {
-            ret = isClosed;
-            if (flag) isClosed = true;
-            lock.notify();
-        }
-        return ret;
-    }
-
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s Launcher.");
     }
 
 }

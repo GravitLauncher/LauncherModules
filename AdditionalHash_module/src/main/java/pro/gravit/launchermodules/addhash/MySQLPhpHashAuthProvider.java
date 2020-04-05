@@ -18,11 +18,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public final class MySQLPhpHashAuthProvider extends AuthProvider {
+    private final int passIterationCountLog2 = 8; // default
     private MySQLSourceConfig mySQLHolder;
     private String query;
     private String message;
     private String[] queryParams;
-    private final int passIterationCountLog2 = 8; // default
     private transient PHPass pass;
 
     @Override

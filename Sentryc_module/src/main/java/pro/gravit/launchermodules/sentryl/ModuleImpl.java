@@ -17,12 +17,16 @@ import java.nio.file.Path;
 import java.util.jar.JarFile;
 
 public class ModuleImpl extends LauncherModule {
-    private static final String keepClass = Type.getInternalName(ModuleImpl.class);
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
+    private static final String keepClass = Type.getInternalName(ModuleImpl.class);
     public Path config;
 
     public ModuleImpl() {
         super(new LauncherModuleInfo("SentryModule", version));
+    }
+
+    public static void main(String[] args) {
+        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 
     public void postInit(LaunchServerPostInitPhase phase) {
@@ -43,10 +47,6 @@ public class ModuleImpl extends LauncherModule {
             ctx.pushJarFile(IOHelper.getCodeSource(ModuleImpl.class), (e) -> e.getName().startsWith("META-INF") || e.getName().startsWith(keepClass), (e) -> true);
             ctx.pushBytes("sentry.config.json", configurable.toJsonString().getBytes(IOHelper.UNICODE_CHARSET));
         });
-    }
-
-    public static void main(String[] args) {
-        System.err.println("This is module, use with GravitLauncher`s LaunchServer.");
     }
 
     @Override

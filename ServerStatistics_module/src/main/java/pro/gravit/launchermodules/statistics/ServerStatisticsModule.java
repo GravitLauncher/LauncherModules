@@ -9,8 +9,8 @@ import pro.gravit.utils.Version;
 
 public class ServerStatisticsModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
-    public transient LaunchServer server;
     public final StatisticsManager manager;
+    public transient LaunchServer server;
 
     public ServerStatisticsModule() {
         super(new LauncherModuleInfo("ServerStatistics", version));

@@ -3,12 +3,12 @@ package pro.gravit.launchermodules.legacysupport;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import pro.gravit.launcher.HTTPRequest;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
-import pro.gravit.launcher.HTTPRequest;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,25 +26,6 @@ public final class MojangAuthProvider extends AuthProvider {
         } catch (MalformedURLException e) {
             throw new InternalError(e);
         }
-    }
-
-    public static class mojangAgent {
-        public String name;
-        public int version;
-    }
-
-    public static class mojangAuth {
-        public mojangAuth(String username, String password) {
-            this.username = username;
-            this.password = password;
-            agent = new mojangAgent();
-            agent.name = "Minecraft";
-            agent.version = 1;
-        }
-
-        public final mojangAgent agent;
-        public final String username;
-        public final String password;
     }
 
     @Override
@@ -75,5 +56,24 @@ public final class MojangAuthProvider extends AuthProvider {
     @Override
     public void close() {
         // Do nothing
+    }
+
+    public static class mojangAgent {
+        public String name;
+        public int version;
+    }
+
+    public static class mojangAuth {
+        public final mojangAgent agent;
+        public final String username;
+        public final String password;
+
+        public mojangAuth(String username, String password) {
+            this.username = username;
+            this.password = password;
+            agent = new mojangAgent();
+            agent.name = "Minecraft";
+            agent.version = 1;
+        }
     }
 }

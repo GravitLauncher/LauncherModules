@@ -14,6 +14,7 @@ import java.util.jar.Manifest;
 
 public class UnsafeURLClassLoader extends URLClassLoader {
     public static Map<String, UnsafeURLClassLoader> classLoaderMap = new HashMap<>();
+
     public UnsafeURLClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
     }
@@ -59,16 +60,16 @@ public class UnsafeURLClassLoader extends URLClassLoader {
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         return super.loadClass(name, resolve);
     }
-    public void rawDefineClass(String name, byte[] bytes, int offset, int length)
-    {
+
+    public void rawDefineClass(String name, byte[] bytes, int offset, int length) {
         defineClass(name, bytes, offset, length);
     }
-    public void rawDefineClass(String name, byte[] bytes, int offset, int length, CodeSource cs)
-    {
+
+    public void rawDefineClass(String name, byte[] bytes, int offset, int length, CodeSource cs) {
         defineClass(name, bytes, offset, length, cs);
     }
-    public void rawDefineClass(String name, byte[] bytes, int offset, int length, ProtectionDomain pd)
-    {
+
+    public void rawDefineClass(String name, byte[] bytes, int offset, int length, ProtectionDomain pd) {
         defineClass(name, bytes, offset, length, pd);
     }
 }

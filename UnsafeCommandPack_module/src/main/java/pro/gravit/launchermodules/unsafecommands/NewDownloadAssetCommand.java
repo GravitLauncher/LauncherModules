@@ -1,5 +1,12 @@
 package pro.gravit.launchermodules.unsafecommands;
 
+import pro.gravit.launcher.AsyncDownloader;
+import pro.gravit.launchermodules.unsafecommands.impl.AssetDownloader;
+import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.command.Command;
+import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.utils.helper.LogHelper;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -8,13 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import pro.gravit.launcher.AsyncDownloader;
-import pro.gravit.launchermodules.unsafecommands.impl.AssetDownloader;
-import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 public class NewDownloadAssetCommand extends Command {
     protected NewDownloadAssetCommand(LaunchServer server) {

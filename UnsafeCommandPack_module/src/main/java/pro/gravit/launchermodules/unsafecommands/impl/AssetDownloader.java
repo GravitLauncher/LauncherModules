@@ -1,111 +1,102 @@
 package pro.gravit.launchermodules.unsafecommands.impl;
 
+import com.google.gson.*;
+import com.google.gson.annotations.SerializedName;
+import pro.gravit.launcher.AsyncDownloader;
+import pro.gravit.utils.helper.IOHelper;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.annotations.SerializedName;
-
-import pro.gravit.launcher.AsyncDownloader;
-import pro.gravit.utils.helper.IOHelper;
+import java.util.*;
 
 public class AssetDownloader {
-	public static final class AssetIndex {
+    private static final Gson GSON = new GsonBuilder().setLenient().create();
 
-		@SerializedName("virtual")
-		public boolean virtual;
+    private AssetDownloader() {
+    }
 
-		@SerializedName("objects")
-		public Map<String, AssetObject> objects;
+    public static String gainAssetsURL(String mc) throws IOException {
+        try {
+            JsonObject obj = ClientDownloader.gainClient(mc);
+            if (obj.has("assetIndex") && obj.getAsJsonObject("assetIndex").has("url"))
+                return obj.getAsJsonObject("assetIndex").get("url").getAsString();
+            throw new IOException("Assets not found");
+        } catch (JsonSyntaxException | MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-		public AssetIndex() {
-			this(false, Collections.emptyMap());
-		}
+    public static String getBase() {
+        return "https://resources.download.minecraft.net/";
+    }
 
-		public AssetIndex(boolean virtual, Map<String, AssetObject> objects) {
-			this.virtual = virtual;
-			this.objects = new HashMap<>(objects);
-		}
-	}
+    public static List<AsyncDownloader.SizedFile> listAssets(Path loc, String ver) throws IOException {
+        List<AsyncDownloader.SizedFile> applies = new ArrayList<>();
+        String dIndex = "indexes/" + ver + ".json";
+        String assetsURL = gainAssetsURL(ver);
+        Path indexPath = loc.resolve(dIndex);
+        AssetIndex index;
+        try (BufferedReader in = IOHelper.newReader(new URL(assetsURL))) {
+            index = GSON.fromJson(in, AssetIndex.class);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        try (BufferedWriter out = IOHelper.newWriter(indexPath)) {
+            GSON.toJson(index, AssetIndex.class, out);
+        } catch (JsonIOException e) {
+            if (e.getCause() != null)
+                throw (IOException) e.getCause();
+            else
+                throw new RuntimeException(e);
+        }
+        if (index != null)
+            for (AssetObject assetObject : index.objects.values()) {
+                String dest = assetObject.getLocation();
+                applies.add(new AsyncDownloader.SizedFile(dest, "objects/" + dest, assetObject.size));
+            }
+        return applies;
+    }
 
-	public static final class AssetObject {
+    public static final class AssetIndex {
 
-		@SerializedName("hash")
-		public String hash;
-		@SerializedName("size")
-		public long size;
+        @SerializedName("virtual")
+        public boolean virtual;
 
-		public AssetObject() {
-			this("", 0);
-		}
+        @SerializedName("objects")
+        public Map<String, AssetObject> objects;
 
-		public AssetObject(String hash, long size) {
-			this.hash = hash;
-			this.size = size;
-		}
+        public AssetIndex() {
+            this(false, Collections.emptyMap());
+        }
 
-		public String getLocation() {
-			return hash.substring(0, 2) + "/" + hash;
-		}
-	}
+        public AssetIndex(boolean virtual, Map<String, AssetObject> objects) {
+            this.virtual = virtual;
+            this.objects = new HashMap<>(objects);
+        }
+    }
 
-	private static final Gson GSON = new GsonBuilder().setLenient().create();
+    public static final class AssetObject {
 
-	public static String gainAssetsURL(String mc) throws IOException {
-		try {
-			JsonObject obj = ClientDownloader.gainClient(mc);
-			if (obj.has("assetIndex") && obj.getAsJsonObject("assetIndex").has("url"))
-				return obj.getAsJsonObject("assetIndex").get("url").getAsString();
-			throw new IOException("Assets not found");
-		} catch (JsonSyntaxException | MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-	}
+        @SerializedName("hash")
+        public String hash;
+        @SerializedName("size")
+        public long size;
 
-	public static String getBase() {
-		return "https://resources.download.minecraft.net/";
-	}
+        public AssetObject() {
+            this("", 0);
+        }
 
-	public static List<AsyncDownloader.SizedFile> listAssets(Path loc, String ver) throws IOException {
-		List<AsyncDownloader.SizedFile> applies = new ArrayList<>();
-		String dIndex = "indexes/" + ver + ".json";
-		String assetsURL = gainAssetsURL(ver);
-		Path indexPath = loc.resolve(dIndex);
-		AssetIndex index;
-		try (BufferedReader in = IOHelper.newReader(new URL(assetsURL))) {
-			index = GSON.fromJson(in, AssetIndex.class);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-		try (BufferedWriter out = IOHelper.newWriter(indexPath)) {
-			GSON.toJson(index, AssetIndex.class, out);
-		} catch (JsonIOException e) {
-			if (e.getCause() != null)
-				throw (IOException) e.getCause();
-			else
-				throw new RuntimeException(e);
-		}
-		if (index != null)
-			for (AssetObject assetObject : index.objects.values()) {
-				String dest = assetObject.getLocation();
-				applies.add(new AsyncDownloader.SizedFile(dest, "objects/" + dest, assetObject.size));
-			}
-		return applies;
-	}
+        public AssetObject(String hash, long size) {
+            this.hash = hash;
+            this.size = size;
+        }
 
-	private AssetDownloader() {
-	}
+        public String getLocation() {
+            return hash.substring(0, 2) + "/" + hash;
+        }
+    }
 }
