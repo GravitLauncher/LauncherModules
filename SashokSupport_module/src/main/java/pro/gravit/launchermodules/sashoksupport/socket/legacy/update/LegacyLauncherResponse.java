@@ -13,17 +13,15 @@ public final class LegacyLauncherResponse extends Response {
 
     private static final int RSA_KEY_LENGTH_BITS = 2048;
     private static final int RSA_KEY_LENGTH = RSA_KEY_LENGTH_BITS / Byte.SIZE;
+
     public LegacyLauncherResponse(LegacyServerComponent component, long session, HInput input, HOutput output) {
         super(component, session, input, output);
     }
 
     @Override
     public void reply() throws IOException {
-        // Resolve launcher binary
         EFileInfo curr = input.readBoolean() ? component.launcherEXE : component.launcher;
         writeNoError(output);
-
-        // Update launcher binary
         output.writeByteArray(curr.sign, -RSA_KEY_LENGTH);
         output.flush();
         if (input.readBoolean()) {

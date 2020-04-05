@@ -20,16 +20,14 @@ public final class LauncherResponse extends Response {
 
     @Override
     public void reply() throws IOException {
-        // Resolve launcher binary
         EFileInfo curr = input.readBoolean() ? component.launcherEXE : component.launcher;
         if (!Arrays.equals(input.readByteArray(MAX_DIGEST), curr.digest)) {
             writeNoError(output);
             output.writeBoolean(true);
             output.writeLength(curr.len, 0);
             IOHelper.transfer(curr.path, output.stream);
-            return;
+            return; // Launcher will be restarted
         }
-        writeNoError(output);
-        output.writeBoolean(false);
+        requestError("You must update");
     }
 }
