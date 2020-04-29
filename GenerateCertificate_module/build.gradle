@@ -1,0 +1,11 @@
+def mainClassName = "pro.gravit.launchermodules.generatecertificate.GenerateCertificateModule"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+dependencies {
+    
+}
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
