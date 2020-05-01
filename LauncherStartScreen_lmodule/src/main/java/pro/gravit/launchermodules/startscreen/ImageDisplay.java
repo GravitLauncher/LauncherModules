@@ -9,6 +9,7 @@ public class ImageDisplay implements Closeable {
     private final JFrame frame;
 
     public ImageDisplay(BufferedImage img) {
+        TestConfig config = new TestConfig();
         frame = new JFrame();
         frame.setUndecorated(true);
         frame.setLayout(new FlowLayout());
@@ -17,6 +18,7 @@ public class ImageDisplay implements Closeable {
         frame.add(lbl);
         frame.setSize(img.getWidth(), img.getHeight());
         frame.setLocationRelativeTo(null);
+        frame.setBackground(new Color(config.colorR, config.colorG, config.colorB, config.colorA));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }

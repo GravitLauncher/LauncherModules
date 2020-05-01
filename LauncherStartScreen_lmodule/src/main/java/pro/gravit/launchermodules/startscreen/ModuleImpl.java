@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.startscreen;
 
+import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
 import pro.gravit.launcher.modules.LauncherInitContext;
@@ -24,8 +25,7 @@ public class ModuleImpl extends LauncherModule {
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preInit, ClientPreGuiPhase.class);
         registerEvent(this::finish, ClientGuiPhase.class);
-        TestConfig config = new TestConfig();
-        LogHelper.debug("S: %s I: %d", config.testProp, config.testIntProp);
+        registerEvent(this::exitPhase, ClientExitPhase.class);
     }
 
     public void preInit(ClientPreGuiPhase phase) {
@@ -35,6 +35,16 @@ public class ModuleImpl extends LauncherModule {
         } catch (Throwable e) {
             LogHelper.error(e);
         }
+    }
+    public void exitPhase(ClientExitPhase exitPhase)
+    {
+        if (screen != null)
+            try {
+                screen.close();
+                screen = null;
+            } catch (Throwable e) {
+                LogHelper.error(e);
+            }
     }
 
     public void finish(ClientGuiPhase context) {
