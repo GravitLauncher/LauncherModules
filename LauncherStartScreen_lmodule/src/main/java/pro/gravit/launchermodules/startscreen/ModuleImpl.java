@@ -31,7 +31,7 @@ public class ModuleImpl extends LauncherModule {
     public void preInit(ClientPreGuiPhase phase) {
         try {
             if (!GraphicsEnvironment.isHeadless())
-                screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL("runtime/splash.png")));
+                screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL(new TestConfig().imageURL)));
         } catch (Throwable e) {
             LogHelper.error(e);
         }
