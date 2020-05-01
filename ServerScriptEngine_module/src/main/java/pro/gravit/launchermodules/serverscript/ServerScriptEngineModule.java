@@ -13,7 +13,7 @@ public class ServerScriptEngineModule extends LauncherModule {
     public static ServerScriptEngine scriptEngine;
 
     public ServerScriptEngineModule() {
-        super(new LauncherModuleInfo("ServerScriptEngine", version));
+        super(new LauncherModuleInfo("ServerScriptEngine", version, new String[]{"LaunchServerCore"}));
     }
 
     public void postInit(LaunchServerFullInitEvent event) {

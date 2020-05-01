@@ -19,7 +19,7 @@ public class ClientModule extends LauncherModule {
     private static volatile boolean isClosed = false;
 
     public ClientModule() {
-        super(new LauncherModuleInfo("DiscordRPC", version));
+        super(new LauncherModuleInfo("DiscordRPC", version, new String[]{ "ClientLauncherCore" }));
     }
 
     /**

@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.legacysupport;
+package pro.gravit.launchermodules.mojangsupport;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

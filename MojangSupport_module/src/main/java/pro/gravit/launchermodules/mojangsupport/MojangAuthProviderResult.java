@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.legacysupport;
+package pro.gravit.launchermodules.mojangsupport;
 
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 

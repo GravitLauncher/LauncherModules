@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.legacysupport;
+package pro.gravit.launchermodules.mojangsupport;
 
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -15,7 +15,7 @@ public class ModuleImpl extends LauncherModule {
     private static boolean registred = false;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LegacySupport", version));
+        super(new LauncherModuleInfo("LegacySupport", version, new String[] { "LaunchServerCore" }));
     }
 
 

@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import pro.gravit.utils.helper.CommonHelper;
 
 public class DiscordRPC {
-    static final Gson confGson = CommonHelper.newBuilder().setPrettyPrinting().serializeNulls().create();
     public static club.minnced.discord.rpc.DiscordRPC lib;
     public static DiscordRichPresence presence;
     public static DiscordParametersReplacer parameters = new DiscordParametersReplacer();

@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class OSSLSignCodeModule extends LauncherModule {
     public OSSLSignCodeModule() {
-        super(new LauncherModuleInfo("OSSLSignCode", new Version(1,0,0)));
+        super(new LauncherModuleInfo("OSSLSignCode", new Version(1,0,0), new String[] { "LaunchServerCore" }));
     }
 
     @Override

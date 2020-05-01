@@ -17,7 +17,7 @@ public class ModuleImpl extends LauncherModule {
     public ImageDisplay screen = null;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LauncherStartScreen", version, Integer.MAX_VALUE - 200, new String[0]));
+        super(new LauncherModuleInfo("LauncherStartScreen", version, Integer.MAX_VALUE - 200, new String[] { "ClientLauncherCore" }));
     }
 
     @Override

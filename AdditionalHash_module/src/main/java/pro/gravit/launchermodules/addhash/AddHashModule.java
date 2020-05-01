@@ -12,7 +12,7 @@ public class AddHashModule extends LauncherModule {
     private static boolean registred = false;
 
     public AddHashModule() {
-        super(new LauncherModuleInfo("AddHash", version));
+        super(new LauncherModuleInfo("AddHash", version, new String[] { "LaunchServerCore"}));
     }
 
 
