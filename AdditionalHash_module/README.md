@@ -10,7 +10,7 @@
           "password": "password",   /--- Пароль БД ---/
           "database": "database"    /--- Название БД ---/
         },
-        "query": "SELECT password, name FROM dle_users WHERE (email=? OR name=?)",    /--- Запрос к БД ---/
+        "query": "SELECT password, name, permission FROM dle_users WHERE (email=? OR name=?)",    /--- Запрос к БД ---/
         "queryParams": [ "%login%", "%login%" ],
         "message": "Пароль неверный"
       },
