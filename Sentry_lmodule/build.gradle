@@ -1,0 +1,18 @@
+def mainClassName = "pro.gravit.launchermodules.sentryl.ModuleImpl"
+def configClassName = "pro.gravit.launchermodules.sentryl.Config"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+dependencies {
+    api('io.sentry:sentry:1.7.28') {
+        exclude group: 'org.slf4j'
+    }
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName,
+            "Module-Config-Class": configClassName,
+            "Module-Config-Name": "SentryLauncher")
+}
+
