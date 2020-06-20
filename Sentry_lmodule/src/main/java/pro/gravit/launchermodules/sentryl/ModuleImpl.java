@@ -1,7 +1,9 @@
 package pro.gravit.launchermodules.sentryl;
 
 import io.sentry.Sentry;
-import pro.gravit.launcher.LauncherInject;
+import io.sentry.event.Event;
+import io.sentry.event.EventBuilder;
+import io.sentry.event.interfaces.ExceptionInterface;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
@@ -19,21 +21,55 @@ public class ModuleImpl extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-
-        registerEvent(this::clientInit, PreConfigPhase.class);
+        registerEvent(this::preInit, PreConfigPhase.class);
     }
-    @LauncherInject("modules.sentry.dsn")
-    public String dsn = "YOUR_DSN";
-    @LauncherInject("modules.sentry.captureAll")
-    public boolean captureAll = false;
-    private void clientInit(PreConfigPhase phase) {
+
+    private void preInit(PreConfigPhase phase) {
+        Config c = new Config();
         try {
-            Sentry.init(dsn);
-            if (captureAll)
+            Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+            Sentry.init(c.dsn);
+            // this code will never throw anything :)
+            LogHelper.addExcCallback(Sentry::capture);
+            if (c.captureAll)
                 LogHelper.addOutput(Sentry::capture, LogHelper.OutputTypes.PLAIN);
+            if (c.setThreadExcpectionHandler)
+                Thread.setDefaultUncaughtExceptionHandler(new CustomUncaughtExceptionHandler(defaultHandler));
         } catch (Throwable e) {
             LogHelper.error(e);
         }
     }
+}
 
+class CustomUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+    private final Thread.UncaughtExceptionHandler defaultExceptionHandler;
+
+    CustomUncaughtExceptionHandler(Thread.UncaughtExceptionHandler defaultExceptionHandler) {
+        this.defaultExceptionHandler = defaultExceptionHandler;
+    }
+
+    @Override
+    public void uncaughtException(Thread thread, Throwable thrown) {
+        if (thrown == null) return;
+        EventBuilder eventBuilder = new EventBuilder()
+                   .withMessage(thrown.getMessage())
+                   .withLevel(Event.Level.FATAL)
+                   .withExtra("thread", thread != null ? thread.getName() : "ERR_nullThreadName")
+                   .withSentryInterface(new ExceptionInterface(thrown));
+
+        try {
+            Sentry.capture(eventBuilder);
+        } catch (Exception e) {
+            LogHelper.error(e);
+        }
+
+        // taken from ThreadGroup#uncaughtException
+        if (defaultExceptionHandler != null) {
+            // call the original handler
+            defaultExceptionHandler.uncaughtException(thread, thrown);
+        } else if (!(thrown instanceof ThreadDeath)) {
+            System.err.print("Exception in thread \"" + thread.getName() + "\" ");
+            thrown.printStackTrace(System.err);
+        }
+    }
 }

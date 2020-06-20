@@ -51,9 +51,7 @@ public class NewDownloadAssetCommand extends Command {
         CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), AssetDownloader.getBase(), assetDir, e)).thenAccept((v) -> {
             LogHelper.subInfo("Asset successfully downloaded: '%s'", dirName);
         }).get();
-        e.awaitTermination(4, TimeUnit.HOURS);
-        e.shutdown();
-        e.awaitTermination(4, TimeUnit.HOURS);
+        e.shutdownNow();
         // Finished
         server.syncUpdatesDir(Collections.singleton(dirName));
     }

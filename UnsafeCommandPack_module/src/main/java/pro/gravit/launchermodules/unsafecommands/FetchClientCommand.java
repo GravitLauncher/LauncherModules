@@ -62,9 +62,7 @@ public class FetchClientCommand extends Command {
         fetchNatives(clientDir.resolve("natives"), info.natives);
         LogHelper.subInfo("Natives downloaded!");
         f.get();
-        e.awaitTermination(4, TimeUnit.HOURS);
-        e.shutdown();
-        e.awaitTermination(4, TimeUnit.HOURS);
+        e.shutdownNow();
         // Finished
         LogHelper.subInfo("Client downloaded!");
         server.syncUpdatesDir(Collections.singleton(dirName));
