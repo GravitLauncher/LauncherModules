@@ -11,6 +11,7 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 
 public class ModuleImpl extends LauncherModule {
@@ -30,8 +31,12 @@ public class ModuleImpl extends LauncherModule {
 
     public void preInit(ClientPreGuiPhase phase) {
         try {
-            if (!GraphicsEnvironment.isHeadless())
-                screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL(new TestConfig().imageURL)));
+            if (!GraphicsEnvironment.isHeadless()) {
+                Config c = new Config();
+                screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL(c.imageURL)),
+                        (c.faviconURL != null && !c.faviconURL.equalsIgnoreCase("null"))/* Because of low-skilled admins */ ? ImageIO.read(IOHelper.getResourceURL(c.faviconURL))
+                                : null, c);
+            }
         } catch (Throwable e) {
             LogHelper.error(e);
         }

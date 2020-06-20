@@ -15,7 +15,7 @@ public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("SentryModule", version));
+        super(new LauncherModuleInfo("SentryModule", version, new String[] { "ClientLauncherCore" }));
     }
 
 
@@ -26,6 +26,10 @@ public class ModuleImpl extends LauncherModule {
 
     private void preInit(PreConfigPhase phase) {
         Config c = new Config();
+        if ("YOUR_DSN".equals(c.dsn) || c.dsn == null) {
+            LogHelper.error("Please, configure Sentry_lmodule config!!!");
+            return;
+        }
         try {
             Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
             Sentry.init(c.dsn);

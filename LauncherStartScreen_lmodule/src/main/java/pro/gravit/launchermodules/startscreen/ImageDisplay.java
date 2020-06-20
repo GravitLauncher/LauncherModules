@@ -8,11 +8,11 @@ import java.io.Closeable;
 public class ImageDisplay implements Closeable {
     private final JFrame frame;
 
-    public ImageDisplay(BufferedImage img) {
-        TestConfig config = new TestConfig();
+    public ImageDisplay(BufferedImage img, BufferedImage icon, Config config) {
         frame = new JFrame();
         frame.setUndecorated(true);
         frame.setLayout(new FlowLayout());
+        if (icon != null) frame.setIconImage(icon);
         JLabel lbl = new JLabel();
         lbl.setIcon(new ImageIcon(img));
         frame.add(lbl);

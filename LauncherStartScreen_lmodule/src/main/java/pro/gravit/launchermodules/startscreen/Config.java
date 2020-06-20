@@ -2,9 +2,11 @@ package pro.gravit.launchermodules.startscreen;
 
 import pro.gravit.launcher.LauncherInject;
 
-public class TestConfig {
+public class Config {
     @LauncherInject(value = "modules.startscreen.imageurl")
     public String imageURL;
+    @LauncherInject(value = "modules.startscreen.faviconURL")
+    public String faviconURL;
     @LauncherInject(value = "modules.startscreen.colorr")
     public float colorR;
     @LauncherInject(value = "modules.startscreen.colorg")
@@ -15,8 +17,9 @@ public class TestConfig {
     public float colorA;
 
     public static Object getDefault() {
-        TestConfig config = new TestConfig();
+        Config config = new Config();
         config.imageURL = "runtime/splash.png";
+        config.faviconURL = "runtime/favicon.ico";
         config.colorR = 1.0f;
         config.colorG = 1.0f;
         config.colorB = 1.0f;

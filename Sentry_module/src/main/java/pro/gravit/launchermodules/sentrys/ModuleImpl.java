@@ -9,14 +9,13 @@ import io.sentry.event.interfaces.ExceptionInterface;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
-import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
@@ -24,25 +23,31 @@ public class ModuleImpl extends LauncherModule {
     public Config c = null;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE - 200, new String[0]));
+        super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE - 200, new String[] {"LaunchServerCore"}));
     }
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent(this::preInit, PreConfigPhase.class);
+        registerEvent(this::preInit, LaunchServerInitPhase.class);
     }
 
-    public void preInit(PreConfigPhase phase) {
+    public void preInit(LaunchServerInitPhase phase) {
         try {
-            Path p = Paths.get("sentry.json");
+            Path p = phase.server.modulesManager.getConfigManager().getModuleConfig(this.moduleInfo.name);
             if (Files.isReadable(p)) {
                 c = GSON_P.fromJson(IOHelper.decode(IOHelper.read(p)), Config.class);
             } else {
                 Files.deleteIfExists(p);
                 c = new Config();
                 IOHelper.write(p, IOHelper.encode(GSON_P.toJson(c, Config.class)));
+                LogHelper.error("Please configure Sentry_module config before use!");
+                return; // First run. Bad config.
             }
             Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+            if ("YOUR_DSN".equals(c.dsn) || c.dsn == null) {
+                LogHelper.error("Please, configure Sentry_module config!!!");
+                return;
+            }
             Sentry.init(c.dsn);
             // this code will never throw anything :)
             LogHelper.addExcCallback(Sentry::capture);
