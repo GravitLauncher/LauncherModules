@@ -107,3 +107,4 @@ buildnumber
 *.directory
 cmd.bat
 cmd.sh
+_*_*module
