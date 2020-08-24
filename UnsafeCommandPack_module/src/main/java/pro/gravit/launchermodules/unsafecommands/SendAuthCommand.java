@@ -65,7 +65,7 @@ public class SendAuthCommand extends Command {
                 }
                 client.type = type;
                 client.permissions = permissions;
-                client.session = new Random().nextLong();
+                client.session = UUID.randomUUID();
                 server.sessionManager.addClient(client);
                 PlayerProfile playerProfile = ProfileByUUIDResponse.getProfile(clientUUID, username, "client", pair != null ? pair.textureProvider : server.config.getAuthProviderPair().textureProvider);
                 AuthRequestEvent authRequestEvent = new AuthRequestEvent(playerProfile, accessToken, permissions);
