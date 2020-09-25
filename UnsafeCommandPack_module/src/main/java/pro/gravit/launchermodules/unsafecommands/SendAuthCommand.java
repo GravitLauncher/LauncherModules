@@ -16,7 +16,6 @@ import pro.gravit.launchserver.socket.response.profile.ProfileByUUIDResponse;
 import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
-import java.util.Random;
 import java.util.UUID;
 
 public class SendAuthCommand extends Command {

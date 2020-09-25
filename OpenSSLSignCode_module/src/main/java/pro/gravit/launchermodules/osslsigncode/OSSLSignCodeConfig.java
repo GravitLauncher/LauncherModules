@@ -1,6 +1,5 @@
 package pro.gravit.launchermodules.osslsigncode;
 
-import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.LaunchServerConfig;
 
 import java.util.ArrayList;

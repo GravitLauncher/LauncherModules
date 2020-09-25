@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class NewDownloadAssetCommand extends Command {
     protected NewDownloadAssetCommand(LaunchServer server) {
@@ -48,9 +47,7 @@ public class NewDownloadAssetCommand extends Command {
         LogHelper.subInfo("Downloading asset, it may take some time");
         AsyncDownloader d = new AsyncDownloader();
         ExecutorService e = Executors.newFixedThreadPool(4);
-        CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), AssetDownloader.getBase(), assetDir, e)).thenAccept((v) -> {
-            LogHelper.subInfo("Asset successfully downloaded: '%s'", dirName);
-        }).get();
+        CompletableFuture.allOf(d.runDownloadList(d.sortFiles(applies, 4), AssetDownloader.getBase(), assetDir, e)).thenAccept((v) -> LogHelper.subInfo("Asset successfully downloaded: '%s'", dirName)).get();
         e.shutdownNow();
         // Finished
         server.syncUpdatesDir(Collections.singleton(dirName));

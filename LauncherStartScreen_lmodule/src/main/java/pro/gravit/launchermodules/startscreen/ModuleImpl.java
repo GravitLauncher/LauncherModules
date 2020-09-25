@@ -11,7 +11,6 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 
 public class ModuleImpl extends LauncherModule {

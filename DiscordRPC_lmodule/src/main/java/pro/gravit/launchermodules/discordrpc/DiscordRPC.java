@@ -2,8 +2,6 @@ package pro.gravit.launchermodules.discordrpc;
 
 import club.minnced.discord.rpc.DiscordEventHandlers;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import com.google.gson.Gson;
-import pro.gravit.utils.helper.CommonHelper;
 
 public class DiscordRPC {
     public static club.minnced.discord.rpc.DiscordRPC lib;
