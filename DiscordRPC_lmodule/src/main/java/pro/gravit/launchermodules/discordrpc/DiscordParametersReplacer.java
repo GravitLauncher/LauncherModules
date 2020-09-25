@@ -16,7 +16,7 @@ public class DiscordParametersReplacer {
             result = ClientModule.config.profileNameKeyMappings.get(profileUUID.toString());
         if (result == null)
             result = profileName;
-        return profileName;
+        return result;
     }
 
     public String replace(String str) {
