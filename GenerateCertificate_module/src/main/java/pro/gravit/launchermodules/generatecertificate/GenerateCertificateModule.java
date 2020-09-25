@@ -9,22 +9,19 @@ import pro.gravit.utils.Version;
 
 public class GenerateCertificateModule extends LauncherModule {
     public GenerateCertificateModule() {
-        super(new LauncherModuleInfo("GenerateCertificate", new Version(1,0,0)));
+        super(new LauncherModuleInfo("GenerateCertificate", new Version(1, 0, 0)));
     }
 
     @Override
     public void init(LauncherInitContext initContext) {
-        if(initContext instanceof LaunchServerInitContext)
-        {
+        if (initContext instanceof LaunchServerInitContext) {
             registerCommand(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
-        }
-        else
-        {
+        } else {
             registerEvent(this::registerCommand, LaunchServerFullInitEvent.class);
         }
     }
-    public void registerCommand(LaunchServerFullInitEvent event)
-    {
+
+    public void registerCommand(LaunchServerFullInitEvent event) {
         event.server.commandHandler.registerCommand("generatecertificate", new GenerateCertificateCommand(event.server));
     }
 }

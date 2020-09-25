@@ -23,7 +23,7 @@ public class ModuleImpl extends LauncherModule {
     public Config c = null;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE - 200, new String[] {"LaunchServerCore"}));
+        super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE - 200, new String[]{"LaunchServerCore"}));
     }
 
     @Override

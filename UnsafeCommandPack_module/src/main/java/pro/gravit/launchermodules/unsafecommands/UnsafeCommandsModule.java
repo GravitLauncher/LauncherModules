@@ -13,7 +13,7 @@ public class UnsafeCommandsModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.EXPERIMENTAL);
 
     public UnsafeCommandsModule() {
-        super(new LauncherModuleInfo("UnsafeCommands", version, new String[] {"LaunchServerCore"}));
+        super(new LauncherModuleInfo("UnsafeCommands", version, new String[]{"LaunchServerCore"}));
     }
 
     public void init(LaunchServerInitPhase initPhase) {

@@ -97,7 +97,7 @@ public class GenerateCertificateCommand extends Command {
                 Date.from(startDate.plusDays(365).atZone(ZoneId.systemDefault()).toInstant()),
                 endingSubject.build(),
                 SubjectPublicKeyInfo.getInstance(endingPair.getPublic().getEncoded()));
-        ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(new KeyPurposeId[] { KeyPurposeId.id_kp_codeSigning });
+        ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(new KeyPurposeId[]{KeyPurposeId.id_kp_codeSigning});
         endingBuilder.addExtension(Extension.extendedKeyUsage, false, extendedKeyUsage);
         endingBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsage.digitalSignature));
         JcaContentSignerBuilder endingCsBuilder = new JcaContentSignerBuilder("SHA256WITHRSA");
@@ -129,8 +129,7 @@ public class GenerateCertificateCommand extends Command {
         pkcsBuilder.addEncryptedData(new BcPKCS12PBEOutputEncryptorBuilder(PKCSObjectIdentifiers.pbeWithSHAAnd40BitRC2_CBC, new CBCBlockCipher(new RC2Engine())).build(passwd.toCharArray()), certs);
         PKCS12PfxPdu pfx = pkcsBuilder.build(new BcPKCS12MacCalculatorBuilder(), passwd.toCharArray());
         LogHelper.info("Save PKCS#12 keystore");
-        try(OutputStream output = IOHelper.newOutput(server.dir.resolve(projectName.concat("CodeSign.p12"))))
-        {
+        try (OutputStream output = IOHelper.newOutput(server.dir.resolve(projectName.concat("CodeSign.p12")))) {
             output.write(pfx.getEncoded());
         }
         LogHelper.info("Generate sign config");
@@ -145,8 +144,7 @@ public class GenerateCertificateCommand extends Command {
         LogHelper.info("Configuration: %s", Launcher.gsonManager.configGson.toJson(conf));
         LogHelper.info("KeyAlias may be incorrect. Usage: 'keytool -storepass %s -keystore %s -list' for check alias", passwd, conf.keyStore);
         LogHelper.warning("Must save your store password");
-        if(!server.config.sign.enabled)
-        {
+        if (!server.config.sign.enabled) {
             LogHelper.info("Write temporary sign config(in memory, reset on restart)");
             server.config.sign = conf;
             LogHelper.info("Add your RootCA to truststore");
@@ -154,9 +152,7 @@ public class GenerateCertificateCommand extends Command {
             Files.deleteIfExists(pathToRootCA);
             Files.copy(server.dir.resolve(projectName.concat("RootCA.crt")), pathToRootCA);
             server.certificateManager.readTrustStore(server.dir.resolve("truststore"));
-        }
-        else
-        {
+        } else {
             Path pathToRootCA = server.dir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
             Files.deleteIfExists(pathToRootCA);
             Files.copy(server.dir.resolve(projectName.concat("RootCA.crt")), pathToRootCA);

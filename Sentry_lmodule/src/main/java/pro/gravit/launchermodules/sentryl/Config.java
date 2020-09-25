@@ -9,6 +9,7 @@ public class Config {
     public boolean captureAll = false;
     @LauncherInject("modules.sentry.setThreadExcpectionHandler")
     public boolean setThreadExcpectionHandler = false;
+
     public static Object getDefault() {
         return new Config();
     }

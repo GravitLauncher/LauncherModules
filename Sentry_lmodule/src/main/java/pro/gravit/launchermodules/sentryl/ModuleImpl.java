@@ -15,7 +15,7 @@ public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("SentryModule", version, new String[] { "ClientLauncherCore" }));
+        super(new LauncherModuleInfo("SentryModule", version, new String[]{"ClientLauncherCore"}));
     }
 
 
@@ -56,10 +56,10 @@ class CustomUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler 
     public void uncaughtException(Thread thread, Throwable thrown) {
         if (thrown == null) return;
         EventBuilder eventBuilder = new EventBuilder()
-                   .withMessage(thrown.getMessage())
-                   .withLevel(Event.Level.FATAL)
-                   .withExtra("thread", thread != null ? thread.getName() : "ERR_nullThreadName")
-                   .withSentryInterface(new ExceptionInterface(thrown));
+                .withMessage(thrown.getMessage())
+                .withLevel(Event.Level.FATAL)
+                .withExtra("thread", thread != null ? thread.getName() : "ERR_nullThreadName")
+                .withSentryInterface(new ExceptionInterface(thrown));
 
         try {
             Sentry.capture(eventBuilder);

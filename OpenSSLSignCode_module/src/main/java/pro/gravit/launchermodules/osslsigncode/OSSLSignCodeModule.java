@@ -15,22 +15,19 @@ import java.io.IOException;
 
 public class OSSLSignCodeModule extends LauncherModule {
     public OSSLSignCodeModule() {
-        super(new LauncherModuleInfo("OSSLSignCode", new Version(1,0,0), new String[] { "LaunchServerCore" }));
+        super(new LauncherModuleInfo("OSSLSignCode", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
     }
 
     @Override
     public void init(LauncherInitContext initContext) {
-        if(initContext instanceof LaunchServerInitContext)
-        {
+        if (initContext instanceof LaunchServerInitContext) {
             registerTask(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
-        }
-        else
-        {
-            registerEvent(this::registerTask,LaunchServerFullInitEvent.class);
+        } else {
+            registerEvent(this::registerTask, LaunchServerFullInitEvent.class);
         }
     }
-    public void registerTask(LaunchServerFullInitEvent event)
-    {
+
+    public void registerTask(LaunchServerFullInitEvent event) {
         OSSLSignCodeConfig config;
         SimpleConfigurable<OSSLSignCodeConfig> configurable = modulesConfigManager.getConfigurable(OSSLSignCodeConfig.class, moduleInfo.name);
         try {

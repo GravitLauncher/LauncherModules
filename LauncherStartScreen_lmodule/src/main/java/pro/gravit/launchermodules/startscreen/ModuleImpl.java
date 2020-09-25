@@ -18,7 +18,7 @@ public class ModuleImpl extends LauncherModule {
     public ImageDisplay screen = null;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LauncherStartScreen", version, Integer.MAX_VALUE - 200, new String[] { "ClientLauncherCore" }));
+        super(new LauncherModuleInfo("LauncherStartScreen", version, Integer.MAX_VALUE - 200, new String[]{"ClientLauncherCore"}));
     }
 
     @Override
@@ -40,8 +40,8 @@ public class ModuleImpl extends LauncherModule {
             LogHelper.error(e);
         }
     }
-    public void exitPhase(ClientExitPhase exitPhase)
-    {
+
+    public void exitPhase(ClientExitPhase exitPhase) {
         if (screen != null)
             try {
                 screen.close();

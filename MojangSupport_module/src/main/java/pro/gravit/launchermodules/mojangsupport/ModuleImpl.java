@@ -15,7 +15,7 @@ public class ModuleImpl extends LauncherModule {
     private static boolean registred = false;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LegacySupport", version, new String[] { "LaunchServerCore" }));
+        super(new LauncherModuleInfo("LegacySupport", version, new String[]{"LaunchServerCore"}));
     }
 
 
