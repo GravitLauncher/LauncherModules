@@ -16,13 +16,20 @@ cp jbcrypt-0.4.jar /LaunchServer/libraries/
 3. Выполнить настройку `auth provider`
 
 Укажите нужный вам `"type": "mysql-bcrypt"` или `"mysql-phphash"`
-Так же требуется заполнить подключение к вашей БД MySQL (MariaDB)
-`"address": "localhost"` - Адрес вашей БД
-`"port": 3306` - Порт БД
-`"username": "root"` - Имя пользователя от БД
-`"password": "db_password"` - Пароль от БД
-`"database": "database"` - Название БД
-`"query": "..."` - В запросе изменить название **dle_users** на вашу таблицу с учетными записями
+Так же требуется заполнить подключение к вашей БД MySQL\|MariaDB.
+
+`"address": "localhost"` - Адрес вашей БД.
+
+`"port": 3306` - Порт БД.
+
+`"username": "root"` - Имя пользователя от БД.
+
+`"password": "db_password"` - Пароль от БД.
+
+`"database": "database"` - Название БД.
+
+`"query": "..."` - В запросе изменить название **dle_users** на вашу таблицу с учетными записями.
+
 
       "provider": {
         "type": "mysql-bcrypt",

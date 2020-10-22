@@ -10,11 +10,17 @@ mv java-discord-rpc-2.0.2.jar /LaunchServer/launcher-libraries/
 mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
 ```
 3. Выполнить настройку конфигурации ***/LaunchServer/config/DiscordRPC/Config.json***
+
 `"appId": "123456789012345678"` - Секция ClientID у дискорд-бота
+
 `"largeKey": "icon"` - Название главной картинки у дискорд-бота
+
 `"smallKey": "small"` - Название дополнительной картинки у дискорд-бота
+
 `"largeText": "Играю"` - Основной текст
+
 `"smallText": "projectname.ml"` - Дополнительный текст
+
 
         {
           "appId": "123456789012345678",
