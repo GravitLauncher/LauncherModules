@@ -10,13 +10,13 @@
 | [AdditionalHash] | Добавляет новый тип **AuthProvider**. Позволяет проверять хеш паролей *bcrypt* и *phpass*.  |
 | [AutoReHash]\* | При любом изменении в папке **updates** модуль автоматически будет выполнять синхронизацию (syncUpdates). |
 | [AutoSaveSessions]\* | Сохраняет игровые сессии. Служит для того, чтобы каждый раз после перезагрузки *[GravitLauncher]* не перезапускать игровые сервера. |
-| [GenerateCertificate] | Создает сертификаты для подписи *Launcher.(jar\|exe)*. |
+| [GenerateCertificate] | Создает сертификаты для подписи **Launcher.**(*jar\|exe*). |
 | [MojangSupport] | Добавляет *[GravitLauncher]* поддержку **mojang**. |
 | [OpenSSLSignCode] | Позволяет подписывать **exe** файлы своим сертификатом. |
 | [SashokSupport] | Позволяет лаунчеру **sashok724's v3** автоматически обновиться до *[GravitLauncher]*. |
 | [Sentry LaunchServer] | Интеграция *[GravitLauncher]* с Sentry. |
 | [ServerScriptEngine] | Позволяет выполнять **javascript** код на стороне сервера. |
-| [SystemdNotifer] |  Служит для правильного порядка загрузки лаунчсервера утилитой **systemd**. |
+| [SystemdNotifer] |  Служит для правильного порядка загрузки **LaunchServer** утилитой **systemd**. |
 | [UnsafeCommandPack] | Добавляет дополнительные команды в *[GravitLauncher]*. |
 | [DiscordRPC] | *(launcher-modules)* Добавляет *Launcher'у* интеграцию с **Discord**. |
 | [LauncherStartScreen] | *(launcher-modules)* Добавляет окно загрузки *Launcher'а* до полной инициализации **runtime**. |

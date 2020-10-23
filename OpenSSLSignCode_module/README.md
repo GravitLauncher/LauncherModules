@@ -1,12 +1,13 @@
 # OpenSSLSignCode
 Позволяет подписывать **Launcher.exe** своим сертификатом используя утилиту *osslsigncode*.
 #### Установка модуля
-1. Скопировать модуль **OpenSSLSignCode_module.jar** в папку **/LaunchServer/modules/**
-2. Обязательно создать самоподписанный сертификат или же купить его (более подробное описание есть на [Wiki])
-2.1 В конфигурации **LaunchServer.json** `"sign": { "enabled": true }`
-3. Установленная программа **osslsigncode**
-3.1 Debian-подобные системы: `sudo apt install osslsigncode`
-3.2 Для CentOS 7:
+1. Скопировать модуль **OpenSSLSignCode_module.jar** в папку **/LaunchServer/modules/**.
+2. Обязательно создать самоподписанный сертификат или же купить его (более подробное описание есть на [Wiki]).
+    - В конфигурации **LaunchServer.json** `"sign": { "enabled": true }`.
+3. Установленная программа **osslsigncode**.
+    - Debian-подобные системы: `sudo apt install osslsigncode`.
+    - Для CentOS 7:
+
 ```sh
 cd /etc/yum.repos.d/
 wget https://download.opensuse.org/repositories/home:danimo/CentOS_7/home:danimo.repo
@@ -15,6 +16,7 @@ yum install osslsigncode calc
 4. Выполнить **build** в консоли *LaunchServer*, если всё сделали правильно, **exe** будет подписан сертификатом.
 
 #### Конфигурация
+- */LaunchServer/config/OSSLSignCode/Config.json*
 
 ```json
 {

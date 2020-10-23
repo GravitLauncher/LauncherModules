@@ -3,19 +3,14 @@
 #### Установка модуля
 1. Скопировать модуль **SystemdNotifer_module.jar** в папку **/LaunchServer/modules/**
 2. Для работы *unit* потребуется так же установленная утилита **screen**.
-2.1 Debian подобные системы `sudo apt install screen`
-2.2 CentOS `sudo yum install screen`
-3. Создаём новый файл **Launcher.service** по пути: `/etc/systemd/system/Launcher.service`
+    - Debian подобные системы `sudo apt install screen`
+    - CentOS `sudo yum install screen`
+3. Создаём новый файл **Launcher.service** по пути: `/etc/systemd/system/Launcher.service`.
 4. Копируем конфигурацию указаную ниже с внесением изменений в созданный файл.
-
-`Description` - Описание сервиса (unit'а).
-
-`WorkingDirectory` - Полный путь до **LaunchServer**.
-
-`User` - Имя пользователя, от имени которого будет запущена служба (LaunchServer.jar).
-
-`Group` - Группа пользователя (обычно совпадает с именем пользователя).
-
+    - `Description` - Описание сервиса (unit'а).
+    - `WorkingDirectory` - Полный путь до **LaunchServer**.
+    - `User` - Имя пользователя, от имени которого будет запущена служба (LaunchServer.jar).
+    - `Group` - Группа пользователя (обычно совпадает с именем пользователя).
 5. Перезапускаем systemd `systemctl daemon-reload`
 6. Включаем наш *unit* `systemctl enable Launcher`
 7. Запускаем *unit* `systemctl start Launcher`

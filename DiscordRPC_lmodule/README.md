@@ -10,17 +10,12 @@ mv java-discord-rpc-2.0.2.jar /LaunchServer/launcher-libraries/
 mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
 ```
 3. Выполнить настройку конфигурациии:
-***/LaunchServer/config/DiscordRPC/Config.json***
-
-`"appId": "123456789012345678"` - Секция ClientID у дискорд-бота
-
-`"largeKey": "icon"` - Название главной картинки у дискорд-бота
-
-`"smallKey": "small"` - Название дополнительной картинки у дискорд-бота
-
-`"largeText": "Играю"` - Основной текст
-
-`"smallText": "projectname.ml"` - Дополнительный текст
+    - */LaunchServer/config/DiscordRPC/Config.json*
+- `"appId": "123456789012345678"` - Секция ClientID у дискорд-бота
+- `"largeKey": "icon"` - Название главной картинки у дискорд-бота
+- `"smallKey": "small"` - Название дополнительной картинки у дискорд-бота
+- `"largeText": "Играю"` - Основной текст
+- `"smallText": "projectname.ml"` - Дополнительный текст
 
 ```json
 {
@@ -46,9 +41,11 @@ mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
 ```
 
 #### Заметки
- - Дополнительные настройки: В конфиге *ProGuard* добавить **club.minnced.discord.rpc.\**** в keeppackagenames и keep class.
- - Альтернативная конфигурация (alt...) применяется при работе в лаунчере, тогда как основная конфигурация.
- - Так же необходимо настроить приложение на *Discord Developer Portal*
+- Дополнительные настройки: В конфиге *ProGuard* добавить **club.minnced.discord.rpc.\**** в *keeppackagenames* и *keep class*.
+- Так же необходимо настроить приложение на *Discord Developer Portal*.
+    - Все изображения должны быть с названием нижнего регистра, а пробелы заменены на "_".
+- Для отображения статуса у игрока - *Игровая активность* в настройках discord должна быть включена.
+- Альтернативная конфигурация `"alt..."` отображает статус открытого **Launcher'а**, тогда как основная конфигурация показывает статус запущеного *игрового клиента*.
 
 [java-discord-rpc]: https://jcenter.bintray.com/club/minnced/java-discord-rpc/2.0.2/java-discord-rpc-2.0.2.jar
 [discord-rpc-release]: https://jcenter.bintray.com/club/minnced/discord-rpc-release/v3.4.0/discord-rpc-release-v3.4.0.jar
