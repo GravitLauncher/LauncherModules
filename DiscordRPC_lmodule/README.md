@@ -1,18 +1,54 @@
-+ Описание: Добавляет лаунчеру интеграцию с Discord'ом. Тоесть, при наличии Discord'а на компьютере человека, запустившего один из ваших игровых клиентов, в его аккауте Discord'а будет показывать, что он играет именно у вас.
-+ Так же для работы RPC требуются libraries. 
-+ https://jcenter.bintray.com/club/minnced/java-discord-rpc/2.0.2/java-discord-rpc-2.0.2.jar
-+ https://jcenter.bintray.com/club/minnced/discord-rpc-release/v3.4.0/discord-rpc-release-v3.4.0.jar
-+ Папка в которую необходимо загрузить libraries: launcher-libraries
-+ Конфигурация:
+# DiscordRPC
+Добавляет **Launcher'у** интеграцию с *Discord'ом*. То есть, при наличии *Discord'а* на компьютере игрока, запустившего один из ваших игровых клиентов, в его аккаунте *Discord'а* будет показывать, что он играет именно у вас.
+#### Установка модуля
+1. Скопировать модуль **DiscordRPC_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
+2. Скачать библиотеки *[java-discord-rpc]*, *[discord-rpc-release]* и положить в папку **/LaunchServer/launcher-libraries/**:
+```sh
+wget https://jcenter.bintray.com/club/minnced/java-discord-rpc/2.0.2/java-discord-rpc-2.0.2.jar
+whet https://jcenter.bintray.com/club/minnced/discord-rpc-release/v3.4.0/discord-rpc-release-v3.4.0.jar
+mv java-discord-rpc-2.0.2.jar /LaunchServer/launcher-libraries/
+mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
+```
+3. Выполнить настройку конфигурациии:
+***/LaunchServer/config/DiscordRPC/Config.json***
 
-      "appId": 617731283404980249,    /--- Секция ClientID у дискорд-бота ---/
-      "firstLine": "Играет на сервере %profile%",
-      "secondLine": "Ник: %user%",
-      "largeKey": "icon",     /--- Название главной картинки у дискорд-бота ---/
-      "smallKey": "small",    /--- Название дополнительной картинки у дискорд-бота  ---/
-      "largeText": "projectname.ml",    /--- Основной текст ---/
-      "smallText": "servername"   /--- Дополнительный текст ---/
-      
-+ Дополнительные настройки: В конфиге прогуарда добавить club.minnced.discord.rpc.** в keeppackagenames и keep class
-+ Альтернативная конфигурация(alt...) применяется при работе в лаунчере, тогда как основная конфигурация 
-+ Так же необходимо настроить приложение на Discord Developer Portal
+`"appId": "123456789012345678"` - Секция ClientID у дискорд-бота
+
+`"largeKey": "icon"` - Название главной картинки у дискорд-бота
+
+`"smallKey": "small"` - Название дополнительной картинки у дискорд-бота
+
+`"largeText": "Играю"` - Основной текст
+
+`"smallText": "projectname.ml"` - Дополнительный текст
+
+```json
+{
+  "appId": "123456789012345678",
+  "firstLine": "Играет на %profileName%",
+  "secondLine": "Ник: %username%",
+  "largeKey": "icon",
+  "smallKey": "small",
+  "largeText": "Играю",
+  "smallText": "projectname.ml",
+  "useAlt": true,
+  "altAppId": "123456789012345678",
+  "altFirstLine": "В лаунчере",
+  "altSecondLine": "Авторизируется",
+  "altAuthorizedFirstLine": "В лаунчере",
+  "altAuthorizedSecondLine": "Ник: %username%",
+  "altLargeKey": "home",
+  "altSmallKey": "small",
+  "altLargeText": "Дома",
+  "altSmallText": "projectname.ml",
+  "profileNameKeyMappings": {}
+}
+```
+
+#### Заметки
+ - Дополнительные настройки: В конфиге *ProGuard* добавить **club.minnced.discord.rpc.\**** в keeppackagenames и keep class.
+ - Альтернативная конфигурация (alt...) применяется при работе в лаунчере, тогда как основная конфигурация.
+ - Так же необходимо настроить приложение на *Discord Developer Portal*
+
+[java-discord-rpc]: https://jcenter.bintray.com/club/minnced/java-discord-rpc/2.0.2/java-discord-rpc-2.0.2.jar
+[discord-rpc-release]: https://jcenter.bintray.com/club/minnced/discord-rpc-release/v3.4.0/discord-rpc-release-v3.4.0.jar
