@@ -10,3 +10,7 @@
 scriptmappings [nothing] - Посмотреть все маппинги классов LaunchServer в JavaScript
 eval [line] - Выполнить JavaScript код на стороне лаунчсервера
 ```
+
+#### Предупреждение
+
+Начиная с Java 15 Nashorn Script Engine удален из JRE и этот модуль работать не будет

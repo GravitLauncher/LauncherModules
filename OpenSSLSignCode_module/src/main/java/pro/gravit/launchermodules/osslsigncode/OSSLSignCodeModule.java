@@ -38,6 +38,7 @@ public class OSSLSignCodeModule extends LauncherModule {
         }
         config = configurable.getConfig();
         LaunchServer server = event.server;
+        server.commandHandler.registerCommand("osslsignexe", new OSSLSignEXECommand(server, config));
         server.launcherEXEBinary.addAfter((t) -> t instanceof Launch4JTask, new OSSLSignTask(server, config));
     }
 }

@@ -19,7 +19,6 @@ public class OSSLSignTask implements LauncherBuildTask {
     private final LaunchServer server;
     private final OSSLSignCodeConfig config;
     private LaunchServerConfig.JarSignerConf signConf;
-    public long lastSignSize;
 
     public OSSLSignTask(LaunchServer server, OSSLSignCodeConfig config) {
         this.server = server;
@@ -39,11 +38,18 @@ public class OSSLSignTask implements LauncherBuildTask {
     @Override
     public Path process(Path inputFile) throws IOException {
         Path resultFile = server.launcherEXEBinary.nextPath(getName());
+        signLaunch4j(config, signConf, inputFile, resultFile);
+        return resultFile;
+    }
+
+    public static void signLaunch4j(OSSLSignCodeConfig config, LaunchServerConfig.JarSignerConf signConf, Path inputFile, Path resultFile) throws IOException
+    {
         File input = new File(inputFile.toUri());
+        long lastSignSize = 0;
         long inputLength = input.length();
         Files.deleteIfExists(resultFile);
-        if (lastSignSize != 0) updateSignSize(inputFile, lastSignSize);
-        sign(inputFile, resultFile);
+        updateSignSize(inputFile, lastSignSize);
+        sign(config, signConf, inputFile, resultFile);
         File output = new File(resultFile.toUri());
         long outputLength = output.length();
         long signSize = outputLength - inputLength;
@@ -52,7 +58,7 @@ public class OSSLSignTask implements LauncherBuildTask {
             lastSignSize = signSize;
             Files.deleteIfExists(resultFile);
             updateSignSize(inputFile, signSize);
-            sign(inputFile, resultFile);
+            sign(config, signConf, inputFile, resultFile);
             if (config.checkSignSize) {
                 output = new File(resultFile.toUri());
                 outputLength = output.length();
@@ -67,7 +73,6 @@ public class OSSLSignTask implements LauncherBuildTask {
                 }
             }
         }
-        return resultFile;
     }
 
     @Override
@@ -75,7 +80,7 @@ public class OSSLSignTask implements LauncherBuildTask {
         return true;
     }
 
-    public void updateSignSize(Path inputFile, long signSize) throws IOException {
+    public static void updateSignSize(Path inputFile, long signSize) throws IOException {
         try (RandomAccessFile file = new RandomAccessFile(new File(inputFile.toUri()), "rw")) {
             long fileSize = file.length();
             long offset = fileSize - 2;
@@ -88,6 +93,10 @@ public class OSSLSignTask implements LauncherBuildTask {
     }
 
     public void sign(Path source, Path dest) throws IOException {
+        OSSLSignTask.sign(config, signConf, source, dest);
+    }
+
+    public static void sign(OSSLSignCodeConfig config, LaunchServerConfig.JarSignerConf signConf, Path source, Path dest) throws IOException {
         ProcessBuilder builder = new ProcessBuilder();
         List<String> args = new ArrayList<>();
         args.add(config.osslsigncodePath);

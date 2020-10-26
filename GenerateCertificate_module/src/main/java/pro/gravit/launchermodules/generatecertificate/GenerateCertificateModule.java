@@ -9,7 +9,7 @@ import pro.gravit.utils.Version;
 
 public class GenerateCertificateModule extends LauncherModule {
     public GenerateCertificateModule() {
-        super(new LauncherModuleInfo("GenerateCertificate", new Version(1, 0, 0)));
+        super(new LauncherModuleInfo("GenerateCertificate", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
     }
 
     @Override

@@ -1,5 +1,5 @@
 # SystemdNotifer
-Служит для правильного порядка загрузки **LaunchServer** утилитой **systemd**.
+Служит для уведомления **LaunchServer** о готовности системному менеджеру **systemd**.
 #### Установка модуля
 1. Скопировать модуль **SystemdNotifer_module.jar** в папку **/LaunchServer/modules/**
 2. Для работы *unit* потребуется так же установленная утилита **screen**.
