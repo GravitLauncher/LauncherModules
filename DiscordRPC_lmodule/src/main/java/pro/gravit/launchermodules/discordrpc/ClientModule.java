@@ -54,13 +54,13 @@ public class ClientModule extends LauncherModule {
     private void clientInit(ClientProcessLaunchEvent phase) {
         CommonHelper.newThread("Discord RPC Thread", true, () -> {
             try {
+                config = new Config();
+                Config c = config;
                 DiscordRPC.parameters.username = phase.params.playerProfile.username;
                 DiscordRPC.parameters.userUUID = phase.params.playerProfile.uuid.toString();
                 DiscordRPC.parameters.profileName = phase.params.profile.getTitle();
                 DiscordRPC.parameters.minecraftVersion = phase.params.profile.getVersion().name;
                 DiscordRPC.parameters.profileNameMapped = DiscordParametersReplacer.mappedProfileName(phase.params.profile.getTitle(), phase.params.profile.getUUID());
-                config = new Config();
-                Config c = config;
                 DiscordRPC.onConfig(c.appId, c.firstLine, c.secondLine, c.largeKey, c.smallKey, c.largeText, c.smallText);
                 RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
                 Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);

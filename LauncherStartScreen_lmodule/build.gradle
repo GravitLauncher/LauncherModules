@@ -1,5 +1,5 @@
 def mainClassName = "pro.gravit.launchermodules.startscreen.ModuleImpl"
-def configClassName = "pro.gravit.launchermodules.startscreen.TestConfig"
+def configClassName = "pro.gravit.launchermodules.startscreen.Config"
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
