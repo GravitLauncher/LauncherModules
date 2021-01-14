@@ -6,6 +6,7 @@ import pro.gravit.launcher.events.request.AuthRequestEvent;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
+import pro.gravit.launchserver.auth.RequiredDAO;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.socket.Client;
@@ -61,6 +62,9 @@ public class SendAuthCommand extends Command {
                 if (pair != null) {
                     client.auth_id = args[3];
                     client.auth = pair;
+                    if(pair.provider instanceof RequiredDAO || pair.handler instanceof RequiredDAO) {
+                        client.daoObject = server.config.dao.userDAO.findByUsername(username);
+                    }
                 }
                 client.type = type;
                 client.permissions = permissions;
