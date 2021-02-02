@@ -16,7 +16,7 @@ mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
 - `"smallKey": "small"` - Название дополнительной картинки у дискорд-бота
 - `"largeText": "Играю"` - Основной текст
 - `"smallText": "projectname.ml"` - Дополнительный текст
-
+- `"profileNameKeyMappings": {"ServerName":"asset1"}` - Набор названий серверов и картинок к ним
 ```json
 {
   "appId": "123456789012345678",
@@ -36,7 +36,10 @@ mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
   "altSmallKey": "small",
   "altLargeText": "Дома",
   "altSmallText": "projectname.ml",
-  "profileNameKeyMappings": {}
+  "profileNameKeyMappings": {
+    "ServerName1":"asset1",
+    "ServerName2":"asset2"
+  }
 }
 ```
 
@@ -46,6 +49,7 @@ mv discord-rpc-release-v3.4.0.jar /LaunchServer/launcher-libraries/
     - Все изображения должны быть с названием нижнего регистра, а пробелы заменены на "_".
 - Для отображения статуса у игрока - *Игровая активность* в настройках discord должна быть включена.
 - Альтернативная конфигурация `"alt..."` отображает статус открытого **Launcher'а**, тогда как основная конфигурация показывает статус запущеного *игрового клиента*.
+- Картинка к изображения сервера берется из ассетцов приложения в дискорде (`Rich Presence -> Art Assets`)
 
 [java-discord-rpc]: https://jcenter.bintray.com/club/minnced/java-discord-rpc/2.0.2/java-discord-rpc-2.0.2.jar
 [discord-rpc-release]: https://jcenter.bintray.com/club/minnced/discord-rpc-release/v3.4.0/discord-rpc-release-v3.4.0.jar
