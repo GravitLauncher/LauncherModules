@@ -9,7 +9,7 @@
 | ------ | ------ |
 | [AdditionalHash] | Добавляет новый тип **AuthProvider**. Позволяет проверять хеш паролей *bcrypt* и *phpass*.  |
 | [AutoReHash]\* | При любом изменении в папке **updates** модуль автоматически будет выполнять синхронизацию (syncUpdates). |
-| [AutoSaveSessions]\* | Сохраняет игровые сессии. Служит для того, чтобы каждый раз после перезагрузки *[GravitLauncher]* не перезапускать игровые сервера. |
+| [FileAuthSystem]\* | Система авторизации с хранением базы пользователей в файле json |
 | [GenerateCertificate] | Создает сертификаты для подписи **Launcher.**(*jar\|exe*). |
 | [MojangSupport] | Добавляет *[GravitLauncher]* поддержку **mojang**. |
 | [OpenSSLSignCode] | Позволяет подписывать **exe** файлы своим сертификатом. |
@@ -27,7 +27,7 @@
 [GravitLauncher]: https://github.com/GravitLauncher/Launcher
 [AdditionalHash]: https://github.com/GravitLauncher/LauncherModules/tree/master/AdditionalHash_module
 [AutoReHash]: https://github.com/GravitLauncher/LauncherModules/tree/master/AutoReHash_module
-[AutoSaveSessions]: https://github.com/GravitLauncher/LauncherModules/tree/master/AutoSaveSessions_module
+[FileAuthSystem]: https://github.com/GravitLauncher/LauncherModules/tree/master/FileAuthSystem_module
 [GenerateCertificate]: https://github.com/GravitLauncher/LauncherModules/tree/master/GenerateCertificate_module
 [MojangSupport]: https://github.com/GravitLauncher/LauncherModules/tree/master/MojangSupport_module
 [OpenSSLSignCode]: https://github.com/GravitLauncher/LauncherModules/tree/master/OpenSSLSignCode_module
