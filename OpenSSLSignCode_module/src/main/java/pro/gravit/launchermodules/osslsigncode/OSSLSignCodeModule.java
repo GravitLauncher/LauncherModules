@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.osslsigncode;
 
+import pro.gravit.launcher.config.JsonConfigurable;
 import pro.gravit.launcher.config.SimpleConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -12,8 +13,10 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class OSSLSignCodeModule extends LauncherModule {
+    public OSSLSignCodeConfig config;
     public OSSLSignCodeModule() {
         super(new LauncherModuleInfo("OSSLSignCode", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
     }
@@ -28,8 +31,25 @@ public class OSSLSignCodeModule extends LauncherModule {
     }
 
     public void registerTask(LaunchServerFullInitEvent event) {
-        OSSLSignCodeConfig config;
-        SimpleConfigurable<OSSLSignCodeConfig> configurable = modulesConfigManager.getConfigurable(OSSLSignCodeConfig.class, moduleInfo.name);
+
+        Path configPath = modulesConfigManager.getModuleConfig(moduleInfo.name);
+        OSSLSignCodeModule module = this;
+        JsonConfigurable<OSSLSignCodeConfig> configurable = new JsonConfigurable<>(OSSLSignCodeConfig.class, configPath) {
+            @Override
+            public OSSLSignCodeConfig getConfig() {
+                return config;
+            }
+
+            @Override
+            public void setConfig(OSSLSignCodeConfig config) {
+                module.config = config;
+            }
+
+            @Override
+            public OSSLSignCodeConfig getDefaultConfig() {
+                return OSSLSignCodeConfig.getDefault();
+            }
+        };
         try {
             configurable.loadConfig();
         } catch (IOException e) {
