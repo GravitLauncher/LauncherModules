@@ -11,9 +11,12 @@ import pro.gravit.launcher.modules.events.ClosePhase;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthHandler;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthProvider;
+import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemDAOProvider;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
+import pro.gravit.launchserver.dao.User;
+import pro.gravit.launchserver.dao.provider.DaoProvider;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
@@ -33,7 +36,7 @@ public class FileAuthSystemModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     private Path dbPath;
     public JsonConfigurable<FileAuthSystemConfig> jsonConfigurable;
-    public static class UserEntity {
+    public static class UserEntity implements User {
         public String username;
         private byte[] password;
         public UUID uuid;
@@ -43,6 +46,51 @@ public class FileAuthSystemModule extends LauncherModule {
 
         public void setPassword(String password) {
             this.password = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.SHA256, password);
+        }
+
+        @Override
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        @Override
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        @Override
+        public String getServerID() {
+            return serverId;
+        }
+
+        @Override
+        public void setServerID(String serverID) {
+            this.serverId = serverID;
+        }
+
+        @Override
+        public UUID getUuid() {
+            return uuid;
+        }
+
+        @Override
+        public void setUuid(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        @Override
+        public String getUsername() {
+            return username;
+        }
+
+        @Override
+        public ClientPermissions getPermissions() {
+            return permissions;
+        }
+
+        @Override
+        public void setPermissions(ClientPermissions permissions) {
+            this.permissions = permissions;
         }
 
         public boolean verifyPassword(String password) {
@@ -89,6 +137,14 @@ public class FileAuthSystemModule extends LauncherModule {
         users.put(entity.uuid, entity);
     }
 
+    public void deleteUser(UserEntity entity) {
+        users.remove(entity.uuid);
+    }
+
+    public void deleteUser(UUID uuid) {
+        users.remove(uuid);
+    }
+
     public FileAuthSystemModule() {
         super(new LauncherModuleInfo("FileAuthSystem", version, new String[]{"LaunchServerCore"}));
     }
@@ -113,6 +169,7 @@ public class FileAuthSystemModule extends LauncherModule {
     public void preConfig(PreConfigPhase preConfigPhase) {
         AuthProvider.providers.register("fileauthsystem", FileSystemAuthProvider.class);
         AuthHandler.providers.register("fileauthsystem", FileSystemAuthHandler.class);
+        DaoProvider.providers.register("fileauthsystem", FileSystemDAOProvider.class);
     }
 
     public void load() {
