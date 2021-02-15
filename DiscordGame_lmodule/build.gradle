@@ -1,0 +1,21 @@
+def mainClassName = "pro.gravit.launchermodules.discordgame.ClientModule"
+def configClassName = "pro.gravit.launchermodules.discordgame.Config"
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly project(':Launcher')
+    api('com.github.JnCrMx:discord-game-sdk4j:v0.5')
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName,
+            "Module-Config-Class": configClassName,
+            "Module-Config-Name": "DiscordGame")
+}

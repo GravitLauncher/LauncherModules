@@ -38,8 +38,7 @@ public class ClientDownloader {
         }
     }
 
-    public static ClientInfo getClient(String ver) throws IOException {
-        JsonObject obj = gainClient(ver);
+    public static ClientInfo getClient(JsonObject obj) throws IOException {
         JsonArray libraries = obj.getAsJsonArray("libraries");
         ClientInfo ret = new ClientInfo();
         for (JsonElement e : libraries) {
@@ -62,9 +61,11 @@ public class ClientDownloader {
 
             }
         }
-        JsonObject tmp = obj.getAsJsonObject("downloads");
-        ret.client = GSON.fromJson(tmp.get("client"), Downloadable.class);
-        ret.server = GSON.fromJson(tmp.get("server"), Downloadable.class);
+        if(obj.has("downloads")) {
+            JsonObject tmp = obj.getAsJsonObject("downloads");
+            ret.client = GSON.fromJson(tmp.get("client"), Downloadable.class);
+            ret.server = GSON.fromJson(tmp.get("server"), Downloadable.class);
+        }
         dedupe(ret.libraries);
         dedupe(ret.natives);
         return ret;

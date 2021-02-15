@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.unsafecommands;
 
+import com.google.gson.JsonObject;
 import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader.Artifact;
@@ -8,9 +9,11 @@ import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
+import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -47,14 +50,25 @@ public class FetchClientCommand extends Command {
         Files.createDirectory(clientDir);
 
         LogHelper.subInfo("Getting client info, it may take some time");
-        ClientDownloader.ClientInfo info = ClientDownloader.getClient(version);
+        JsonObject obj;
+        if(Files.exists(Paths.get(version))) {
+            LogHelper.subInfo("Using file %s", version);
+            try(Reader reader = IOHelper.newReader(Paths.get(version))) {
+                obj = ClientDownloader.GSON.fromJson(reader, JsonObject.class);
+            }
+        } else {
+            obj = ClientDownloader.gainClient(version);
+        }
+        ClientDownloader.ClientInfo info = ClientDownloader.getClient(obj);
         // Download required files
         LogHelper.subInfo("Downloading client, it may take some time");
         AsyncDownloader d = new AsyncDownloader();
         ExecutorService e = Executors.newFixedThreadPool(4);
         List<AsyncDownloader.SizedFile> applies = info.libraries.stream().map(y -> new AsyncDownloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
         CompletableFuture<Void> f = CompletableFuture.allOf(d.runDownloadListSimple(d.sortFiles(applies, 4), "", clientDir.resolve("libraries"), e)).thenAccept((v) -> LogHelper.subInfo("Client libraries successfully downloaded!"));
-        IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
+        if(info.client != null) {
+            IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
+        }
         LogHelper.subInfo("Downloaded client jar!");
         fetchNatives(clientDir.resolve("natives"), info.natives);
         LogHelper.subInfo("Natives downloaded!");
