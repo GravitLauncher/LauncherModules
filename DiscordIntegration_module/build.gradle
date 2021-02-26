@@ -1,0 +1,16 @@
+def mainClassName = "ru.tenebrius.launchermodules.discordintegration.DSIntegrationModule"
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
+
+dependencies {
+    compile 'net.dv8tion:JDA:4.2.0_229'
+}
+
+repositories {
+    jcenter()
+}
