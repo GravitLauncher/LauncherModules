@@ -1,8 +1,7 @@
 package ru.tenebrius.launchermodules.discordintegration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.dv8tion.jda.api.JDABuilder;
+import pro.gravit.launcher.config.SimpleConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
@@ -13,19 +12,15 @@ import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DSIntegrationModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 1, 1, Version.Type.BETA);
-    private static final Gson GSON_P = new GsonBuilder().setPrettyPrinting().setLenient().create();
     private static boolean registred = false;
 
     public static Config config = null;
@@ -85,19 +80,14 @@ public class DSIntegrationModule extends LauncherModule {
 
     public void initConfig(LaunchServerInitPhase phase) {
         phase.server.authHookManager.postHook.registerHook(this::authHook);
+        SimpleConfigurable<Config> configurable = modulesConfigManager.getConfigurable(Config.class, moduleInfo.name);
         try {
-            Path p = phase.server.modulesManager.getConfigManager().getModuleConfig(this.moduleInfo.name);
-            if (Files.isReadable(p)) {
-                config = GSON_P.fromJson(IOHelper.decode(IOHelper.read(p)), Config.class);
-            } else {
-                Files.deleteIfExists(p);
-                config = new Config();
-                IOHelper.write(p, IOHelper.encode(GSON_P.toJson(config, Config.class)));
-                LogHelper.error("Please configure DiscordIntegration config before use!");
-            }
-        } catch (Throwable e) {
+            configurable.loadConfig();
+        } catch (IOException e) {
             LogHelper.error(e);
+            return;
         }
+        config = configurable.getConfig();
     }
 
     public void postInit(LaunchServerFullInitEvent event) {
