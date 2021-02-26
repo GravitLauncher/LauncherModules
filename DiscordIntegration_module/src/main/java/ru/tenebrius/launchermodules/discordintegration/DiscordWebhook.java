@@ -1,17 +1,16 @@
 package ru.tenebrius.launchermodules.discordintegration;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import javax.net.ssl.HttpsURLConnection;
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Class used to execute Discord Webhooks with low effort
@@ -59,22 +58,22 @@ public class DiscordWebhook {
             throw new IllegalArgumentException("Set content or add at least one EmbedObject");
         }
 
-        JSONObject json = new JSONObject();
-
-        json.put("content", this.content);
-        json.put("username", this.username);
-        json.put("avatar_url", this.avatarUrl);
-        json.put("tts", this.tts);
+        JsonObject json = new JsonObject();
+//        JsonObject json = new JsonObject();
+        json.addProperty("content", this.content);
+        json.addProperty("username", this.username);
+        json.addProperty("avatar_url", this.avatarUrl);
+        json.addProperty("tts", this.tts);
 
         if (!this.embeds.isEmpty()) {
-            List<JSONObject> embedObjects = new ArrayList<>();
+            JsonArray embedObjects = new JsonArray();
 
             for (EmbedObject embed : this.embeds) {
-                JSONObject jsonEmbed = new JSONObject();
+                JsonObject jsonEmbed = new JsonObject();
 
-                jsonEmbed.put("title", embed.getTitle());
-                jsonEmbed.put("description", embed.getDescription());
-                jsonEmbed.put("url", embed.getUrl());
+                jsonEmbed.addProperty("title", embed.getTitle());
+                jsonEmbed.addProperty("description", embed.getDescription());
+                jsonEmbed.addProperty("url", embed.getUrl());
 
                 if (embed.getColor() != null) {
                     Color color = embed.getColor();
@@ -82,7 +81,7 @@ public class DiscordWebhook {
                     rgb = (rgb << 8) + color.getGreen();
                     rgb = (rgb << 8) + color.getBlue();
 
-                    jsonEmbed.put("color", rgb);
+                    jsonEmbed.addProperty("color", rgb);
                 }
 
                 EmbedObject.Footer footer = embed.getFooter();
@@ -92,52 +91,53 @@ public class DiscordWebhook {
                 List<EmbedObject.Field> fields = embed.getFields();
 
                 if (footer != null) {
-                    JSONObject jsonFooter = new JSONObject();
+                    JsonObject jsonFooter = new JsonObject();
 
-                    jsonFooter.put("text", footer.getText());
-                    jsonFooter.put("icon_url", footer.getIconUrl());
-                    jsonEmbed.put("footer", jsonFooter);
+                    jsonFooter.addProperty("text", footer.getText());
+                    jsonFooter.addProperty("icon_url", footer.getIconUrl());
+                    jsonEmbed.add("footer", jsonFooter);
+//                    jsonEmbed.addProperty("footer", jsonFooter);
                 }
 
                 if (image != null) {
-                    JSONObject jsonImage = new JSONObject();
+                    JsonObject jsonImage = new JsonObject();
 
-                    jsonImage.put("url", image.getUrl());
-                    jsonEmbed.put("image", jsonImage);
+                    jsonImage.addProperty("url", image.getUrl());
+                    jsonEmbed.add("footer", jsonImage);
                 }
 
                 if (thumbnail != null) {
-                    JSONObject jsonThumbnail = new JSONObject();
+                    JsonObject jsonThumbnail = new JsonObject();
 
-                    jsonThumbnail.put("url", thumbnail.getUrl());
-                    jsonEmbed.put("thumbnail", jsonThumbnail);
+                    jsonThumbnail.addProperty("url", thumbnail.getUrl());
+                    jsonEmbed.add("thumbnail", jsonThumbnail);
                 }
 
                 if (author != null) {
-                    JSONObject jsonAuthor = new JSONObject();
+                    JsonObject jsonAuthor = new JsonObject();
 
-                    jsonAuthor.put("name", author.getName());
-                    jsonAuthor.put("url", author.getUrl());
-                    jsonAuthor.put("icon_url", author.getIconUrl());
-                    jsonEmbed.put("author", jsonAuthor);
+                    jsonAuthor.addProperty("name", author.getName());
+                    jsonAuthor.addProperty("url", author.getUrl());
+                    jsonAuthor.addProperty("icon_url", author.getIconUrl());
+                    jsonEmbed.add("author", jsonAuthor);
                 }
 
-                List<JSONObject> jsonFields = new ArrayList<>();
+                JsonArray jsonFields = new JsonArray();
                 for (EmbedObject.Field field : fields) {
-                    JSONObject jsonField = new JSONObject();
+                    JsonObject jsonField = new JsonObject();
 
-                    jsonField.put("name", field.getName());
-                    jsonField.put("value", field.getValue());
-                    jsonField.put("inline", field.isInline());
+                    jsonField.addProperty("name", field.getName());
+                    jsonField.addProperty("value", field.getValue());
+                    jsonField.addProperty("inline", field.isInline());
 
                     jsonFields.add(jsonField);
                 }
-
-                jsonEmbed.put("fields", jsonFields.toArray());
+                jsonEmbed.add("fields", jsonFields);
+//                jsonEmbed.add("fields", jsonFields.toArray());
                 embedObjects.add(jsonEmbed);
             }
 
-            json.put("embeds", embedObjects.toArray());
+            json.add("embeds", embedObjects);
         }
 
         URL url = new URL(this.url);
@@ -149,13 +149,8 @@ public class DiscordWebhook {
 
         OutputStream stream = connection.getOutputStream();
 
-        String req = json.toString().replaceAll("[\\\\]", "\\\\\\\\").replaceAll("[\\n]", "\\\\n").replaceAll("[\\r]", "").replaceAll("[\t]", "   ").replaceAll("[а-яА-ЯёЁ]", "?");
-//        FileWriter fw = new FileWriter("test_file.txt", true);
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        bw.write(req);
-//        bw.newLine();
-//        bw.close();
-
+        String req = json.toString().replaceAll("[\\\\]", "\\\\").replaceAll("[\\n]", "\\n").replaceAll("[\\r]", "").replaceAll("[\t]", "   ").replaceAll("[а-яА-ЯёЁ]", "?");
+//        System.out.println(req);
         stream.write(req.getBytes(StandardCharsets.UTF_8));
         stream.flush();
         stream.close();
@@ -345,55 +340,6 @@ public class DiscordWebhook {
             private boolean isInline() {
                 return inline;
             }
-        }
-    }
-
-    private class JSONObject {
-
-        private final HashMap<String, Object> map = new HashMap<>();
-
-        void put(String key, Object value) {
-            if (value != null) {
-                map.put(key, value);
-            }
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            Set<Map.Entry<String, Object>> entrySet = map.entrySet();
-            builder.append("{");
-
-            int i = 0;
-            for (Map.Entry<String, Object> entry : entrySet) {
-                Object val = entry.getValue();
-                builder.append(quote(entry.getKey())).append(":");
-
-                if (val instanceof String) {
-                    builder.append(quote(String.valueOf(val)));
-                } else if (val instanceof Integer) {
-                    builder.append(Integer.valueOf(String.valueOf(val)));
-                } else if (val instanceof Boolean) {
-                    builder.append(val);
-                } else if (val instanceof JSONObject) {
-                    builder.append(val.toString());
-                } else if (val.getClass().isArray()) {
-                    builder.append("[");
-                    int len = Array.getLength(val);
-                    for (int j = 0; j < len; j++) {
-                        builder.append(Array.get(val, j).toString()).append(j != len - 1 ? "," : "");
-                    }
-                    builder.append("]");
-                }
-
-                builder.append(++i == entrySet.size() ? "}" : ",");
-            }
-
-            return builder.toString();
-        }
-
-        private String quote(String string) {
-            return "\"" + string + "\"";
         }
     }
 

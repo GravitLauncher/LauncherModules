@@ -30,9 +30,13 @@
 ```
 
 #### Example:
-#####Log:
+
+####Log:
+
 ![Log](img/log.png)
-#####Commands:
+
+####Commands:
+
 ![Command](img/command.png)
 
 [jda]: https://github.com/DV8FromTheWorld/JDA/releases/download/v4.2.0/JDA-4.2.0_168-withDependencies-min.jar
