@@ -1,0 +1,11 @@
+def mainClassName = "pro.gravit.launchermodules.onelauncher.OneLauncherModule"
+def configClassName = "pro.gravit.launchermodules.onelauncher.OneLauncherConfig"
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName,
+            "Module-Config-Class": configClassName,
+            "Module-Config-Name": "OneLauncher")
+}

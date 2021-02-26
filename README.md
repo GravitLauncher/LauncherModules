@@ -12,6 +12,7 @@
 | [FileAuthSystem]\* | Система авторизации с хранением базы пользователей в файле json |
 | [GenerateCertificate] | Создает сертификаты для подписи **Launcher.**(*jar\|exe*). |
 | [MojangSupport] | Добавляет *[GravitLauncher]* поддержку **mojang**. |
+| [OneLauncher] | Запрещает запуск двух и более копий лаунчера |
 | [OpenSSLSignCode] | Позволяет подписывать **exe** файлы своим сертификатом. |
 | [SashokSupport] | Позволяет лаунчеру **sashok724's v3** автоматически обновиться до *[GravitLauncher]*. |
 | [Sentry LaunchServer] | Интеграция *[GravitLauncher]* с Sentry. |
@@ -30,6 +31,7 @@
 [FileAuthSystem]: https://github.com/GravitLauncher/LauncherModules/tree/master/FileAuthSystem_module
 [GenerateCertificate]: https://github.com/GravitLauncher/LauncherModules/tree/master/GenerateCertificate_module
 [MojangSupport]: https://github.com/GravitLauncher/LauncherModules/tree/master/MojangSupport_module
+[OneLauncher]: https://github.com/GravitLauncher/LauncherModules/tree/master/OneLauncher_module
 [OpenSSLSignCode]: https://github.com/GravitLauncher/LauncherModules/tree/master/OpenSSLSignCode_module
 [SashokSupport]: https://github.com/GravitLauncher/LauncherModules/tree/master/SashokSupport_module
 [Sentry LaunchServer]: https://github.com/GravitLauncher/LauncherModules/tree/master/Sentry_module
