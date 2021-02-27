@@ -25,24 +25,28 @@ public class DiscordBridge {
     private static void initCore() throws IOException {
         Path pathToLib;
         if(JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
+			String libraryName = "discord_game_sdk_jni_"+String.valueOf(JVMHelper.JVM_BITS)+".dll";
             pathToLib =  DirBridge.getGuardDir().resolve("discord_game_sdk_jni.dll");
-            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk_jni.dll"), pathToLib);
+            UnpackHelper.unpack(IOHelper.getResourceURL(libraryName), pathToLib);
         }
         else if(JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
+			String libraryName = "libdiscord_game_sdk_jni_"+String.valueOf(JVMHelper.JVM_BITS)+".so";
             pathToLib =  DirBridge.getGuardDir().resolve("libdiscord_game_sdk_jni.so");
-            UnpackHelper.unpack(IOHelper.getResourceURL("libdiscord_game_sdk_jni.so"), pathToLib);
+            UnpackHelper.unpack(IOHelper.getResourceURL(libraryName), pathToLib);
         }
         else {
             throw new IOException("MacOS not supported");
         }
         Path pathToDiscordSdkLib;
         if(JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
+			String libraryName = "discord_game_sdk_"+String.valueOf(JVMHelper.JVM_BITS)+".dll";
             pathToDiscordSdkLib =  DirBridge.getGuardDir().resolve("discord_game_sdk.dll");
-            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk.dll"), pathToDiscordSdkLib);
+            UnpackHelper.unpack(IOHelper.getResourceURL(libraryName), pathToDiscordSdkLib);
         }
         else {
+			String libraryName = "discord_game_sdk_"+String.valueOf(JVMHelper.JVM_BITS)+".so";
             pathToDiscordSdkLib =  DirBridge.getGuardDir().resolve("discord_game_sdk.so");
-            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk.so"), pathToDiscordSdkLib);
+            UnpackHelper.unpack(IOHelper.getResourceURL(libraryName), pathToDiscordSdkLib);
         }
 		System.load(pathToDiscordSdkLib.toAbsolutePath().toString());
 		System.load(pathToLib.toAbsolutePath().toString());
