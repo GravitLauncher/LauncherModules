@@ -8,11 +8,13 @@
 - `text` текст, который выведется при обнаружении уже запущенного лаунчера
 - `launcherLock` запретить запуск двух лаунчеров одновременно ( `launcher.lock` )
 - `clientLock` запретить запуск двух клиентов одновременно ( `client.lock` )
+- `checkClientLock` запретить запуск лаунчера если запущен клиент майнкрафта (параметры `clientLock` и `launcherLock` должны быть включены, а `multipleProfilesAllow` выключен)
 - `multipleProfilesAllow` вместо `client.lock` будет использоваться `{profileUUID}.lock`, что разрешает запускать **не более одного клиента на каждый профиль** вместо **не более одного клиента вообще** по умолчанию
 ```
 {
   "text": "Launcher or minecraft is already running",
   "launcherLock": true,
+  "checkClientLock": true,
   "clientLock": true,
   "multipleProfilesAllow": false
 }

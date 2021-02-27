@@ -26,16 +26,17 @@ import java.nio.file.StandardOpenOption;
 public class OneLauncherModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     private Path path;
+    private Path locksDir;
     private FileLock lock;
     private FileChannel channel;
     private OneLauncherConfig config = new OneLauncherConfig();
 
     public OneLauncherModule() {
-        super(new LauncherModuleInfo("OneLauncher", version, new String[]{"ClientLauncherCore"}));
+        super(new LauncherModuleInfo("OneLauncher", version, -9999, new String[]{"ClientLauncherCore"}));
     }
 
     public void prepareLock(String name) {
-        Path locksDir = DirBridge.dir.resolve("locks");
+        locksDir = DirBridge.dir.resolve("locks");
         if(!IOHelper.isDir(locksDir)) {
             try {
                 Files.createDirectories(locksDir);
@@ -54,7 +55,8 @@ public class OneLauncherModule extends LauncherModule {
         }
     }
 
-    public boolean tryLock(boolean hold, OpenOption... options) {
+    public boolean tryLock(Path path, boolean hold, OpenOption... options) {
+        if(!Files.exists(path)) return false;
         try {
             channel = FileChannel.open(path, options);
             lock = channel.tryLock(); // Exclusive lock
@@ -63,6 +65,7 @@ public class OneLauncherModule extends LauncherModule {
             }
             if(!hold) {
                 lock.close();
+                lock = null;
             }
         } catch (IOException e) {
             LogHelper.error(e);
@@ -73,14 +76,22 @@ public class OneLauncherModule extends LauncherModule {
 
     public void initClient(ClientProcessLaunchEvent event) {
         prepareLock(config.multipleProfilesAllow ? event.params.profile.getUUID().toString() : "client");
-        if(!tryLock(true, StandardOpenOption.WRITE)) {
+        if(!tryLock(path,true, StandardOpenOption.WRITE)) {
+            event.cancel();
             startError();
         }
     }
 
     public void initLauncher(ClientEngineInitPhase phase) {
         prepareLock("launcher");
-        if(!tryLock(true, StandardOpenOption.WRITE)) {
+        if(!config.multipleProfilesAllow && config.checkClientLock) {
+            if(!tryLock(locksDir.resolve("client.lock"),false, StandardOpenOption.WRITE)) {
+                phase.cancel();
+                startError();
+            }
+        }
+        if(!tryLock(path,true, StandardOpenOption.WRITE)) {
+            phase.cancel();
             startError();
         }
     }
