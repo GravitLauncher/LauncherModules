@@ -8,7 +8,7 @@ jar {
 }
 
 dependencies {
-    compile 'net.dv8tion:JDA:4.2.0_229'
+    api 'net.dv8tion:JDA:4.2.0_229'
 }
 
 repositories {
