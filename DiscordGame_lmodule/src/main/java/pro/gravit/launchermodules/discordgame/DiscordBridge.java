@@ -35,17 +35,17 @@ public class DiscordBridge {
         else {
             throw new IOException("MacOS not supported");
         }
-        System.load(pathToLib.toAbsolutePath().toString());
         Path pathToDiscordSdkLib;
         if(JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
             pathToDiscordSdkLib =  DirBridge.getGuardDir().resolve("discord_game_sdk.dll");
-            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk.dll"), pathToLib);
+            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk.dll"), pathToDiscordSdkLib);
         }
         else {
             pathToDiscordSdkLib =  DirBridge.getGuardDir().resolve("discord_game_sdk.so");
-            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk.so"), pathToLib);
+            UnpackHelper.unpack(IOHelper.getResourceURL("discord_game_sdk.so"), pathToDiscordSdkLib);
         }
-        System.load(pathToLib.toAbsolutePath().toString());
+		System.load(pathToDiscordSdkLib.toAbsolutePath().toString());
+		System.load(pathToLib.toAbsolutePath().toString());
         try {
             Method method = Core.class.getDeclaredMethod("initDiscordNative", String.class);
             method.setAccessible(true);
