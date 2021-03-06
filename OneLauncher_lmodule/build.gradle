@@ -1,8 +1,8 @@
 def mainClassName = "pro.gravit.launchermodules.onelauncher.OneLauncherModule"
 def configClassName = "pro.gravit.launchermodules.onelauncher.OneLauncherConfig"
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
