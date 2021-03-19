@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.unsafecommands;
 
+import pro.gravit.launchermodules.unsafecommands.patcher.StaticReplacerPatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.UnsafePatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.*;
 import pro.gravit.launchserver.LaunchServer;
@@ -41,6 +42,7 @@ public class PatcherCommand extends Command {
             patchers.put("findSun", new FindSunPatcher());
             patchers.put("findPacketHack", new FindPacketHackPatcher());
             patchers.put("findDefineClass", new FindDefineClassPatcher());
+            patchers.put("findReflect", new FindReflectPatcher());
         }
         verifyArgs(args, 3);
         String name = args[0];
