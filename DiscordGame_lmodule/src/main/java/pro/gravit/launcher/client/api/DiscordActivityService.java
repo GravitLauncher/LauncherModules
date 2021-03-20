@@ -8,7 +8,6 @@ import pro.gravit.launchermodules.discordgame.ClientModule;
 import pro.gravit.launchermodules.discordgame.Config;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DiscordActivityService {
+    private final Map<String, String> params = new ConcurrentHashMap<>();
     private String details;
     private String state;
     private String largeKey;
@@ -27,7 +27,6 @@ public class DiscordActivityService {
     private String partyId;
     private int partySize;
     private int partyMaxSize;
-    private final Map<String, String> params = new ConcurrentHashMap<>();
 
     public DiscordActivityService() {
         setParam("launcherVersion", Version.getVersion().getVersionString());
@@ -39,22 +38,22 @@ public class DiscordActivityService {
     public void applyToActivity(Activity activity) {
         activity.setDetails(details);
         activity.setState(state);
-        if(largeKey != null) {
+        if (largeKey != null) {
             activity.assets().setLargeImage(largeKey);
         }
-        if(smallKey != null) {
+        if (smallKey != null) {
             activity.assets().setSmallImage(smallKey);
         }
-        if(smallText != null) {
+        if (smallText != null) {
             activity.assets().setSmallText(smallText);
         }
-        if(largeText != null) {
+        if (largeText != null) {
             activity.assets().setSmallText(largeText);
         }
-        if(partyId != null) {
+        if (partyId != null) {
             activity.party().setID(partyId);
         }
-        if(partyMaxSize != 0) {
+        if (partyMaxSize != 0) {
             activity.party().size().setCurrentSize(partySize);
             activity.party().size().setMaxSize(partyMaxSize);
         }
@@ -62,7 +61,7 @@ public class DiscordActivityService {
 
     public void updateActivity() {
         Core core = DiscordBridge.getCore();
-        if(core == null) return;
+        if (core == null) return;
         applyToActivity(DiscordBridge.getActivity());
         core.activityManager().updateActivity(DiscordBridge.getActivity());
     }
@@ -150,7 +149,7 @@ public class DiscordActivityService {
 
     public void setParam(String key, String value) {
         String old = params.put(key, value);
-        if(old != null) {
+        if (old != null) {
             updateActivity();
         }
     }
@@ -164,14 +163,14 @@ public class DiscordActivityService {
     }
 
     public String replaceParams(String str) {
-        if(str == null) return null;
+        if (str == null) return null;
         String result = str;
-        for(Map.Entry<String, String> e : params.entrySet()) {
-            if(e.getValue() == null) {
+        for (Map.Entry<String, String> e : params.entrySet()) {
+            if (e.getValue() == null) {
                 LogHelper.warning("DiscordGame: Param %s null", e.getKey());
                 continue;
             }
-            result = result.replaceAll("%"+e.getKey()+"%", e.getValue());
+            result = result.replaceAll("%" + e.getKey() + "%", e.getValue());
         }
         return result;
     }
@@ -204,10 +203,10 @@ public class DiscordActivityService {
     public void onPlayerProfile(PlayerProfile playerProfile) {
         setParam("username", playerProfile.username);
         setParam("uuid", playerProfile.uuid.toString());
-        if(playerProfile.skin != null) {
+        if (playerProfile.skin != null) {
             setParam("skinurl", playerProfile.skin.url);
         }
-        if(playerProfile.cloak != null) {
+        if (playerProfile.cloak != null) {
             setParam("cloakurl", playerProfile.cloak.url);
         }
     }

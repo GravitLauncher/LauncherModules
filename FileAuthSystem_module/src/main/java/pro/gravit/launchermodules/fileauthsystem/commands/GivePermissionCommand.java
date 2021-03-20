@@ -4,11 +4,11 @@ import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.launchserver.dao.User;
 import pro.gravit.utils.helper.LogHelper;
 
 public class GivePermissionCommand extends Command {
     private final FileAuthSystemModule module;
+
     public GivePermissionCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
         this.module = module;

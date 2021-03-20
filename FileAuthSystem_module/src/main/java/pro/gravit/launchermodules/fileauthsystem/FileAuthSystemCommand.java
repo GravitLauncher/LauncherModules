@@ -6,6 +6,7 @@ import pro.gravit.launchserver.command.Command;
 
 public class FileAuthSystemCommand extends Command {
     private final FileAuthSystemModule module;
+
     public FileAuthSystemCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
         this.module = module;

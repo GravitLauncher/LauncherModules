@@ -12,7 +12,7 @@ public class DiscordUpdateTask implements Runnable {
 
     @Override
     public void run() {
-        while(!Thread.interrupted()) {
+        while (!Thread.interrupted()) {
             try {
                 core.runCallbacks();
             } catch (Throwable e) {

@@ -10,54 +10,46 @@ import pro.gravit.launchermodules.discordgame.event.DiscordInitEvent;
 import pro.gravit.utils.helper.*;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.time.Instant;
 
 public class DiscordBridge {
+    public static final DiscordActivityService activityService = new DiscordActivityService();
     private static Thread thread;
     private static Core core;
     private static Activity activity;
 
-    public static final DiscordActivityService activityService = new DiscordActivityService();
-
     private static void initCore() throws IOException {
         Path pathToLib;
         String arch = System.getProperty("os.arch");
-        if(JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
-            pathToLib =  DirBridge.getGuardDir().resolve("discord_game_sdk_jni.dll");
-            String libraryJarPath = "/native/windows/"+arch+"/discord_game_sdk_jni.dll";
+        if (JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
+            pathToLib = DirBridge.getGuardDir().resolve("discord_game_sdk_jni.dll");
+            String libraryJarPath = "/native/windows/" + arch + "/discord_game_sdk_jni.dll";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
-        }
-        else if(JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
-            pathToLib =  DirBridge.getGuardDir().resolve("libdiscord_game_sdk_jni.so");
-            String libraryJarPath = "/native/linux/"+arch+"/libdiscord_game_sdk_jni.so";
+        } else if (JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
+            pathToLib = DirBridge.getGuardDir().resolve("libdiscord_game_sdk_jni.so");
+            String libraryJarPath = "/native/linux/" + arch + "/libdiscord_game_sdk_jni.so";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
-        }
-        else {
+        } else {
             throw new IOException("MacOS not supported");
         }
         Path pathToDiscordSdkLib;
-        if(JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
-            pathToDiscordSdkLib =  DirBridge.getGuardDir().resolve("discord_game_sdk.dll");
-            String libraryJarPath = "/native/linux/"+arch+"/discord_game_sdk.dll";
+        if (JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
+            pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.dll");
+            String libraryJarPath = "/native/linux/" + arch + "/discord_game_sdk.dll";
+            UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
+        } else {
+            pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.so");
+            String libraryJarPath = "/native/linux/" + arch + "/discord_game_sdk.so";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
         }
-        else {
-            pathToDiscordSdkLib =  DirBridge.getGuardDir().resolve("discord_game_sdk.so");
-            String libraryJarPath = "/native/linux/"+arch+"/discord_game_sdk.so";
-            UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
-        }
-		System.load(pathToDiscordSdkLib.toAbsolutePath().toString());
-		System.load(pathToLib.toAbsolutePath().toString());
+        System.load(pathToDiscordSdkLib.toAbsolutePath().toString());
+        System.load(pathToLib.toAbsolutePath().toString());
         Core.initDiscordNative(pathToDiscordSdkLib.toAbsolutePath().toString());
     }
 
     public static void init(long appId) throws IOException {
         initCore();
-        try(CreateParams params = new CreateParams())
-        {
+        try (CreateParams params = new CreateParams()) {
             params.setClientID(appId);
             //params.setClientID(698611073133051974L);
             params.setFlags(CreateParams.getDefaultFlags());
@@ -86,7 +78,7 @@ public class DiscordBridge {
     }
 
     public static void close() {
-        if(core == null) return;
+        if (core == null) return;
         thread.interrupt();
         core.close();
     }

@@ -1,7 +1,6 @@
 package pro.gravit.launchermodules.fileauthsystem.providers;
 
 import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule;
-import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.handler.CachedAuthHandler;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ public class FileSystemAuthHandler extends CachedAuthHandler {
     protected Entry fetchEntry(String username) throws IOException {
         FileAuthSystemModule module = srv.modulesManager.getModule(FileAuthSystemModule.class);
         FileAuthSystemModule.UserEntity entity = module.getUser(username);
-        if(entity == null) return null;
+        if (entity == null) return null;
         return new Entry(entity.uuid, entity.username, entity.accessToken, entity.serverId);
     }
 
@@ -25,7 +24,7 @@ public class FileSystemAuthHandler extends CachedAuthHandler {
     protected Entry fetchEntry(UUID uuid) throws IOException {
         FileAuthSystemModule module = srv.modulesManager.getModule(FileAuthSystemModule.class);
         FileAuthSystemModule.UserEntity entity = module.getUser(uuid);
-        if(entity == null) return null;
+        if (entity == null) return null;
         return new Entry(entity.uuid, entity.username, entity.accessToken, entity.serverId);
     }
 
@@ -33,7 +32,7 @@ public class FileSystemAuthHandler extends CachedAuthHandler {
     protected boolean updateAuth(UUID uuid, String username, String accessToken) throws IOException {
         FileAuthSystemModule module = srv.modulesManager.getModule(FileAuthSystemModule.class);
         FileAuthSystemModule.UserEntity entity = module.getUser(uuid);
-        if(entity == null) return false;
+        if (entity == null) return false;
         entity.accessToken = accessToken;
         return true;
     }
@@ -42,7 +41,7 @@ public class FileSystemAuthHandler extends CachedAuthHandler {
     protected boolean updateServerID(UUID uuid, String serverID) throws IOException {
         FileAuthSystemModule module = srv.modulesManager.getModule(FileAuthSystemModule.class);
         FileAuthSystemModule.UserEntity entity = module.getUser(uuid);
-        if(entity == null) return false;
+        if (entity == null) return false;
         entity.serverId = serverID;
         return true;
     }

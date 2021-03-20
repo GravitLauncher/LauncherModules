@@ -13,6 +13,7 @@ public class OneLauncherConfig {
     public boolean checkClientLock;
     @LauncherInject(value = "modules.onelauncher.multipleprofilesallowlock")
     public boolean multipleProfilesAllow;
+
     public static Object getDefault() {
         OneLauncherConfig config = new OneLauncherConfig();
         config.text = "Launcher or minecraft is already running";

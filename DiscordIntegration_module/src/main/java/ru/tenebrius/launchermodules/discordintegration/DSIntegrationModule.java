@@ -21,19 +21,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DSIntegrationModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 1, 1, Version.Type.BETA);
-    private static boolean registred = false;
-
     public static Config config = null;
+    private static boolean registred = false;
     private static String log = "";
 
     public DSIntegrationModule() {
         super(new LauncherModuleInfo("DiscordIntegration", version, new String[]{"LaunchServerCore"}));
-    }
-
-    public void preInit(PreConfigPhase preConfigPhase) {
-        if (!registred) {
-            registred = true;
-        }
     }
 
     public static void sendMsg(String msg) {
@@ -58,6 +51,11 @@ public class DSIntegrationModule extends LauncherModule {
         }
     }
 
+    public void preInit(PreConfigPhase preConfigPhase) {
+        if (!registred) {
+            registred = true;
+        }
+    }
 
     public boolean authHook(AuthResponse.AuthContext context, Client client) {
         DiscordWebhook webhook = new DiscordWebhook(config.webhook);

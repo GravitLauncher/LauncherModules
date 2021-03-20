@@ -30,20 +30,7 @@ public class OSSLSignTask implements LauncherBuildTask {
             throw new IllegalStateException("sign.keyStoreType must be PKCS12");
     }
 
-    @Override
-    public String getName() {
-        return "OSSLSign";
-    }
-
-    @Override
-    public Path process(Path inputFile) throws IOException {
-        Path resultFile = server.launcherEXEBinary.nextPath(getName());
-        signLaunch4j(config, signConf, inputFile, resultFile);
-        return resultFile;
-    }
-
-    public static void signLaunch4j(OSSLSignCodeConfig config, LaunchServerConfig.JarSignerConf signConf, Path inputFile, Path resultFile) throws IOException
-    {
+    public static void signLaunch4j(OSSLSignCodeConfig config, LaunchServerConfig.JarSignerConf signConf, Path inputFile, Path resultFile) throws IOException {
         File input = new File(inputFile.toUri());
         long lastSignSize = 0;
         long inputLength = input.length();
@@ -75,11 +62,6 @@ public class OSSLSignTask implements LauncherBuildTask {
         }
     }
 
-    @Override
-    public boolean allowDelete() {
-        return true;
-    }
-
     public static void updateSignSize(Path inputFile, long signSize) throws IOException {
         try (RandomAccessFile file = new RandomAccessFile(new File(inputFile.toUri()), "rw")) {
             long fileSize = file.length();
@@ -90,10 +72,6 @@ public class OSSLSignTask implements LauncherBuildTask {
             file.seek(offset);
             file.write(toWrite);
         }
-    }
-
-    public void sign(Path source, Path dest) throws IOException {
-        OSSLSignTask.sign(config, signConf, source, dest);
     }
 
     public static void sign(OSSLSignCodeConfig config, LaunchServerConfig.JarSignerConf signConf, Path source, Path dest) throws IOException {
@@ -127,5 +105,26 @@ public class OSSLSignTask implements LauncherBuildTask {
         if (process.exitValue() != 0) {
             throw new RuntimeException(String.format("OSSLSignCode process return %d", process.exitValue()));
         }
+    }
+
+    @Override
+    public String getName() {
+        return "OSSLSign";
+    }
+
+    @Override
+    public Path process(Path inputFile) throws IOException {
+        Path resultFile = server.launcherEXEBinary.nextPath(getName());
+        signLaunch4j(config, signConf, inputFile, resultFile);
+        return resultFile;
+    }
+
+    @Override
+    public boolean allowDelete() {
+        return true;
+    }
+
+    public void sign(Path source, Path dest) throws IOException {
+        OSSLSignTask.sign(config, signConf, source, dest);
     }
 }

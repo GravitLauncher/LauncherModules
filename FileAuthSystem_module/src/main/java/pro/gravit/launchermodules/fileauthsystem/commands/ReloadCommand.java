@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 
 public class ReloadCommand extends Command {
     private final FileAuthSystemModule module;
+
     public ReloadCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
         this.module = module;
@@ -26,7 +27,7 @@ public class ReloadCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        if(args.length > 0) {
+        if (args.length > 0) {
             module.load(Paths.get(args[0]));
         } else {
             module.load();

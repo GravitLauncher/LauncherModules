@@ -14,6 +14,7 @@ public class OSSLSignCodeConfig {
     public boolean checkSignSize = true;
     public boolean checkCorrectSign = true;
     public boolean checkCorrectJar = true;
+
     public static OSSLSignCodeConfig getDefault() {
         OSSLSignCodeConfig config = new OSSLSignCodeConfig();
         config.timestampServer = "http://timestamp.sectigo.com";

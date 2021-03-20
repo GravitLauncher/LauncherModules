@@ -7,6 +7,7 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class ChangePasswordCommand extends Command {
     private final FileAuthSystemModule module;
+
     public ChangePasswordCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
         this.module = module;
@@ -26,7 +27,7 @@ public class ChangePasswordCommand extends Command {
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
         FileAuthSystemModule.UserEntity entity = module.getUser(args[0]);
-        if(entity == null)
+        if (entity == null)
             throw new IllegalArgumentException(String.format("User %s not found", args[0]));
         entity.setPassword(args[1]);
         LogHelper.info("Password changed");

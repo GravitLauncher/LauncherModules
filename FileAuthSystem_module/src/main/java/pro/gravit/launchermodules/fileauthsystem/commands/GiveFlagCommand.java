@@ -8,6 +8,7 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class GiveFlagCommand extends Command {
     private final FileAuthSystemModule module;
+
     public GiveFlagCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
         this.module = module;

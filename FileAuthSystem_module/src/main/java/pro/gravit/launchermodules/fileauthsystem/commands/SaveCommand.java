@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 
 public class SaveCommand extends Command {
     private final FileAuthSystemModule module;
+
     public SaveCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
         this.module = module;
@@ -26,7 +27,7 @@ public class SaveCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        if(args.length > 0) {
+        if (args.length > 0) {
             module.save(Paths.get(args[0]));
         } else {
             module.save();

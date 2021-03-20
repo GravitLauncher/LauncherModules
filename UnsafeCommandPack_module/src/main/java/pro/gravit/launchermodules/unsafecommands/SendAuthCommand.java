@@ -62,7 +62,7 @@ public class SendAuthCommand extends Command {
                 if (pair != null) {
                     client.auth_id = args[3];
                     client.auth = pair;
-                    if(pair.provider instanceof RequiredDAO || pair.handler instanceof RequiredDAO) {
+                    if (pair.provider instanceof RequiredDAO || pair.handler instanceof RequiredDAO) {
                         client.daoObject = server.config.dao.userDAO.findByUsername(username);
                     }
                 }

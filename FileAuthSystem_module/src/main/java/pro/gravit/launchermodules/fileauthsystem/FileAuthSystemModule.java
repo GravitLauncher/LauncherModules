@@ -29,20 +29,135 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FileAuthSystemModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
-    private Path dbPath;
     public JsonConfigurable<FileAuthSystemConfig> jsonConfigurable;
+    public Map<UUID, UserEntity> users = new ConcurrentHashMap<>();
+    private Path dbPath;
+
+    public FileAuthSystemModule() {
+        super(new LauncherModuleInfo("FileAuthSystem", version, new String[]{"LaunchServerCore"}));
+    }
+
+    public UserEntity getUser(String username) {
+        for (UserEntity e : users.values()) {
+            if (username.equals(e.username)) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public UserEntity getUser(UUID uuid) {
+        return users.get(uuid);
+    }
+
+    public Collection<UserEntity> getAllUsers() {
+        return users.values();
+    }
+
+    public void addUser(UserEntity entity) {
+        users.put(entity.uuid, entity);
+    }
+
+    public void deleteUser(UserEntity entity) {
+        users.remove(entity.uuid);
+    }
+
+    public void deleteUser(UUID uuid) {
+        users.remove(uuid);
+    }
+
+    public void finish(LaunchServerFullInitEvent event) {
+        LaunchServer launchServer = event.server;
+        try {
+            jsonConfigurable.loadConfig();
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
+        launchServer.commandHandler.registerCommand("fileauthsystem", new FileAuthSystemCommand(launchServer, this));
+        load();
+    }
+
+    public void exit(ClosePhase closePhase) {
+        if (jsonConfigurable != null && jsonConfigurable.getConfig() != null && jsonConfigurable.getConfig().autoSave)
+            save();
+    }
+
+    public void preConfig(PreConfigPhase preConfigPhase) {
+        AuthProvider.providers.register("fileauthsystem", FileSystemAuthProvider.class);
+        AuthHandler.providers.register("fileauthsystem", FileSystemAuthHandler.class);
+        DaoProvider.providers.register("fileauthsystem", FileSystemDAOProvider.class);
+    }
+
+    public void load() {
+        load(dbPath);
+    }
+
+    public void load(Path path) {
+        if (!Files.exists(path)) return;
+        Type collectionType = new TypeToken<Map<UUID, UserEntity>>() {
+        }.getType();
+        try (Reader reader = IOHelper.newReader(path)) {
+            this.users = Launcher.gsonManager.configGson.fromJson(reader, collectionType);
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
+    }
+
+    public void save() {
+        save(dbPath);
+    }
+
+    public void save(Path path) {
+        Type collectionType = new TypeToken<Map<UUID, UserEntity>>() {
+        }.getType();
+        try (Writer writer = IOHelper.newWriter(path)) {
+            Launcher.gsonManager.configGson.toJson(users, collectionType, writer);
+        } catch (IOException e) {
+            LogHelper.error(e);
+        }
+    }
+
+    @Override
+    public void init(LauncherInitContext initContext) {
+        registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        registerEvent(this::preConfig, PreConfigPhase.class);
+        registerEvent(this::exit, ClosePhase.class);
+        dbPath = modulesConfigManager.getModuleConfig(moduleInfo.name, "Database");
+        jsonConfigurable = modulesConfigManager.getConfigurable(FileAuthSystemConfig.class, moduleInfo.name);
+    }
+
     public static class UserEntity implements User {
         public String username;
-        private byte[] password;
         public UUID uuid;
         public ClientPermissions permissions;
         public String serverId;
         public String accessToken;
+        private byte[] password;
+
+        public UserEntity() {
+            permissions = new ClientPermissions();
+        }
+
+        public UserEntity(String username) {
+            this.username = username;
+            this.uuid = UUID.randomUUID();
+            this.permissions = new ClientPermissions();
+        }
+
+        public UserEntity(String username, String password) {
+            this.username = username;
+            this.uuid = UUID.randomUUID();
+            this.permissions = new ClientPermissions();
+            this.setPassword(password);
+        }
 
         public void setPassword(String password) {
             this.password = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.SHA256, password);
@@ -94,117 +209,7 @@ public class FileAuthSystemModule extends LauncherModule {
         }
 
         public boolean verifyPassword(String password) {
-            return Arrays.equals( this.password,  SecurityHelper.digest(SecurityHelper.DigestAlgorithm.SHA256, password));
+            return Arrays.equals(this.password, SecurityHelper.digest(SecurityHelper.DigestAlgorithm.SHA256, password));
         }
-
-        public UserEntity() {
-            permissions = new ClientPermissions();
-        }
-
-        public UserEntity(String username) {
-            this.username = username;
-            this.uuid = UUID.randomUUID();
-            this.permissions = new ClientPermissions();
-        }
-
-        public UserEntity(String username, String password) {
-            this.username = username;
-            this.uuid = UUID.randomUUID();
-            this.permissions = new ClientPermissions();
-            this.setPassword(password);
-        }
-    }
-    public Map<UUID, UserEntity> users = new ConcurrentHashMap<>();
-
-    public UserEntity getUser(String username) {
-        for(UserEntity e : users.values()) {
-            if(username.equals(e.username)) {
-                return e;
-            }
-        }
-        return null;
-    }
-
-    public UserEntity getUser(UUID uuid) {
-        return users.get(uuid);
-    }
-
-    public Collection<UserEntity> getAllUsers() {
-        return users.values();
-    }
-
-    public void addUser(UserEntity entity) {
-        users.put(entity.uuid, entity);
-    }
-
-    public void deleteUser(UserEntity entity) {
-        users.remove(entity.uuid);
-    }
-
-    public void deleteUser(UUID uuid) {
-        users.remove(uuid);
-    }
-
-    public FileAuthSystemModule() {
-        super(new LauncherModuleInfo("FileAuthSystem", version, new String[]{"LaunchServerCore"}));
-    }
-
-
-    public void finish(LaunchServerFullInitEvent event) {
-        LaunchServer launchServer = event.server;
-        try {
-            jsonConfigurable.loadConfig();
-        } catch (IOException e) {
-            LogHelper.error(e);
-        }
-        launchServer.commandHandler.registerCommand("fileauthsystem", new FileAuthSystemCommand(launchServer, this));
-        load();
-    }
-
-    public void exit(ClosePhase closePhase) {
-        if(jsonConfigurable != null && jsonConfigurable.getConfig() != null && jsonConfigurable.getConfig().autoSave)
-            save();
-    }
-
-    public void preConfig(PreConfigPhase preConfigPhase) {
-        AuthProvider.providers.register("fileauthsystem", FileSystemAuthProvider.class);
-        AuthHandler.providers.register("fileauthsystem", FileSystemAuthHandler.class);
-        DaoProvider.providers.register("fileauthsystem", FileSystemDAOProvider.class);
-    }
-
-    public void load() {
-        load(dbPath);
-    }
-
-    public void load(Path path) {
-        if(!Files.exists(path)) return;
-        Type collectionType = new TypeToken<Map<UUID, UserEntity>>() {}.getType();
-        try(Reader reader = IOHelper.newReader(path)) {
-            this.users = Launcher.gsonManager.configGson.fromJson(reader, collectionType);
-        } catch (IOException e) {
-            LogHelper.error(e);
-        }
-    }
-
-    public void save() {
-        save(dbPath);
-    }
-
-    public void save(Path path) {
-        Type collectionType = new TypeToken<Map<UUID, UserEntity>>() {}.getType();
-        try(Writer writer = IOHelper.newWriter(path)) {
-            Launcher.gsonManager.configGson.toJson(users, collectionType, writer);
-        } catch (IOException e) {
-            LogHelper.error(e);
-        }
-    }
-
-    @Override
-    public void init(LauncherInitContext initContext) {
-        registerEvent(this::finish, LaunchServerFullInitEvent.class);
-        registerEvent(this::preConfig, PreConfigPhase.class);
-        registerEvent(this::exit, ClosePhase.class);
-        dbPath = modulesConfigManager.getModuleConfig(moduleInfo.name, "Database");
-        jsonConfigurable = modulesConfigManager.getConfigurable(FileAuthSystemConfig.class, moduleInfo.name);
     }
 }

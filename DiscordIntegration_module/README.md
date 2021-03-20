@@ -1,15 +1,21 @@
 # DiscordIntegration
-Добавляет **LauncherServer'у** интеграцию  с *Discord'ом*. То есть станет доступным удаленное управление лаунчером из дискорд канала, а также логируется авторизация через лаунчер.
+
+Добавляет **LauncherServer'у** интеграцию с *Discord'ом*. То есть станет доступным удаленное управление лаунчером из
+дискорд канала, а также логируется авторизация через лаунчер.
+
 #### Установка модуля
+
 1. Скопировать модуль **DiscordIntegration_module.jar** в папку **/LaunchServer/modules/**
 2. Скачать библиотеку *[jda]* и положить в папку **/LaunchServer/libraries/**:
 3. Выполнить настройку конфигурации:
     - */LaunchServer/config/DiscordIntegration/Config.json*
+
 - `"logAuth": true` - Логировать авторизацию пользователей.
 - `"avatarEnable": true` - Отображение головы в логах.
 - `"prefix": "!"` - Префикс команд.
 - `"url": "https://minotar.net/cube/user/%s.png"` - ссылка на API для возвращения картинки головы.
-- `"webhook": "https://discord.com/api/webhooks/{YOUR_WEBHOOK}"` - ссылка на веб-хук для логирования авторизации, а также результата выполнения команды.
+- `"webhook": "https://discord.com/api/webhooks/{YOUR_WEBHOOK}"` - ссылка на веб-хук для логирования авторизации, а
+  также результата выполнения команды.
 - `"bot": true` - бот для управления *LaunchServer'ом* через канал.
 - `"token": "MY_TOKEN"` - токен бота.
 - `"channelID": "CHANNEL_ID"` - ID канала для работы с ботом.
@@ -31,11 +37,11 @@
 
 #### Example:
 
-####Log:
+#### Log:
 
 ![Log](img/log.png)
 
-####Commands:
+#### Commands:
 
 ![Command](img/command.png)
 

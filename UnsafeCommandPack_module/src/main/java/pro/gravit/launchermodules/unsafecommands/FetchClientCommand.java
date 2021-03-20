@@ -51,9 +51,9 @@ public class FetchClientCommand extends Command {
 
         LogHelper.subInfo("Getting client info, it may take some time");
         JsonObject obj;
-        if(Files.exists(Paths.get(version))) {
+        if (Files.exists(Paths.get(version))) {
             LogHelper.subInfo("Using file %s", version);
-            try(Reader reader = IOHelper.newReader(Paths.get(version))) {
+            try (Reader reader = IOHelper.newReader(Paths.get(version))) {
                 obj = ClientDownloader.GSON.fromJson(reader, JsonObject.class);
             }
         } else {
@@ -66,7 +66,7 @@ public class FetchClientCommand extends Command {
         ExecutorService e = Executors.newFixedThreadPool(4);
         List<AsyncDownloader.SizedFile> applies = info.libraries.stream().map(y -> new AsyncDownloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
         CompletableFuture<Void> f = CompletableFuture.allOf(d.runDownloadListSimple(d.sortFiles(applies, 4), "", clientDir.resolve("libraries"), e)).thenAccept((v) -> LogHelper.subInfo("Client libraries successfully downloaded!"));
-        if(info.client != null) {
+        if (info.client != null) {
             IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
         }
         LogHelper.subInfo("Downloaded client jar!");

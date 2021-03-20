@@ -1,6 +1,5 @@
 package pro.gravit.launchermodules.unsafecommands;
 
-import pro.gravit.launchermodules.unsafecommands.patcher.StaticReplacerPatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.UnsafePatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.*;
 import pro.gravit.launchserver.LaunchServer;

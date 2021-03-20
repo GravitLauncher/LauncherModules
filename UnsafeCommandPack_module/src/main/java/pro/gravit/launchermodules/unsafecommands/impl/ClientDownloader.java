@@ -61,7 +61,7 @@ public class ClientDownloader {
 
             }
         }
-        if(obj.has("downloads")) {
+        if (obj.has("downloads")) {
             JsonObject tmp = obj.getAsJsonObject("downloads");
             ret.client = GSON.fromJson(tmp.get("client"), Downloadable.class);
             ret.server = GSON.fromJson(tmp.get("server"), Downloadable.class);

@@ -1,7 +1,6 @@
 package pro.gravit.launchermodules.osslsigncode;
 
 import pro.gravit.launcher.config.JsonConfigurable;
-import pro.gravit.launcher.config.SimpleConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
@@ -17,6 +16,7 @@ import java.nio.file.Path;
 
 public class OSSLSignCodeModule extends LauncherModule {
     public OSSLSignCodeConfig config;
+
     public OSSLSignCodeModule() {
         super(new LauncherModuleInfo("OSSLSignCode", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
     }

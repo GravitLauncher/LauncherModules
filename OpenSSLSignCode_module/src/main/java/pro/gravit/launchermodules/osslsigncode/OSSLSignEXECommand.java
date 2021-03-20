@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 
 public class OSSLSignEXECommand extends Command {
     public final OSSLSignCodeConfig config;
+
     public OSSLSignEXECommand(LaunchServer server, OSSLSignCodeConfig config) {
         super(server);
         this.config = config;

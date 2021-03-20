@@ -9,10 +9,7 @@ import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.request.Request;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.LogHelper;
-
-import java.io.IOException;
 
 public class ClientModule extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);

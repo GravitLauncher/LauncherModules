@@ -1,6 +1,9 @@
 # UnsafeCommandPack
+
 Данный модуль добавляет дополнительные команды в [GravitLauncher]
+
 #### Установка модуля
+
 1. Скопировать модуль **UnsafeCommandPack_module.jar** в папку **/LaunchServer/modules/**
 2. Настройка не требуется.
 
