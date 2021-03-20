@@ -45,8 +45,6 @@ public class FindReflectPatcher extends ClassTransformerPatcher {
     }
 
     public boolean isReflection(String name) {
-        if ((name.startsWith("java/lang/reflect/") || name.startsWith("java.lang.reflect.")))
-            return true;
-        return false;
+        return name.startsWith("java/lang/reflect/") || name.startsWith("java.lang.reflect.");
     }
 }

@@ -29,7 +29,7 @@ public class OneLauncherModule extends LauncherModule {
     private Path locksDir;
     private FileLock lock;
     private FileChannel channel;
-    private OneLauncherConfig config = new OneLauncherConfig();
+    private final OneLauncherConfig config = new OneLauncherConfig();
 
     public OneLauncherModule() {
         super(new LauncherModuleInfo("OneLauncher", version, -9999, new String[]{"ClientLauncherCore"}));
