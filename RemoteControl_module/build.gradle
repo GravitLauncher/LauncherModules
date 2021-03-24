@@ -1,0 +1,8 @@
+def mainClassName = "pro.gravit.launchermodules.remotecontrol.RemoteControlModule"
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
