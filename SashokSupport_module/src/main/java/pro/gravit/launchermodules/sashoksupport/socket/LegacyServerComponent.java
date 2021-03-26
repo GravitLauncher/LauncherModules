@@ -24,7 +24,6 @@ public class LegacyServerComponent extends Component {
     public String oldRSAPrivateKey;
     public transient EFileInfo launcher;
     public transient EFileInfo launcherEXE;
-    public transient LaunchServer launchServer;
     public transient ServerSocketHandler handler;
 
     public SocketAddress getSocketAddress() {
@@ -32,17 +31,7 @@ public class LegacyServerComponent extends Component {
     }
 
     @Override
-    public void preInit(LaunchServer launchServer) {
-        this.launchServer = launchServer;
-    }
-
-    @Override
     public void init(LaunchServer launchServer) {
-
-    }
-
-    @Override
-    public void postInit(LaunchServer launchServer) {
         Path key = Paths.get(oldRSAPrivateKey);
         try {
             launcher = new EFileInfo(launcherFile, key);
