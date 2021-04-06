@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands;
+package pro.gravit.launchermodules.unsafecommands.commands;
 
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.StarterAgent;

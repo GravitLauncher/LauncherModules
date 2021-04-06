@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.unsafecommands;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launchermodules.unsafecommands.commands.*;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
@@ -25,6 +26,7 @@ public class UnsafeCommandsModule extends LauncherModule {
         category.registerCommand("newDownloadClient", new FetchClientCommand(initPhase.server));
         category.registerCommand("sendAuth", new SendAuthCommand(initPhase.server));
         category.registerCommand("patcher", new PatcherCommand(initPhase.server));
+        category.registerCommand("cipherList", new CipherListCommand(initPhase.server));
         initPhase.server.commandHandler.registerCategory(new CommandHandler.Category(category, "Unsafe"));
     }
 

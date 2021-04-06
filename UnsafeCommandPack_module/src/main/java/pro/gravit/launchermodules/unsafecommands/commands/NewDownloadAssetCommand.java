@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands;
+package pro.gravit.launchermodules.unsafecommands.commands;
 
 import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.AssetDownloader;
@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class NewDownloadAssetCommand extends Command {
-    protected NewDownloadAssetCommand(LaunchServer server) {
+    public NewDownloadAssetCommand(LaunchServer server) {
         super(server);
     }
 

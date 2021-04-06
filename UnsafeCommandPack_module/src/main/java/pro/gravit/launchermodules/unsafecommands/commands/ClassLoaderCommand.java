@@ -1,5 +1,6 @@
-package pro.gravit.launchermodules.unsafecommands;
+package pro.gravit.launchermodules.unsafecommands.commands;
 
+import pro.gravit.launchermodules.unsafecommands.UnsafeURLClassLoader;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;

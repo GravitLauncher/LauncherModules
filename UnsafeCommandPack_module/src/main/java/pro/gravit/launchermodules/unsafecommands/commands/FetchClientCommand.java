@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands;
+package pro.gravit.launchermodules.unsafecommands.commands;
 
 import com.google.gson.JsonObject;
 import pro.gravit.launcher.AsyncDownloader;
@@ -24,7 +24,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class FetchClientCommand extends Command {
-    protected FetchClientCommand(LaunchServer server) {
+    public FetchClientCommand(LaunchServer server) {
         super(server);
     }
 

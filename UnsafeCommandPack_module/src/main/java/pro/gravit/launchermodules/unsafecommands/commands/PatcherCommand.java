@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands;
+package pro.gravit.launchermodules.unsafecommands.commands;
 
 import pro.gravit.launchermodules.unsafecommands.patcher.UnsafePatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.*;

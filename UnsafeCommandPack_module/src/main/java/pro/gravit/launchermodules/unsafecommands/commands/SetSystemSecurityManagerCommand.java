@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands;
+package pro.gravit.launchermodules.unsafecommands.commands;
 
 import pro.gravit.launchermodules.unsafecommands.impl.AllowSecurityManager;
 import pro.gravit.launchermodules.unsafecommands.impl.LoggerSecurityManager;
@@ -6,7 +6,7 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 
 public class SetSystemSecurityManagerCommand extends Command {
-    protected SetSystemSecurityManagerCommand(LaunchServer server) {
+    public SetSystemSecurityManagerCommand(LaunchServer server) {
         super(server);
     }
 
