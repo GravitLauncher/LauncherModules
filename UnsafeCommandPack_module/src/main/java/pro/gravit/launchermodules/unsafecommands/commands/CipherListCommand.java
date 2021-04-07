@@ -7,6 +7,7 @@ import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
 import javax.crypto.Cipher;
+import java.security.KeyFactory;
 import java.security.Provider;
 import java.security.Security;
 
