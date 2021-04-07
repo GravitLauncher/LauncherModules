@@ -4,6 +4,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchermodules.unsafecommands.commands.*;
+import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
@@ -17,25 +18,29 @@ public class UnsafeCommandsModule extends LauncherModule {
         super(new LauncherModuleInfo("UnsafeCommands", version, new String[]{"LaunchServerCore"}));
     }
 
-    public void init(LaunchServerInitPhase initPhase) {
+    public void init(LaunchServer server) {
         BaseCommandCategory category = new BaseCommandCategory();
-        category.registerCommand("loadJar", new LoadJarCommand(initPhase.server));
-        category.registerCommand("registerComponent", new RegisterComponentCommand(initPhase.server));
-        category.registerCommand("setSecurityManager", new SetSystemSecurityManagerCommand(initPhase.server));
-        category.registerCommand("newDownloadAsset", new NewDownloadAssetCommand(initPhase.server));
-        category.registerCommand("newDownloadClient", new FetchClientCommand(initPhase.server));
-        category.registerCommand("sendAuth", new SendAuthCommand(initPhase.server));
-        category.registerCommand("patcher", new PatcherCommand(initPhase.server));
-        category.registerCommand("cipherList", new CipherListCommand(initPhase.server));
-        initPhase.server.commandHandler.registerCategory(new CommandHandler.Category(category, "Unsafe"));
+        category.registerCommand("loadJar", new LoadJarCommand(server));
+        category.registerCommand("registerComponent", new RegisterComponentCommand(server));
+        category.registerCommand("setSecurityManager", new SetSystemSecurityManagerCommand(server));
+        category.registerCommand("newDownloadAsset", new NewDownloadAssetCommand(server));
+        category.registerCommand("newDownloadClient", new FetchClientCommand(server));
+        category.registerCommand("sendAuth", new SendAuthCommand(server));
+        category.registerCommand("patcher", new PatcherCommand(server));
+        category.registerCommand("cipherList", new CipherListCommand(server));
+        server.commandHandler.registerCategory(new CommandHandler.Category(category, "Unsafe"));
+    }
+
+    public void initPhase(LaunchServerInitPhase initPhase) {
+        init(initPhase.server);
     }
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent(this::init, LaunchServerInitPhase.class);
+        registerEvent(this::initPhase, LaunchServerInitPhase.class);
         if (initContext != null) {
             if (initContext instanceof LaunchServerInitContext) {
-                init(new LaunchServerInitPhase(((LaunchServerInitContext) initContext).server));
+                init(((LaunchServerInitContext) initContext).server);
             }
         }
     }

@@ -4,6 +4,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -18,6 +19,9 @@ public class SystemdNotifyModule extends LauncherModule {
 
 
     public void finish(LaunchServerFullInitEvent event) {
+        notifySystemd();
+    }
+    public void notifySystemd() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("systemd-notify", "--ready");
         try {
@@ -31,5 +35,8 @@ public class SystemdNotifyModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        if(initContext instanceof LaunchServerInitContext) {
+            notifySystemd();
+        }
     }
 }

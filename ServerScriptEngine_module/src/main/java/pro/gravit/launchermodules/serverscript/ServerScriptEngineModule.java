@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.serverscript;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
@@ -17,10 +18,15 @@ public class ServerScriptEngineModule extends LauncherModule {
     }
 
     public void postInit(LaunchServerFullInitEvent event) {
+        initScriptEngine(event.server);
+    }
+
+    public void initScriptEngine(LaunchServer server) {
+
         scriptEngine = new ServerScriptEngine();
-        scriptEngine.initBaseBindings(event.server);
-        event.server.commandHandler.registerCommand("eval", new EvalCommand(event.server));
-        event.server.commandHandler.registerCommand("scriptMappings", new ScriptMappingsCommand(event.server));
+        scriptEngine.initBaseBindings(server);
+        server.commandHandler.registerCommand("eval", new EvalCommand(server));
+        server.commandHandler.registerCommand("scriptMappings", new ScriptMappingsCommand(server));
     }
 
     @Override
@@ -28,7 +34,7 @@ public class ServerScriptEngineModule extends LauncherModule {
         registerEvent(this::postInit, LaunchServerFullInitEvent.class);
         if (initContext != null) {
             if (initContext instanceof LaunchServerInitContext) {
-                postInit(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
+                initScriptEngine(((LaunchServerInitContext) initContext).server);
             }
         }
     }

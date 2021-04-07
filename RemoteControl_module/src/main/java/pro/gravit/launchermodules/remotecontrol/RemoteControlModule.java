@@ -5,6 +5,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchermodules.remotecontrol.commands.RemoteControlCommand;
+import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.launchserver.socket.handlers.NettyWebAPIHandler;
@@ -27,14 +28,17 @@ public class RemoteControlModule extends LauncherModule {
 
 
     public void finish(LaunchServerFullInitEvent event) {
+        initRemoteControl(event.server);
+    }
+    public void initRemoteControl(LaunchServer server) {
         try {
             configurable.loadConfig();
         } catch (IOException e) {
             LogHelper.error(e);
             config = configurable.getDefaultConfig();
         }
-        event.server.commandHandler.registerCommand("remotecontrol", new RemoteControlCommand(event.server));
-        NettyWebAPIHandler.addNewSeverlet("remotecontrol/command", new RemoteControlWebSeverlet(this, event.server));
+        server.commandHandler.registerCommand("remotecontrol", new RemoteControlCommand(server));
+        NettyWebAPIHandler.addNewSeverlet("remotecontrol/command", new RemoteControlWebSeverlet(this, server));
         if (config.enabled) {
             LogHelper.info("RemoteControl enabled. Found %d access tokens", config.list.size());
         }
@@ -65,7 +69,7 @@ public class RemoteControlModule extends LauncherModule {
             }
         };
         if (initContext instanceof LaunchServerInitContext) {
-            finish(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
+            initRemoteControl(((LaunchServerInitContext) initContext).server);
             return;
         }
         registerEvent(this::finish, LaunchServerFullInitEvent.class);

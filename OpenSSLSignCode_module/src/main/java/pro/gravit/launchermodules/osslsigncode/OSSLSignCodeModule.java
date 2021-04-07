@@ -24,14 +24,17 @@ public class OSSLSignCodeModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         if (initContext instanceof LaunchServerInitContext) {
-            registerTask(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
+            initOSSLSignCode(((LaunchServerInitContext) initContext).server);
         } else {
             registerEvent(this::registerTask, LaunchServerFullInitEvent.class);
         }
     }
 
     public void registerTask(LaunchServerFullInitEvent event) {
+        initOSSLSignCode(event.server);
+    }
 
+    public void initOSSLSignCode(LaunchServer server) {
         Path configPath = modulesConfigManager.getModuleConfig(moduleInfo.name);
         OSSLSignCodeModule module = this;
         JsonConfigurable<OSSLSignCodeConfig> configurable = new JsonConfigurable<>(OSSLSignCodeConfig.class, configPath) {
@@ -57,7 +60,6 @@ public class OSSLSignCodeModule extends LauncherModule {
             return;
         }
         config = configurable.getConfig();
-        LaunchServer server = event.server;
         server.commandHandler.registerCommand("osslsignexe", new OSSLSignEXECommand(server, config));
         server.launcherEXEBinary.addAfter((t) -> t instanceof Launch4JTask, new OSSLSignTask(server, config));
     }

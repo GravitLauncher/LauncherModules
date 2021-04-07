@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.generatecertificate;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
@@ -15,13 +16,17 @@ public class GenerateCertificateModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         if (initContext instanceof LaunchServerInitContext) {
-            registerCommand(new LaunchServerFullInitEvent(((LaunchServerInitContext) initContext).server));
+            initGenerateCertificate(((LaunchServerInitContext) initContext).server);
         } else {
             registerEvent(this::registerCommand, LaunchServerFullInitEvent.class);
         }
     }
 
     public void registerCommand(LaunchServerFullInitEvent event) {
-        event.server.commandHandler.registerCommand("generatecertificate", new GenerateCertificateCommand(event.server));
+        initGenerateCertificate(event.server);
+    }
+
+    public void initGenerateCertificate(LaunchServer server) {
+        server.commandHandler.registerCommand("generatecertificate", new GenerateCertificateCommand(server));
     }
 }
