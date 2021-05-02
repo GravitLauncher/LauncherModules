@@ -1,13 +1,18 @@
 package pro.gravit.launchermodules.unsafecommands.patcher;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.*;
 import pro.gravit.utils.helper.LogHelper;
+
+import java.util.ServiceLoader;
 
 public class StaticReplacerPatcher extends ClassTransformerPatcher {
     public final String targetOwnerClass;
     public final String targetOwnerMethod;
     public final String replaceOwnerClass;
     public final String replaceOwnerMethod;
+    private transient final Logger logger = LogManager.getLogger();
 
     public StaticReplacerPatcher(String targetOwnerClass, String targetOwnerMethod, String replaceOwnerClass, String replaceOwnerMethod) {
         this.targetOwnerClass = targetOwnerClass;
@@ -18,11 +23,15 @@ public class StaticReplacerPatcher extends ClassTransformerPatcher {
 
     public StaticReplacerPatcher(String[] args) {
         if (args.length < 4) throw new IllegalArgumentException("Patcher need 4 args");
-        targetOwnerClass = args[0];
-        targetOwnerMethod = args[1];
-        replaceOwnerClass = args[2];
-        replaceOwnerMethod = args[3];
-        LogHelper.info("Create patcher %s.%s replaced to %s.%s", targetOwnerClass, targetOwnerMethod, replaceOwnerClass, replaceOwnerMethod);
+        targetOwnerClass = toInternalClassFormat(args[0]);
+        targetOwnerMethod = toInternalClassFormat(args[1]);
+        replaceOwnerClass = toInternalClassFormat(args[2]);
+        replaceOwnerMethod = toInternalClassFormat(args[3]);
+        logger.info("Create patcher {}.{} replaced to {}.{}", targetOwnerClass, targetOwnerMethod, replaceOwnerClass, replaceOwnerMethod);
+    }
+
+    private String toInternalClassFormat(String str) {
+        return str.replaceAll("\\.", "/");
     }
 
     public StaticReplacerPatcher() {
@@ -31,17 +40,18 @@ public class StaticReplacerPatcher extends ClassTransformerPatcher {
 
     @Override
     public ClassVisitor getVisitor(ClassReader reader, ClassWriter cw) {
-        return new ClassVisitor(Opcodes.ASM7) {
+        return new ClassVisitor(Opcodes.ASM8, cw) {
             @Override
             public MethodVisitor visitMethod(int access, String methodName, String descriptor, String signature, String[] exceptions) {
-                return new MethodVisitor(Opcodes.ASM7) {
+                return new MethodVisitor(Opcodes.ASM8, super.visitMethod(access, methodName, descriptor, signature, exceptions)) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                         if (opcode == Opcodes.INVOKESTATIC && owner.equals(targetOwnerClass) && name.equals(targetOwnerMethod)) {
                             super.visitMethodInsn(opcode, replaceOwnerClass, replaceOwnerMethod, descriptor, isInterface);
-                            LogHelper.debug("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
+                            logger.info("Class {} method {} call {}.{}({})", reader.getClassName(), methodName, owner, name, descriptor);
+                        } else {
+                            super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                         }
-                        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                     }
                 };
             }
