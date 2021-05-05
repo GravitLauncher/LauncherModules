@@ -97,7 +97,7 @@ public class DSIntegrationModule extends LauncherModule {
                 .setTitle("Launcher started!")
                 .setDescription("Launcher started!")
                 .setColor(new Color(ThreadLocalRandom.current().nextInt(0, 0xFF) << 8));
-        StringBuilder profiles = new StringBuilder();
+        /*StringBuilder profiles = new StringBuilder();
         if (event.server.getProfiles().size() == 0) {
             profiles.append("Profiles not found");
         } else {
@@ -105,7 +105,7 @@ public class DSIntegrationModule extends LauncherModule {
                 profiles.append(" - ").append(profile.getTitle()).append("\n");
             }
         }
-        embedObject.addField("Profiles:", profiles.toString(), true);
+        embedObject.addField("Profiles:", profiles.toString(), true);*/
         webhook.addEmbed(embedObject);
 
         if (config.bot) {
