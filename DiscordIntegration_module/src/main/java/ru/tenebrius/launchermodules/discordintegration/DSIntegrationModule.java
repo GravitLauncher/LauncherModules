@@ -1,6 +1,8 @@
 package ru.tenebrius.launchermodules.discordintegration;
 
 import net.dv8tion.jda.api.JDABuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.config.SimpleConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -21,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class DSIntegrationModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 1, 1, Version.Type.BETA);
+    private static transient final Logger logger = LogManager.getLogger();
     public static Config config = null;
     private static boolean registred = false;
     private static String log = "";
@@ -45,7 +48,7 @@ public class DSIntegrationModule extends LauncherModule {
             try {
                 webhook.execute();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
             log = "";
         }
@@ -71,7 +74,7 @@ public class DSIntegrationModule extends LauncherModule {
         try {
             webhook.execute();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         return false;
     }
@@ -82,7 +85,7 @@ public class DSIntegrationModule extends LauncherModule {
         try {
             configurable.loadConfig();
         } catch (IOException e) {
-            LogHelper.error(e);
+            logger.error(e);
             return;
         }
         config = configurable.getConfig();
@@ -111,13 +114,13 @@ public class DSIntegrationModule extends LauncherModule {
             try {
                 builder.build();
             } catch (LoginException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
         try {
             webhook.execute();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
 
     }
