@@ -1,4 +1,4 @@
-def mainClassName = "ru.tenebrius.launchermodules.discordintegration.DSIntegrationModule"
+def mainClassName = "pro.gravit.launchermodules.discordintegration.DSIntegrationModule"
 
 sourceCompatibility = '11'
 targetCompatibility = '11'

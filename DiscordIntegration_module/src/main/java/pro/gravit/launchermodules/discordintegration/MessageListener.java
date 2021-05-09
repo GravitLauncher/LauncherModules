@@ -1,4 +1,4 @@
-package ru.tenebrius.launchermodules.discordintegration;
+package pro.gravit.launchermodules.discordintegration;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -12,9 +12,9 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class MessageListener extends ListenerAdapter {
 
-    private final LaunchServer server;
+    public final LaunchServer server;
 
-    public MessageListener(LaunchServer srv) {
+    MessageListener(LaunchServer srv) {
         server = srv;
     }
 

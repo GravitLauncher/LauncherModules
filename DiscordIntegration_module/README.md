@@ -11,27 +11,28 @@
     - */LaunchServer/config/DiscordIntegration/Config.json*
 
 - `"logAuth": true` - Логировать авторизацию пользователей.
+- `"profilesEnable": true` - Отображение профилей. // Не работает на 5.2.0+
 - `"avatarEnable": true` - Отображение головы в логах.
 - `"prefix": "!"` - Префикс команд.
 - `"url": "https://minotar.net/cube/user/%s.png"` - ссылка на API для возвращения картинки головы.
-- `"webhook": "https://discord.com/api/webhooks/{YOUR_WEBHOOK}"` - ссылка на веб-хук для логирования авторизации, а
-  также результата выполнения команды.
-- `"bot": true` - бот для управления *LaunchServer'ом* через канал.
 - `"token": "MY_TOKEN"` - токен бота.
 - `"channelID": "CHANNEL_ID"` - ID канала для работы с ботом.
 - `"adminOnly": true` - выполнять команды только от пользователей с правами Администратора.
+- `"colorRun": 1` - Цвет Embed запуска лаунчера [0 - 10]
+- `"colorAuth": 8` - Цвет Embed авторизации в лаунчере [0 - 10]
 
 ```json
 {
   "logAuth": true,
+  "profilesEnable": true,
   "avatarEnable": true,
   "prefix": "!",
   "url": "https://minotar.net/cube/user/%s.png",
-  "webhook": "https://discord.com/api/webhooks/{YOUR_WEBHOOK}",
-  "bot": true,
   "token": "MY_TOKEN",
   "channelID": "CHANNEL_ID",
-  "adminOnly": true
+  "adminOnly": true,
+  "colorRun": 1,
+  "colorAuth": 8
 }
 ```
 
