@@ -11,10 +11,9 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.utils.helper.LogHelper;
 
 public class MessageListener extends ListenerAdapter {
+    private final LaunchServer server;
 
-    public final LaunchServer server;
-
-    MessageListener(LaunchServer srv) {
+    public MessageListener(LaunchServer srv) {
         server = srv;
     }
 

@@ -130,7 +130,6 @@ public class DSIntegrationModule extends LauncherModule {
     }
 
     public void postInit(LaunchServerFullInitEvent event) {
-        if (config.bot) {
             JDABuilder builder = JDABuilder.createDefault(config.token);
             builder.addEventListeners(new MessageListener(event.server));
             try {
@@ -158,7 +157,6 @@ public class DSIntegrationModule extends LauncherModule {
                 pr = profiles.toString();
             }
             discordMsg(null, "Лаунчер Запущен", pr, config.colorRun, null);
-        }
     }
 
     @Override
@@ -174,7 +172,6 @@ public class DSIntegrationModule extends LauncherModule {
         boolean avatarEnable = true;
         String prefix = "!";
         String url = "https://minotar.net/cube/user/%s.png";
-        boolean bot = true;
         String token = "MY_TOKEN";
         String channelID = "CHANNEL_ID";
         boolean adminOnly = true;
