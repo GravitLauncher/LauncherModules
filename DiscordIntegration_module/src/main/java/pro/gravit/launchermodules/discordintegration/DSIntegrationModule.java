@@ -9,13 +9,11 @@ import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.config.SimpleConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launcher.modules.LauncherModulesManager;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
-import pro.gravit.launchserver.modules.impl.LaunchServerCoreModule;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import pro.gravit.utils.Version;
@@ -130,33 +128,33 @@ public class DSIntegrationModule extends LauncherModule {
     }
 
     public void postInit(LaunchServerFullInitEvent event) {
-            JDABuilder builder = JDABuilder.createDefault(config.token);
-            builder.addEventListeners(new MessageListener(event.server));
-            try {
-                JDA jda = builder.build();
+        JDABuilder builder = JDABuilder.createDefault(config.token);
+        builder.addEventListeners(new MessageListener(event.server));
+        try {
+            JDA jda = builder.build();
 
-                jda.awaitReady();
-                api = jda;
-            } catch (LoginException | InterruptedException e) {
-                logger.error(e);
-            }
-            String pr = null;
-            String ver = Version.getVersion().getVersionString().replace(".", "");
-            if (config.profilesEnable || Integer.parseInt(ver) < 5200) {
-                StringBuilder profiles = new StringBuilder();
-                if (event.server.getProfiles().size() == 0) {
-                    profiles.append("Профили не найдены");
-                } else {
-                    profiles.append("**Список профилей:**\n\n");
-                    for (ClientProfile profile : event.server.getProfiles()) {
-                        profiles.append(" - **" + profile.getTitle() + " " + profile.getVersion().toString().replace("Minecraft ", "") + "**\n");
-                        profiles.append("sortIndex: " + profile.getSortIndex() + "\n");
-                        profiles.append("UUID: " + profile.getUUID() + "\n\n");
-                    }
+            jda.awaitReady();
+            api = jda;
+        } catch (LoginException | InterruptedException e) {
+            logger.error(e);
+        }
+        String pr = null;
+        String ver = Version.getVersion().getVersionString().replace(".", "");
+        if (config.profilesEnable || Integer.parseInt(ver) < 5200) {
+            StringBuilder profiles = new StringBuilder();
+            if (event.server.getProfiles().size() == 0) {
+                profiles.append("Профили не найдены");
+            } else {
+                profiles.append("**Список профилей:**\n\n");
+                for (ClientProfile profile : event.server.getProfiles()) {
+                    profiles.append(" - **").append(profile.getTitle()).append(" ").append(profile.getVersion().toString().replace("Minecraft ", "")).append("**\n");
+                    profiles.append("sortIndex: ").append(profile.getSortIndex()).append("\n");
+                    profiles.append("UUID: ").append(profile.getUUID()).append("\n\n");
                 }
-                pr = profiles.toString();
             }
-            discordMsg(null, "Лаунчер Запущен", pr, config.colorRun, null);
+            pr = profiles.toString();
+        }
+        discordMsg(null, "Лаунчер Запущен", pr, config.colorRun, null);
     }
 
     @Override
