@@ -7,7 +7,8 @@
 
 1. Скопировать модуль **DiscordIntegration_module.jar** в папку **/LaunchServer/modules/**
 2. Скачать библиотеку *[jda]* и положить в папку **/LaunchServer/libraries/**:
-3. Выполнить настройку конфигурации:
+3. Скачать библиотеку *[log4j-api]* и положить в папку **/LaunchServer/libraries/**:
+4. Выполнить настройку конфигурации:
     - */LaunchServer/config/DiscordIntegration/Config.json*
 
 - `"logAuth": true` - Логировать авторизацию пользователей.
@@ -51,3 +52,4 @@
 ![Colors](img/colors.png)
 
 [jda]: https://github.com/DV8FromTheWorld/JDA/releases/download/v4.2.0/JDA-4.2.0_168-withDependencies-min.jar
+[log4j-api]: https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.14.1/log4j-api-2.14.1.jar
