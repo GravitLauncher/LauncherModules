@@ -110,8 +110,10 @@ public class DSIntegrationModule extends LauncherModule {
         if (!config.logAuth)
             return false;
         String thumbnail = null;
+        StringBuilder description = new StringBuilder();
+        description.append("IP: ").append(context.ip);
         if (config.avatarEnable) thumbnail = String.format(config.url, context.login);
-        discordMsg("Авторизирован", context.login, null, config.colorAuth, thumbnail);
+        discordMsg("Авторизирован", context.login, description.toString(), config.colorAuth, thumbnail);
         return false;
     }
 
