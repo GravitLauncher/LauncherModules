@@ -3,6 +3,7 @@ package pro.gravit.launcher.client.api;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
+import de.jcm.discordgamesdk.user.DiscordUser;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
 
 public class DiscordGameService {
@@ -20,5 +21,9 @@ public class DiscordGameService {
 
     public static DiscordActivityService getDiscordActivityService() {
         return DiscordBridge.activityService;
+    }
+
+    public static DiscordUser getDiscordUser() {
+        return DiscordBridge.getCore().userManager().getCurrentUser();
     }
 }
