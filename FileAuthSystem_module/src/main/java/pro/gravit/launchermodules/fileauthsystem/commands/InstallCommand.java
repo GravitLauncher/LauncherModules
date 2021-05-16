@@ -1,6 +1,9 @@
 package pro.gravit.launchermodules.fileauthsystem.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule;
+import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthHandler;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthProvider;
 import pro.gravit.launchserver.LaunchServer;
@@ -10,6 +13,7 @@ import pro.gravit.utils.helper.LogHelper;
 
 public class InstallCommand extends Command {
     private final FileAuthSystemModule module;
+    private final Logger logger = LogManager.getLogger();
 
     public InstallCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
@@ -38,25 +42,16 @@ public class InstallCommand extends Command {
             throw new IllegalArgumentException("AuthProvider pair not found");
         }
         boolean changed = false;
-        if (!(pair.provider instanceof FileSystemAuthProvider)) {
-            pair.provider.close();
-            pair.provider = new FileSystemAuthProvider();
-            pair.provider.init(server);
+        if(!(pair.core instanceof FileSystemAuthCoreProvider)) {
+            pair.core = new FileSystemAuthCoreProvider();
+            logger.info("FileSystemAuthCoreProvider installed");
             changed = true;
-            LogHelper.info("AuthProvider successful changed");
-        }
-        if (!(pair.handler instanceof FileSystemAuthHandler)) {
-            pair.handler.close();
-            pair.handler = new FileSystemAuthHandler();
-            pair.handler.init(server);
-            changed = true;
-            LogHelper.info("AuthHandler successful changed");
         }
         if (changed) {
             server.launchServerConfigManager.writeConfig(server.config);
-            LogHelper.info("LaunchServer config updated");
+            logger.info("LaunchServer config updated");
         } else {
-            LogHelper.info("Already installed. Good!");
+            logger.info("Already installed. Good!");
         }
     }
 }

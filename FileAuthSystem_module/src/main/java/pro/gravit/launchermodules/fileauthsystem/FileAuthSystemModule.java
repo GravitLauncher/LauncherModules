@@ -9,14 +9,14 @@ import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.ClosePhase;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthHandler;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthProvider;
-import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemDAOProvider;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.auth.core.AuthCoreProvider;
+import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
-import pro.gravit.launchserver.dao.User;
-import pro.gravit.launchserver.dao.provider.DaoProvider;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
@@ -93,7 +93,7 @@ public class FileAuthSystemModule extends LauncherModule {
     public void preConfig(PreConfigPhase preConfigPhase) {
         AuthProvider.providers.register("fileauthsystem", FileSystemAuthProvider.class);
         AuthHandler.providers.register("fileauthsystem", FileSystemAuthHandler.class);
-        DaoProvider.providers.register("fileauthsystem", FileSystemDAOProvider.class);
+        AuthCoreProvider.providers.register("fileauthsystem", FileSystemAuthCoreProvider.class);
     }
 
     public void load() {
@@ -164,48 +164,28 @@ public class FileAuthSystemModule extends LauncherModule {
         }
 
         @Override
-        public String getAccessToken() {
-            return accessToken;
-        }
-
-        @Override
-        public void setAccessToken(String accessToken) {
-            this.accessToken = accessToken;
-        }
-
-        @Override
-        public String getServerID() {
-            return serverId;
-        }
-
-        @Override
-        public void setServerID(String serverID) {
-            this.serverId = serverID;
-        }
-
-        @Override
-        public UUID getUuid() {
-            return uuid;
-        }
-
-        @Override
-        public void setUuid(UUID uuid) {
-            this.uuid = uuid;
-        }
-
-        @Override
         public String getUsername() {
             return username;
         }
 
         @Override
-        public ClientPermissions getPermissions() {
-            return permissions;
+        public UUID getUUID() {
+            return uuid;
         }
 
         @Override
-        public void setPermissions(ClientPermissions permissions) {
-            this.permissions = permissions;
+        public String getServerId() {
+            return serverId;
+        }
+
+        @Override
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        @Override
+        public ClientPermissions getPermissions() {
+            return permissions;
         }
 
         public boolean verifyPassword(String password) {
