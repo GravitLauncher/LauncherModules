@@ -13,6 +13,6 @@ dependencies {
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
             "Module-Config-Class": configClassName,
-            "Module-Config-Name": "SentryLauncher")
+            "Module-Config-Name": "Sentry")
 }
 
