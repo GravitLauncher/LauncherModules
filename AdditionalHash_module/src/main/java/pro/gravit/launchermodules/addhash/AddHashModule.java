@@ -4,6 +4,9 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launchermodules.addhash.verifier.BCryptPasswordVerifier;
+import pro.gravit.launchermodules.addhash.verifier.PhpHashPasswordVerifier;
+import pro.gravit.launchserver.auth.password.PasswordVerifier;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.utils.Version;
 
@@ -20,6 +23,8 @@ public class AddHashModule extends LauncherModule {
         if (!registred) {
             AuthProvider.providers.register("mysql-bcrypt", MySQLBcryptAuthProvider.class);
             AuthProvider.providers.register("mysql-phphash", MySQLPhpHashAuthProvider.class);
+            PasswordVerifier.providers.register("bcrypt", BCryptPasswordVerifier.class);
+            PasswordVerifier.providers.register("phpass", PhpHashPasswordVerifier.class);
             registred = true;
         }
     }
