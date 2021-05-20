@@ -48,10 +48,11 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    protected boolean updateAuth(User user) throws IOException {
+    protected boolean updateAuth(User user, String accessToken) throws IOException {
         FileAuthSystemModule.UserEntity entity = (FileAuthSystemModule.UserEntity) user;
         if (entity == null) return false;
         entity.serverId = null;
+        entity.accessToken = accessToken;
         return true;
     }
 

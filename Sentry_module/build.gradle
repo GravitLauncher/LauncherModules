@@ -1,0 +1,18 @@
+def mainClassName = "pro.gravit.launchermodules.sentrys.ModuleImpl"
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+dependencies {
+    api('io.sentry:sentry:5.0.0-beta.4') {
+        exclude group: 'org.slf4j'
+    }
+    api('io.sentry:sentry-log4j2:5.0.0-beta.4') {
+        exclude group: 'org.apache.logging.log4j'
+    }
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
+
