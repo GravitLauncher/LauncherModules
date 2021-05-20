@@ -68,12 +68,12 @@ public class ModuleImpl extends LauncherModule {
             }
             Sentry.init(options -> {
                 options.setDsn(c.dsn);
+                options.setRelease(Version.getVersion().getVersionString());
+                options.setEnvironment(Version.getVersion().release.name());
             });
             Sentry.configureScope(scope -> {
-                scope.setTag("release", Version.getVersion().getVersionString());
-                scope.setTag("release_type", Version.getVersion().release.name());
                 scope.setTag("java_version", String.valueOf(JVMHelper.RUNTIME_MXBEAN.getVmVersion()));
-                scope.setTag("modules", modulesList());
+                scope.setContexts("modules", modulesList());
             });
             if(c.addSentryAppender) {
                 appender = SentryAppender.createAppender("Sentry", null, Level.getLevel(c.appenderLogLevel), null, null);
