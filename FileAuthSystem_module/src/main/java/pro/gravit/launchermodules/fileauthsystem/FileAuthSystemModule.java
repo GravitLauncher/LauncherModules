@@ -29,16 +29,14 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FileAuthSystemModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public JsonConfigurable<FileAuthSystemConfig> jsonConfigurable;
     public Map<UUID, UserEntity> users = new ConcurrentHashMap<>();
+    public Set<UserSessionEntity> sessions = ConcurrentHashMap.newKeySet();
     private Path dbPath;
 
     public FileAuthSystemModule() {
@@ -52,6 +50,14 @@ public class FileAuthSystemModule extends LauncherModule {
             }
         }
         return null;
+    }
+
+    public UserSessionEntity getSessionByAccessToken(String accessToken) {
+        return sessions.stream().filter(e -> e.accessToken != null && e.accessToken.equals(accessToken)).findFirst().orElse(null);
+    }
+
+    public UserSessionEntity getSessionByRefreshToken(String refreshToken) {
+        return sessions.stream().filter(e -> e.accessToken != null && e.refreshToken.equals(refreshToken)).findFirst().orElse(null);
     }
 
     public UserEntity getUser(UUID uuid) {
@@ -190,6 +196,39 @@ public class FileAuthSystemModule extends LauncherModule {
 
         public boolean verifyPassword(String password) {
             return Arrays.equals(this.password, SecurityHelper.digest(SecurityHelper.DigestAlgorithm.SHA256, password));
+        }
+    }
+
+    public static class UserSessionEntity {
+        private UUID uuid;
+        public UserEntity entity;
+        public String accessToken;
+        public String refreshToken;
+        public long expireMillis;
+
+        public UserSessionEntity(UserEntity entity) {
+            this.uuid = UUID.randomUUID();
+            this.entity = entity;
+            this.accessToken = SecurityHelper.randomStringToken();
+            this.refreshToken = SecurityHelper.randomStringToken();
+            this.expireMillis = 0;
+        }
+
+        public void update(long expireMillis) {
+            this.expireMillis = System.currentTimeMillis() + expireMillis;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UserSessionEntity entity = (UserSessionEntity) o;
+            return Objects.equals(uuid, entity.uuid);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(uuid);
         }
     }
 }
