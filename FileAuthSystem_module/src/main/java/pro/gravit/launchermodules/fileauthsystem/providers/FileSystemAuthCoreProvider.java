@@ -8,6 +8,7 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.auth.core.User;
+import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import pro.gravit.utils.helper.SecurityHelper;
@@ -28,13 +29,13 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    public User getUserByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
+    public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
         FileAuthSystemConfig config = module.jsonConfigurable.getConfig();
         if(!config.memoryOAuth) return null;
         FileAuthSystemModule.UserSessionEntity session = module.getSessionByAccessToken(accessToken);
         if(session == null) return null;
         if(session.expireMillis != 0 && session.expireMillis < System.currentTimeMillis()) throw new OAuthAccessTokenExpired();
-        return session.entity;
+        return session;
     }
 
     @Override

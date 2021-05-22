@@ -15,6 +15,7 @@ import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthProvide
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.auth.core.User;
+import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
@@ -199,8 +200,8 @@ public class FileAuthSystemModule extends LauncherModule {
         }
     }
 
-    public static class UserSessionEntity {
-        private UUID uuid;
+    public static class UserSessionEntity implements UserSession {
+        private final UUID uuid;
         public UserEntity entity;
         public String accessToken;
         public String refreshToken;
@@ -229,6 +230,21 @@ public class FileAuthSystemModule extends LauncherModule {
         @Override
         public int hashCode() {
             return Objects.hash(uuid);
+        }
+
+        @Override
+        public String getID() {
+            return uuid.toString();
+        }
+
+        @Override
+        public User getUser() {
+            return entity;
+        }
+
+        @Override
+        public long getExpireIn() {
+            return expireMillis;
         }
     }
 }
