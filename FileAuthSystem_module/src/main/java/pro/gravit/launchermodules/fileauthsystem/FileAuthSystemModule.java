@@ -61,6 +61,10 @@ public class FileAuthSystemModule extends LauncherModule {
         return sessions.stream().filter(e -> e.accessToken != null && e.refreshToken.equals(refreshToken)).findFirst().orElse(null);
     }
 
+    public void addNewSession(UserSessionEntity session) {
+        sessions.add(session);
+    }
+
     public UserEntity getUser(UUID uuid) {
         return users.get(uuid);
     }

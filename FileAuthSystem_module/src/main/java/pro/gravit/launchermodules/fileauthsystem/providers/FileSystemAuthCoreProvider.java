@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.fileauthsystem.providers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
 import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemConfig;
@@ -11,12 +13,14 @@ import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
+import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class FileSystemAuthCoreProvider extends AuthCoreProvider {
+    private transient Logger logger = LogManager.getLogger();
     private FileAuthSystemModule module;
     @Override
     public User getUserByUsername(String username) {
@@ -75,6 +79,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider {
         FileAuthSystemConfig config = module.jsonConfigurable.getConfig();
         if(config.memoryOAuth) {
             FileAuthSystemModule.UserSessionEntity entity = new FileAuthSystemModule.UserSessionEntity((FileAuthSystemModule.UserEntity) user);
+            module.addNewSession(entity);
             if(config.oauthTokenExpire != 0) {
                 entity.update(config.oauthTokenExpire);
             }
