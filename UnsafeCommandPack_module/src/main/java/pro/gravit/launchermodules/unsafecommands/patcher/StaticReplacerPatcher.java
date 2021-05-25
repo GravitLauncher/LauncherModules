@@ -3,9 +3,6 @@ package pro.gravit.launchermodules.unsafecommands.patcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.*;
-import pro.gravit.utils.helper.LogHelper;
-
-import java.util.ServiceLoader;
 
 public class StaticReplacerPatcher extends ClassTransformerPatcher {
     public final String targetOwnerClass;
@@ -30,12 +27,12 @@ public class StaticReplacerPatcher extends ClassTransformerPatcher {
         logger.info("Create patcher {}.{} replaced to {}.{}", targetOwnerClass, targetOwnerMethod, replaceOwnerClass, replaceOwnerMethod);
     }
 
-    private String toInternalClassFormat(String str) {
-        return str.replaceAll("\\.", "/");
-    }
-
     public StaticReplacerPatcher() {
         throw new NullPointerException("Patcher need args!");
+    }
+
+    private String toInternalClassFormat(String str) {
+        return str.replaceAll("\\.", "/");
     }
 
     @Override

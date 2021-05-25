@@ -30,6 +30,7 @@ public class RemoteControlModule extends LauncherModule {
     public void finish(LaunchServerFullInitEvent event) {
         initRemoteControl(event.server);
     }
+
     public void initRemoteControl(LaunchServer server) {
         try {
             configurable.loadConfig();

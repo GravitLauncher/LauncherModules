@@ -21,6 +21,7 @@ public class SystemdNotifyModule extends LauncherModule {
     public void finish(LaunchServerFullInitEvent event) {
         notifySystemd();
     }
+
     public void notifySystemd() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("systemd-notify", "--ready");
@@ -35,7 +36,7 @@ public class SystemdNotifyModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::finish, LaunchServerFullInitEvent.class);
-        if(initContext instanceof LaunchServerInitContext) {
+        if (initContext instanceof LaunchServerInitContext) {
             notifySystemd();
         }
     }

@@ -4,12 +4,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
-import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthHandler;
-import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthProvider;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.LogHelper;
 
 public class InstallCommand extends Command {
     private final FileAuthSystemModule module;
@@ -42,7 +39,7 @@ public class InstallCommand extends Command {
             throw new IllegalArgumentException("AuthProvider pair not found");
         }
         boolean changed = false;
-        if(!(pair.core instanceof FileSystemAuthCoreProvider)) {
+        if (!(pair.core instanceof FileSystemAuthCoreProvider)) {
             pair.core = new FileSystemAuthCoreProvider();
             logger.info("FileSystemAuthCoreProvider installed");
             changed = true;

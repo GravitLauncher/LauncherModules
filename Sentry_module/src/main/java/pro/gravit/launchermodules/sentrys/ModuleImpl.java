@@ -2,7 +2,6 @@ package pro.gravit.launchermodules.sentrys;
 
 import io.sentry.Sentry;
 import io.sentry.log4j2.SentryAppender;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,9 +21,9 @@ import java.nio.file.Path;
 
 public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
-    public Config c = null;
-    private transient final Logger logger = LogManager.getLogger();
     private static final String DEFAULT_DSN = "YOUR_DSN";
+    private transient final Logger logger = LogManager.getLogger();
+    public Config c = null;
     private LaunchServer server;
     private JsonConfigurable<Config> configurable;
     private SentryAppender appender;
@@ -63,7 +62,7 @@ public class ModuleImpl extends LauncherModule {
                 logger.error("Please, configure Sentry_module config!!!");
                 return;
             }
-            if(c.dsn.equals(DEFAULT_DSN)) {
+            if (c.dsn.equals(DEFAULT_DSN)) {
                 logger.info("");
             }
             Sentry.init(options -> {
@@ -75,7 +74,7 @@ public class ModuleImpl extends LauncherModule {
                 scope.setTag("java_version", String.valueOf(JVMHelper.RUNTIME_MXBEAN.getVmVersion()));
                 scope.setContexts("modules", modulesList());
             });
-            if(c.addSentryAppender) {
+            if (c.addSentryAppender) {
                 appender = SentryAppender.createAppender("Sentry", null, Level.getLevel(c.appenderLogLevel), null, null);
                 appender.start();
                 LogAppender.getInstance().addListener(this::append);
@@ -86,10 +85,10 @@ public class ModuleImpl extends LauncherModule {
     }
 
     public void append(LogEvent event) {
-        if(c.filterExceptions) {
-            if(event.getThrownProxy() != null) {
+        if (c.filterExceptions) {
+            if (event.getThrownProxy() != null) {
                 Throwable thrown = event.getThrownProxy().getThrowable();
-                if(thrown instanceof CommandException) return;
+                if (thrown instanceof CommandException) return;
             }
         }
         appender.append(event);
@@ -97,7 +96,7 @@ public class ModuleImpl extends LauncherModule {
 
     public String modulesList() {
         StringBuilder builder = new StringBuilder();
-        for(LauncherModule module : server.modulesManager.getModules()) {
+        for (LauncherModule module : server.modulesManager.getModules()) {
             LauncherModuleInfo info = module.getModuleInfo();
             builder.append(String.format("%s v%s | ", info.name, info.version.getVersionString()));
         }

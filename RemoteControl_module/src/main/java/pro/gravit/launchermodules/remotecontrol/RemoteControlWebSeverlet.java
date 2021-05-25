@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class RemoteControlWebSeverlet implements NettyWebAPIHandler.SimpleSeverletHandler {
     private final RemoteControlModule module;
@@ -124,11 +123,12 @@ public class RemoteControlWebSeverlet implements NettyWebAPIHandler.SimpleSeverl
         public final String level;
         public final String message;
         public final String exception;
+
         public LogEventView(LogEvent event) {
             level = event.getLevel().toString();
             message = event.getMessage().getFormattedMessage();
             Throwable throwable = event.getMessage().getThrowable();
-            if(throwable != null) {
+            if (throwable != null) {
                 exception = String.format("%s: %s", throwable.getClass().getName(), throwable.getMessage());
             } else {
                 exception = null;

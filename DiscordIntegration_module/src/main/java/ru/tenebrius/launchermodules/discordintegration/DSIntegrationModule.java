@@ -8,13 +8,11 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
-import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.LogHelper;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
