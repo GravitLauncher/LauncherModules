@@ -73,6 +73,7 @@ public class OneLauncherModule extends LauncherModule {
     }
 
     public void initClient(ClientProcessLaunchEvent event) {
+        if (lock != null) return;
         prepareLock(config.multipleProfilesAllow ? event.params.profile.getUUID().toString() : "client");
         if (!tryLock(path, true, StandardOpenOption.WRITE)) {
             event.cancel();
@@ -81,6 +82,7 @@ public class OneLauncherModule extends LauncherModule {
     }
 
     public void initLauncher(ClientEngineInitPhase phase) {
+        if (lock != null) return;
         prepareLock("launcher");
         if (!config.multipleProfilesAllow && config.checkClientLock) {
             if (!tryLock(locksDir.resolve("client.lock"), false, StandardOpenOption.WRITE)) {

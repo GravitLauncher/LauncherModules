@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.startscreen;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
 import pro.gravit.launcher.client.events.ClientPreGuiPhase;
+import pro.gravit.launcher.client.events.client.ClientProcessPreInvokeMainClassEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
@@ -26,6 +27,7 @@ public class ModuleImpl extends LauncherModule {
         registerEvent(this::preInit, ClientPreGuiPhase.class);
         registerEvent(this::finish, ClientGuiPhase.class);
         registerEvent(this::exitPhase, ClientExitPhase.class);
+        registerEvent(this::preMainClass, ClientProcessPreInvokeMainClassEvent.class);
     }
 
     public void preInit(ClientPreGuiPhase phase) {
@@ -39,6 +41,16 @@ public class ModuleImpl extends LauncherModule {
         } catch (Throwable e) {
             LogHelper.error(e);
         }
+    }
+
+    public void preMainClass(ClientProcessPreInvokeMainClassEvent event) {
+        if (screen != null)
+            try {
+                screen.close();
+                screen = null;
+            } catch (Throwable e) {
+                LogHelper.error(e);
+            }
     }
 
     public void exitPhase(ClientExitPhase exitPhase) {
