@@ -1,4 +1,5 @@
 task bundleZip(type: Zip) {
+    subprojects.stream().map(e -> e.tasks.build).forEach(e -> dependsOn(e))
     archiveFileName = 'modules.zip'
     destinationDirectory = file("$buildDir")
 }
