@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class FileSystemAuthCoreProvider extends AuthCoreProvider implements AuthSupportRegistration, AuthSupportExit {
     private transient Logger logger = LogManager.getLogger();
-    private FileAuthSystemModule module;
+    private transient FileAuthSystemModule module;
 
     @Override
     public User getUserByUsername(String username) {

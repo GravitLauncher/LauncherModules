@@ -2,14 +2,18 @@ package pro.gravit.launchermodules.unsafecommands.commands;
 
 import com.google.gson.JsonObject;
 import pro.gravit.launcher.AsyncDownloader;
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader.Artifact;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
+import pro.gravit.launchserver.command.hash.SaveProfilesCommand;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +81,17 @@ public class FetchClientCommand extends Command {
         // Finished
         LogHelper.subInfo("Client downloaded!");
         server.syncUpdatesDir(Collections.singleton(dirName));
+        try {
+            ClientProfile.Version clientVersion = ClientProfile.Version.byName(version);
+            SaveProfilesCommand.MakeProfileOption[] options = SaveProfilesCommand.getMakeProfileOptionsFromDir(clientDir, clientVersion);
+            ClientProfile profile = SaveProfilesCommand.makeProfile(clientVersion, dirName, options);
+            try (Writer w = IOHelper.newWriter(server.profilesDir.resolve(dirName + ".json"))) {
+                Launcher.gsonManager.configGson.toJson(profile, w);
+            }
+            server.syncProfilesDir();
+        } catch (Exception ex) {
+            LogHelper.error(ex);
+        }
     }
 
     private void fetchNatives(Path resolve, List<Artifact> natives) {
