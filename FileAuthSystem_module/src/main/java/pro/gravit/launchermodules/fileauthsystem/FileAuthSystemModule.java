@@ -85,6 +85,14 @@ public class FileAuthSystemModule extends LauncherModule {
         users.remove(uuid);
     }
 
+    public boolean deleteSession(UserSessionEntity entity) {
+        return sessions.remove(entity);
+    }
+
+    public boolean exitUser(UserEntity user) {
+        return sessions.removeIf(e -> e.entity == user);
+    }
+
     public void finish(LaunchServerFullInitEvent event) {
         LaunchServer launchServer = event.server;
         try {
@@ -112,13 +120,32 @@ public class FileAuthSystemModule extends LauncherModule {
     }
 
     public void load(Path path) {
-        if (!Files.exists(path)) return;
-        Type collectionType = new TypeToken<Map<UUID, UserEntity>>() {
-        }.getType();
-        try (Reader reader = IOHelper.newReader(path)) {
-            this.users = Launcher.gsonManager.configGson.fromJson(reader, collectionType);
-        } catch (IOException e) {
-            LogHelper.error(e);
+        {
+            Path databasePath = path.resolve("Database.json");
+            if (!Files.exists(databasePath)) return;
+            Type databaseType = new TypeToken<Map<UUID, UserEntity>>() {
+            }.getType();
+            try (Reader reader = IOHelper.newReader(databasePath)) {
+                this.users = Launcher.gsonManager.configGson.fromJson(reader, databaseType);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        {
+            Path sessionsPath = path.resolve("Sessions.json");
+            if (!Files.exists(sessionsPath)) return;
+            Type sessionsType = new TypeToken<Set<UserSessionEntity>>() {
+            }.getType();
+            try (Reader reader = IOHelper.newReader(sessionsPath)) {
+                this.sessions = Launcher.gsonManager.configGson.fromJson(reader, sessionsType);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+            for (UserSessionEntity sessionEntity : sessions) {
+                if (sessionEntity.userEntityUUID != null) {
+                    sessionEntity.entity = getUser(sessionEntity.userEntityUUID);
+                }
+            }
         }
     }
 
@@ -127,12 +154,26 @@ public class FileAuthSystemModule extends LauncherModule {
     }
 
     public void save(Path path) {
-        Type collectionType = new TypeToken<Map<UUID, UserEntity>>() {
-        }.getType();
-        try (Writer writer = IOHelper.newWriter(path)) {
-            Launcher.gsonManager.configGson.toJson(users, collectionType, writer);
-        } catch (IOException e) {
-            LogHelper.error(e);
+
+        {
+            Path databasePath = path.resolve("Database.json");
+            Type databaseType = new TypeToken<Map<UUID, UserEntity>>() {
+            }.getType();
+            try (Writer writer = IOHelper.newWriter(databasePath)) {
+                Launcher.gsonManager.configGson.toJson(users, databaseType, writer);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
+        }
+        {
+            Path sessionsPath = path.resolve("Sessions.json");
+            Type sessionsType = new TypeToken<Set<UserSessionEntity>>() {
+            }.getType();
+            try (Writer writer = IOHelper.newWriter(sessionsPath)) {
+                Launcher.gsonManager.configGson.toJson(sessions, sessionsType, writer);
+            } catch (IOException e) {
+                LogHelper.error(e);
+            }
         }
     }
 
@@ -141,7 +182,7 @@ public class FileAuthSystemModule extends LauncherModule {
         registerEvent(this::finish, LaunchServerFullInitEvent.class);
         registerEvent(this::preConfig, PreConfigPhase.class);
         registerEvent(this::exit, ClosePhase.class);
-        dbPath = modulesConfigManager.getModuleConfig(moduleInfo.name, "Database");
+        dbPath = modulesConfigManager.getModuleConfigDir(moduleInfo.name);
         jsonConfigurable = modulesConfigManager.getConfigurable(FileAuthSystemConfig.class, moduleInfo.name);
     }
 
@@ -206,7 +247,8 @@ public class FileAuthSystemModule extends LauncherModule {
 
     public static class UserSessionEntity implements UserSession {
         private final UUID uuid;
-        public UserEntity entity;
+        public transient UserEntity entity;
+        public UUID userEntityUUID;
         public String accessToken;
         public String refreshToken;
         public long expireMillis;
@@ -217,6 +259,7 @@ public class FileAuthSystemModule extends LauncherModule {
             this.accessToken = SecurityHelper.randomStringToken();
             this.refreshToken = SecurityHelper.randomStringToken();
             this.expireMillis = 0;
+            this.userEntityUUID = entity.uuid;
         }
 
         public void update(long expireMillis) {

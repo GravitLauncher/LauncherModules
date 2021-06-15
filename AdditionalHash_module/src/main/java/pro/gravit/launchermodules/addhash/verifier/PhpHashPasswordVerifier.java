@@ -10,4 +10,9 @@ public class PhpHashPasswordVerifier extends PasswordVerifier {
     public boolean check(String encryptedPassword, String password) {
         return pass.checkPassword(password, encryptedPassword);
     }
+
+    @Override
+    public String encrypt(String password) {
+        return pass.hashPassword(password);
+    }
 }

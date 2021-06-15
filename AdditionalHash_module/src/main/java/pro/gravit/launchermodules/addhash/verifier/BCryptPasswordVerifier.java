@@ -8,4 +8,9 @@ public class BCryptPasswordVerifier extends PasswordVerifier {
     public boolean check(String encryptedPassword, String password) {
         return BCrypt.checkpw(password, "$2a" + encryptedPassword.substring(3));
     }
+
+    @Override
+    public String encrypt(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
 }

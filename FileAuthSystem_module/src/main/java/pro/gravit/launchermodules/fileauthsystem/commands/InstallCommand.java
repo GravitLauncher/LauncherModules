@@ -41,6 +41,8 @@ public class InstallCommand extends Command {
         boolean changed = false;
         if (!(pair.core instanceof FileSystemAuthCoreProvider)) {
             pair.core = new FileSystemAuthCoreProvider();
+            pair.provider = null;
+            pair.handler = null;
             logger.info("FileSystemAuthCoreProvider installed");
             changed = true;
         }
