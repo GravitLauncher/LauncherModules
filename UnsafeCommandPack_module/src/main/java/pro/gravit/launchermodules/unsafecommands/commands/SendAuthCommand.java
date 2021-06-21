@@ -7,8 +7,11 @@ import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.RequiredDAO;
+import pro.gravit.launchserver.auth.core.User;
+import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 import pro.gravit.launchserver.command.Command;
+import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.WebSocketService;
 import pro.gravit.launchserver.socket.handlers.WebSocketFrameHandler;
@@ -26,7 +29,7 @@ public class SendAuthCommand extends Command {
 
     @Override
     public String getArgsDescription() {
-        return "[connectUUID] [username] [auth_id] [client type] (permissions) (client uuid)";
+        return "[connectUUID] [username] [auth_id] [client type] (permissions)";
     }
 
     @Override
@@ -41,42 +44,46 @@ public class SendAuthCommand extends Command {
         String username = args[1];
         AuthResponse.ConnectTypes type = AuthResponse.ConnectTypes.valueOf(args[3]);
         AuthProviderPair pair = server.config.getAuthProviderPair(args[2]);
-
         ClientPermissions permissions = args.length > 4 ? new ClientPermissions(Long.parseLong(args[4])) : ClientPermissions.DEFAULT;
-
-        UUID clientUUID;
-        String accessToken = SecurityHelper.randomStringToken();
-        if (pair == null) {
-            clientUUID = args.length > 5 ? UUID.fromString(args[5]) : UUID.randomUUID();
-        } else {
-            clientUUID = pair.handler.auth(new AuthProviderResult(username, accessToken, permissions));
-        }
-        WebSocketService service = server.nettyServerSocketHandler.nettyServer.service;
-        service.channels.forEach((channel -> {
-            WebSocketFrameHandler frameHandler = channel.pipeline().get(WebSocketFrameHandler.class);
-            if (frameHandler.getConnectUUID().equals(connectUUID)) {
-                Client client = frameHandler.getClient();
-                if (client.isAuth) LogHelper.warning("This client already authorized");
-                client.isAuth = true;
-                client.username = username;
-                if (pair != null) {
-                    client.auth_id = args[3];
-                    client.auth = pair;
-                    if (pair.provider instanceof RequiredDAO || pair.handler instanceof RequiredDAO) {
-                        client.daoObject = server.config.dao.userDAO.findByUsername(username);
-                    }
-                }
-                client.type = type;
-                client.permissions = permissions;
-                client.session = UUID.randomUUID();
-                server.sessionManager.addClient(client);
-                PlayerProfile playerProfile = ProfileByUUIDResponse.getProfile(clientUUID, username, "client", pair != null ? pair.textureProvider : server.config.getAuthProviderPair().textureProvider);
-                AuthRequestEvent authRequestEvent = new AuthRequestEvent(playerProfile, accessToken, permissions);
-                authRequestEvent.requestUUID = RequestEvent.eventUUID;
-                authRequestEvent.session = client.session;
-                service.sendObject(channel, authRequestEvent);
-                LogHelper.info("Success auth injected");
+        if(pair.isUseCore()) {
+            User user = pair.core.getUserByLogin(username);
+            UUID uuid;
+            if(user == null) {
+                uuid = UUID.randomUUID();
+            } else {
+                uuid = user.getUUID();
             }
-        }));
+            UserSession session;
+            String minecraftAccessToken;
+            AuthRequestEvent.OAuthRequestEvent oauth;
+            if(user != null) {
+                AuthManager.AuthReport report = pair.core.createOAuthSession(user, null, null, true);
+                if(report == null) throw new UnsupportedOperationException("AuthCoreProvider not supported sendAuth");
+                minecraftAccessToken = report.minecraftAccessToken;
+
+                if(report.isUsingOAuth()) {
+                    session = report.session;
+                    oauth = new AuthRequestEvent.OAuthRequestEvent(report.oauthAccessToken, report.oauthRefreshToken, report.oauthExpire);
+                } else {
+                    session = null;
+                    oauth = null;
+                }
+            } else {
+                session = null;
+                minecraftAccessToken = null;
+                oauth = null;
+            }
+            server.nettyServerSocketHandler.nettyServer.service.forEachActiveChannels((ch, ws) -> {
+                if(!ws.getConnectUUID().equals(connectUUID)) return;
+                Client client = ws.getClient();
+                client.coreObject = user;
+                client.sessionObject = session;
+                server.authManager.internalAuth(client, type, pair, username, uuid, permissions, oauth != null);
+                PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
+                server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth));
+            });
+        } else {
+            throw new UnsupportedOperationException("Auth provider/handler not supported");
+        }
     }
 }
