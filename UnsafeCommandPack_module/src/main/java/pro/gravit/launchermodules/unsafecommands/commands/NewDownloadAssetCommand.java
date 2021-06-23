@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class NewDownloadAssetCommand extends Command {
-    private Logger logger = LogManager.getLogger();
+    private final Logger logger = LogManager.getLogger();
     public NewDownloadAssetCommand(LaunchServer server) {
         super(server);
     }

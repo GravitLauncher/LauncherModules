@@ -1,24 +1,16 @@
 package pro.gravit.launchermodules.unsafecommands.commands;
 
 import pro.gravit.launcher.ClientPermissions;
-import pro.gravit.launcher.events.RequestEvent;
 import pro.gravit.launcher.events.request.AuthRequestEvent;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
-import pro.gravit.launchserver.auth.RequiredDAO;
 import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
-import pro.gravit.launchserver.auth.provider.AuthProviderResult;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.Client;
-import pro.gravit.launchserver.socket.WebSocketService;
-import pro.gravit.launchserver.socket.handlers.WebSocketFrameHandler;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
-import pro.gravit.launchserver.socket.response.profile.ProfileByUUIDResponse;
-import pro.gravit.utils.helper.LogHelper;
-import pro.gravit.utils.helper.SecurityHelper;
 
 import java.util.UUID;
 
