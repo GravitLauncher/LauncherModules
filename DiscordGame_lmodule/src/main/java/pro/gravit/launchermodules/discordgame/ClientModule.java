@@ -2,12 +2,14 @@ package pro.gravit.launchermodules.discordgame;
 
 import pro.gravit.launcher.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientExitPhase;
+import pro.gravit.launcher.client.events.ClientUnlockConsoleEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessBuilderParamsWrittedEvent;
 import pro.gravit.launcher.client.events.client.ClientProcessLaunchEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.request.Request;
+import pro.gravit.launchermodules.discordgame.commands.DiscordCommand;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -54,6 +56,10 @@ public class ClientModule extends LauncherModule {
         } catch (Throwable e) {
             LogHelper.error(e);
         }
+    }
+
+    private void unlock(ClientUnlockConsoleEvent event) {
+        event.handler.registerCommand("discord", new DiscordCommand());
     }
 
     private void launcherInit(ClientEngineInitPhase phase) {
