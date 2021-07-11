@@ -52,7 +52,7 @@ public class NewDownloadAssetCommand extends Command {
         }
         final long finalTotal = total;
         logger.info("Download started, total {}", finalTotal);
-        Downloader downloader = downloadWithProgressBar(applies, AssetDownloader.getBase(), assetDir);
+        Downloader downloader = downloadWithProgressBar(args[1], applies, AssetDownloader.getBase(), assetDir);
         downloader.getFuture().get();
         // Finished
         server.syncUpdatesDir(Collections.singleton(dirName));
