@@ -17,6 +17,7 @@ import java.util.List;
 
 public class NewDownloadAssetCommand extends Command {
     private final Logger logger = LogManager.getLogger();
+
     public NewDownloadAssetCommand(LaunchServer server) {
         super(server);
     }

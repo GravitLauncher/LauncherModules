@@ -39,7 +39,7 @@ public class DiscordBridge {
             pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.dll");
             String libraryJarPath = "/native/linux/" + arch + "/discord_game_sdk.dll";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
-        } else if(JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
+        } else if (JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
             pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.so");
             String libraryJarPath = "/native/linux/" + arch + "/discord_game_sdk.so";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);

@@ -37,10 +37,10 @@ public class SendAuthCommand extends Command {
         AuthResponse.ConnectTypes type = AuthResponse.ConnectTypes.valueOf(args[3]);
         AuthProviderPair pair = server.config.getAuthProviderPair(args[2]);
         ClientPermissions permissions = args.length > 4 ? new ClientPermissions(Long.parseLong(args[4])) : ClientPermissions.DEFAULT;
-        if(pair.isUseCore()) {
+        if (pair.isUseCore()) {
             User user = pair.core.getUserByLogin(username);
             UUID uuid;
-            if(user == null) {
+            if (user == null) {
                 uuid = UUID.randomUUID();
             } else {
                 uuid = user.getUUID();
@@ -48,12 +48,12 @@ public class SendAuthCommand extends Command {
             UserSession session;
             String minecraftAccessToken;
             AuthRequestEvent.OAuthRequestEvent oauth;
-            if(user != null) {
+            if (user != null) {
                 AuthManager.AuthReport report = pair.core.createOAuthSession(user, null, null, true);
-                if(report == null) throw new UnsupportedOperationException("AuthCoreProvider not supported sendAuth");
+                if (report == null) throw new UnsupportedOperationException("AuthCoreProvider not supported sendAuth");
                 minecraftAccessToken = report.minecraftAccessToken;
 
-                if(report.isUsingOAuth()) {
+                if (report.isUsingOAuth()) {
                     session = report.session;
                     oauth = new AuthRequestEvent.OAuthRequestEvent(report.oauthAccessToken, report.oauthRefreshToken, report.oauthExpire);
                 } else {
@@ -66,7 +66,7 @@ public class SendAuthCommand extends Command {
                 oauth = null;
             }
             server.nettyServerSocketHandler.nettyServer.service.forEachActiveChannels((ch, ws) -> {
-                if(!ws.getConnectUUID().equals(connectUUID)) return;
+                if (!ws.getConnectUUID().equals(connectUUID)) return;
                 Client client = ws.getClient();
                 client.coreObject = user;
                 client.sessionObject = session;
