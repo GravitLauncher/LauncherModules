@@ -1,8 +1,0 @@
-def mainClassName = "pro.gravit.launchermodules.autorehash.AutoReHashModule"
-
-sourceCompatibility = '11'
-targetCompatibility = '11'
-
-jar {
-    manifest.attributes("Module-Main-Class": mainClassName)
-}
