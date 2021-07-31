@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     compileOnly project(':Launcher')
-    api('com.github.JnCrMx:discord-game-sdk4j:v0.5.2')
+    compileOnly ('com.github.JnCrMx:discord-game-sdk4j:v0.5.4')
 }
 
 jar {

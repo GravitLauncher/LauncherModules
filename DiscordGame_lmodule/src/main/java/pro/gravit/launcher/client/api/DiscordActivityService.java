@@ -48,7 +48,8 @@ public class DiscordActivityService {
             activity.assets().setSmallText(smallText);
         }
         if (largeText != null) {
-            activity.assets().setSmallText(largeText);
+            activity.assets().setLargeText(largeText);
+            ;
         }
         if (partyId != null) {
             activity.party().setID(partyId);
