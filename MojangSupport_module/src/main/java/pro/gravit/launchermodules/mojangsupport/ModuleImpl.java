@@ -4,6 +4,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.auth.handler.AuthHandler;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
 import pro.gravit.launchserver.auth.texture.TextureProvider;
@@ -24,6 +25,7 @@ public class ModuleImpl extends LauncherModule {
             AuthHandler.providers.register("mojang", MojangAuthHandler.class);
             AuthProvider.providers.register("mojang", MojangAuthProvider.class);
             TextureProvider.providers.register("mojang", MojangTextureProvider.class);
+            AuthCoreProvider.providers.register("mojang", MojangAuthCoreProvider.class);
             registred = true;
         }
     }

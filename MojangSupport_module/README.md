@@ -5,17 +5,11 @@
 #### Установка модуля
 
 1. Скопировать модуль **GenerateCertificate_module.jar** в папку **/LaunchServer/modules/**
-2. Выполнить настройку `auth provider`, `auth handler` и `auth textureProvider`
+2. Выполнить настройку `auth core provider`:
 
 ```json
 {
-  "provider": {
-    "type": "mojang"
-  },
-  "handler": {
-    "type": "mojang"
-  },
-  "textureProvider": {
+  "core": {
     "type": "mojang"
   }
 }
