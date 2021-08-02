@@ -75,11 +75,21 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
             public String signature;
         }
 
+        public static class MojangProfileTexture {
+            public String url;
+            public String digest;
+            public Map<String, String> metadata;
+
+            public Texture toTexture() {
+                return new Texture(url, digest == null ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, url) : SecurityHelper.fromHex(digest), metadata);
+            }
+        }
+
         public static class MojangProfilePropertyTexture {
             public String profileId;
             public String profileName;
             public boolean signatureRequired;
-            public Map<String, Texture> textures;
+            public Map<String, MojangProfileTexture> textures;
         }
 
         public MojangProfilePropertyTexture getTextures() {
@@ -111,9 +121,9 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         if (textures != null) {
             for (var e : textures.textures.entrySet()) {
                 if (e.getKey().equals("SKIN")) {
-                    user.skin = e.getValue();
+                    user.skin = e.getValue().toTexture();
                 } else if (e.getKey().equals("CLOAK")) {
-                    user.cloak = e.getValue();
+                    user.cloak = e.getValue().toTexture();
                 }
             }
         }
@@ -160,7 +170,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
                 if (variant != null && variant.equals("SLIM")) {
                     metadata = Map.of("model", "slim");
                 }
-                return new Texture(url, digest == null ? new byte[0] : SecurityHelper.fromHex(digest), metadata);
+                return new Texture(url, digest == null ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, url) : SecurityHelper.fromHex(digest), metadata);
             }
         }
     }
