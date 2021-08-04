@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.commands;
 
 import pro.gravit.launcher.ClientPermissions;
+import pro.gravit.launcher.events.RequestEvent;
 import pro.gravit.launcher.events.request.AuthRequestEvent;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchserver.LaunchServer;
@@ -72,7 +73,9 @@ public class SendAuthCommand extends Command {
                 client.sessionObject = session;
                 server.authManager.internalAuth(client, type, pair, username, uuid, permissions, oauth != null);
                 PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
-                server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth));
+                AuthRequestEvent request = new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth);
+                request.requestUUID = RequestEvent.eventUUID;
+                server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, request);
             });
         } else {
             throw new UnsupportedOperationException("Auth provider/handler not supported");
