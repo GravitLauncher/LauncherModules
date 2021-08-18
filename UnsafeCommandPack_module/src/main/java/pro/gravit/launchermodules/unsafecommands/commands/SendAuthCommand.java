@@ -72,6 +72,9 @@ public class SendAuthCommand extends Command {
                 client.coreObject = user;
                 client.sessionObject = session;
                 server.authManager.internalAuth(client, type, pair, username, uuid, permissions, oauth != null);
+                if (oauth == null) { // Set legacy session
+                    client.session = UUID.randomUUID();
+                }
                 PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
                 AuthRequestEvent request = new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth);
                 request.requestUUID = RequestEvent.eventUUID;
