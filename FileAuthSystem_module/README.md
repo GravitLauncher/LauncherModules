@@ -35,16 +35,7 @@ fileauthsystem giveflag [username] [flag] [true/false] - выдача флаго
 }
 ```
 
-- Тип authProvider `fileauthsystem`, конфигурация:
-
-```json
-{
-  "type": "fileauthsystem",
-  "errorMessage": "Login or password incorrect"
-}
-```
-
-- Тип authHandler `fileauthsystem`, конфигурация:
+- Тип authCoreProvider `fileauthsystem`, конфигурация:
 
 ```json
 {
@@ -52,4 +43,4 @@ fileauthsystem giveflag [username] [flag] [true/false] - выдача флаго
 }
 ```
 
-- При установке через `fileauthsystem install` provider и handler будут установлены автоматически
+- При установке через `fileauthsystem install` AuthCoreProvider будет установлен автоматически
