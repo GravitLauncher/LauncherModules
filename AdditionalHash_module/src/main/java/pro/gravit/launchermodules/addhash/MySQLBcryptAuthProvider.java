@@ -1,9 +1,12 @@
 package pro.gravit.launchermodules.addhash;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
+import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.MySQLSourceConfig;
 import pro.gravit.launchserver.auth.provider.AuthProvider;
@@ -17,10 +20,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public final class MySQLBcryptAuthProvider extends AuthProvider {
+    private transient final Logger logger = LogManager.getLogger();
     private MySQLSourceConfig mySQLHolder;
     private String query;
     private String message;
     private String[] queryParams;
+    private boolean flagsEnabled;
+
+    @Override
+    public void init(LaunchServer srv) {
+        super.init(srv);
+        if (mySQLHolder == null) logger.error("mySQLHolder cannot be null");
+        if (query == null) logger.error("query cannot be null");
+        if (message == null) logger.error("message cannot be null");
+        if (queryParams == null) logger.error("queryParams cannot be null");
+    }
 
     @Override
     public AuthProviderResult auth(String login, AuthRequest.AuthPasswordInterface password, String ip) throws SQLException, AuthException {
@@ -34,7 +48,8 @@ public final class MySQLBcryptAuthProvider extends AuthProvider {
             // Execute SQL query
             s.setQueryTimeout(MySQLSourceConfig.TIMEOUT);
             try (ResultSet set = s.executeQuery()) {
-                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), new ClientPermissions(set.getLong(3))) : authError(message) : authError(message);
+                return set.next() ? BCrypt.checkpw(((AuthPlainPassword) password).password, "$2a" + set.getString(1).substring(3)) ? new AuthProviderResult(set.getString(2), SecurityHelper.randomStringToken(), new ClientPermissions(
+                        set.getLong(3), flagsEnabled ? set.getLong(4) : 0)) : authError(message) : authError(message);
             }
         }
     }
