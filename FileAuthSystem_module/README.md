@@ -2,10 +2,7 @@
 
 Система авторизации пользователей, с хранением данных в формате `.json`
 
-<h2 align="center">
-<br>
-Установка
-</h2>
+## Установка
 
 1. Скопировать модуль **FileAuthSystem_module.jar** в папку **modules/**
 2. Запустить LaunchServer и прописать команду: `fileauthsystem install`
@@ -13,10 +10,7 @@
 - Все другие способы авторизацию будут заменены. Делайте БЕКАП `LaunchServer.json`
 3. Регистрация пользователя командой: `fileauthsystem register [username] [password]`
 
-<h2 align="center">
-<br>
-Команды
-</h2>
+## Команды
 
 Для просмотра доступных команд модуля, используйте: `help fileauthsystem`
 
@@ -33,10 +27,7 @@ fileauthsystem register [username] [password] - зарегистрировать
 fileauthsystem giveflag [username] [flag] [true/false] - выдача флагов пользователю
 ```
 
-<h2 align="center">
-<br>
-Конфигурация
-</h2>
+## Конфигурация
 
 Настройка `fileauthsystem`, конфигурация в `LaunchServer.json`:
 ```json
@@ -63,10 +54,7 @@ fileauthsystem giveflag [username] [flag] [true/false] - выдача флаго
 > 
 > },
 
-<h2 align="center">
-<br>
-Стандартные настройки модуля
-</h2>
+## Стандартные настройки модуля
 
 - `autoSave` - автоматически сохранить базу данных в файл, при остановке **LaunchServer**
 - `oauthTokenExpire` - время жизни Токена авторизации
@@ -77,20 +65,3 @@ fileauthsystem giveflag [username] [flag] [true/false] - выдача флаго
    "oauthTokenExpire": 3600000
 }
 ```
-
-<h2 align="center">
-<br>
-Файловая структура модуля
-</h2>
-
-> LaunchServer/
->> config/
->>> FileAuthSystem/
->>>> Config.json
->>>>
->>>> Database.json
->>>>
->>>> Sessions.json
->>
->> modules/
->>> FileAuthSystem_module.jar
