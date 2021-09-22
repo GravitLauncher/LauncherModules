@@ -32,8 +32,7 @@ public class MojangAuthHandler extends AuthHandler {
 
     @Override
     public UUID auth(AuthProviderResult authResult) {
-        if (authResult instanceof MojangAuthProviderResult) {
-            MojangAuthProviderResult result = (MojangAuthProviderResult) authResult;
+        if (authResult instanceof MojangAuthProviderResult result) {
             usernameToUUID.put(result.username, result.uuid);
             return result.uuid;
         }

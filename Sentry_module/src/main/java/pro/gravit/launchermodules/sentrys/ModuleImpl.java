@@ -75,7 +75,7 @@ public class ModuleImpl extends LauncherModule {
                 scope.setContexts("modules", modulesList());
             });
             if (c.addSentryAppender) {
-                appender = SentryAppender.createAppender("Sentry", null, Level.getLevel(c.appenderLogLevel), null, null);
+                appender = SentryAppender.createAppender("Sentry", Level.getLevel(c.appenderLogLevel), null, null, null, null);
                 appender.start();
                 LogAppender.getInstance().addListener(this::append);
             }

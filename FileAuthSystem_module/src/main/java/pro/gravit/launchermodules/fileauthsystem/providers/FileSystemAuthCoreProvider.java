@@ -65,10 +65,9 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     @Override
     public PasswordVerifyReport verifyPassword(User user, AuthRequest.AuthPasswordInterface password) {
         FileAuthSystemModule.UserEntity entity = (FileAuthSystemModule.UserEntity) user;
-        if (!(password instanceof AuthPlainPassword)) {
+        if (!(password instanceof AuthPlainPassword plainPassword)) {
             return PasswordVerifyReport.FAILED;
         }
-        AuthPlainPassword plainPassword = (AuthPlainPassword) password;
         if (entity.verifyPassword(plainPassword.password)) {
             return PasswordVerifyReport.OK;
         }

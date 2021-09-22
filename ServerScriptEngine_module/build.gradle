@@ -1,7 +1,7 @@
 def mainClassName = "pro.gravit.launchermodules.serverscript.ServerScriptEngineModule"
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName)

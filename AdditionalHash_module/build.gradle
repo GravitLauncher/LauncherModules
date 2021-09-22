@@ -1,7 +1,7 @@
 def mainClassName = "pro.gravit.launchermodules.addhash.AddHashModule"
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 dependencies {
     api 'org.mindrot:jbcrypt:0.4'

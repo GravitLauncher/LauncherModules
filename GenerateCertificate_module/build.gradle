@@ -1,7 +1,7 @@
 def mainClassName = "pro.gravit.launchermodules.generatecertificate.GenerateCertificateModule"
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 dependencies {
 
