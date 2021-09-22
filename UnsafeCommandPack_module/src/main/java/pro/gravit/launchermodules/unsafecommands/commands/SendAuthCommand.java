@@ -38,50 +38,46 @@ public class SendAuthCommand extends Command {
         AuthResponse.ConnectTypes type = AuthResponse.ConnectTypes.valueOf(args[3]);
         AuthProviderPair pair = server.config.getAuthProviderPair(args[2]);
         ClientPermissions permissions = args.length > 4 ? new ClientPermissions(Long.parseLong(args[4])) : ClientPermissions.DEFAULT;
-        if (pair.isUseCore()) {
-            User user = pair.core.getUserByLogin(username);
-            UUID uuid;
-            if (user == null) {
-                uuid = UUID.randomUUID();
-            } else {
-                uuid = user.getUUID();
-            }
-            UserSession session;
-            String minecraftAccessToken;
-            AuthRequestEvent.OAuthRequestEvent oauth;
-            if (user != null) {
-                AuthManager.AuthReport report = pair.core.createOAuthSession(user, null, null, true);
-                if (report == null) throw new UnsupportedOperationException("AuthCoreProvider not supported sendAuth");
-                minecraftAccessToken = report.minecraftAccessToken;
+        User user = pair.core.getUserByLogin(username);
+        UUID uuid;
+        if (user == null) {
+            uuid = UUID.randomUUID();
+        } else {
+            uuid = user.getUUID();
+        }
+        UserSession session;
+        String minecraftAccessToken;
+        AuthRequestEvent.OAuthRequestEvent oauth;
+        if (user != null) {
+            AuthManager.AuthReport report = pair.core.createOAuthSession(user, null, null, true);
+            if (report == null) throw new UnsupportedOperationException("AuthCoreProvider not supported sendAuth");
+            minecraftAccessToken = report.minecraftAccessToken();
 
-                if (report.isUsingOAuth()) {
-                    session = report.session;
-                    oauth = new AuthRequestEvent.OAuthRequestEvent(report.oauthAccessToken, report.oauthRefreshToken, report.oauthExpire);
-                } else {
-                    session = null;
-                    oauth = null;
-                }
+            if (report.isUsingOAuth()) {
+                session = report.session();
+                oauth = new AuthRequestEvent.OAuthRequestEvent(report.oauthAccessToken(), report.oauthRefreshToken(), report.oauthExpire());
             } else {
                 session = null;
-                minecraftAccessToken = null;
                 oauth = null;
             }
-            server.nettyServerSocketHandler.nettyServer.service.forEachActiveChannels((ch, ws) -> {
-                if (!ws.getConnectUUID().equals(connectUUID)) return;
-                Client client = ws.getClient();
-                client.coreObject = user;
-                client.sessionObject = session;
-                server.authManager.internalAuth(client, type, pair, username, uuid, permissions, oauth != null);
-                if (oauth == null) { // Set legacy session
-                    client.session = UUID.randomUUID();
-                }
-                PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
-                AuthRequestEvent request = new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth);
-                request.requestUUID = RequestEvent.eventUUID;
-                server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, request);
-            });
         } else {
-            throw new UnsupportedOperationException("Auth provider/handler not supported");
+            session = null;
+            minecraftAccessToken = null;
+            oauth = null;
         }
+        server.nettyServerSocketHandler.nettyServer.service.forEachActiveChannels((ch, ws) -> {
+            if (!ws.getConnectUUID().equals(connectUUID)) return;
+            Client client = ws.getClient();
+            client.coreObject = user;
+            client.sessionObject = session;
+            server.authManager.internalAuth(client, type, pair, username, uuid, permissions, oauth != null);
+            if (oauth == null) { // Set legacy session
+                client.session = UUID.randomUUID();
+            }
+            PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
+            AuthRequestEvent request = new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth);
+            request.requestUUID = RequestEvent.eventUUID;
+            server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, request);
+        });
     }
 }

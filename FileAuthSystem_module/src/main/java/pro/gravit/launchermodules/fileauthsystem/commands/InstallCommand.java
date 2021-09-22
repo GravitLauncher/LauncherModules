@@ -43,8 +43,6 @@ public class InstallCommand extends Command {
             if (pair.core != null) pair.core.close();
             pair.core = new FileSystemAuthCoreProvider();
             pair.core.init(server);
-            pair.provider = null;
-            pair.handler = null;
             logger.info("FileSystemAuthCoreProvider installed");
             changed = true;
         }
