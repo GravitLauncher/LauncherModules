@@ -93,6 +93,18 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
+    public User getUserByLogin(String login) {
+        if (autoReg) {
+            User user = getUser(login);
+            if (user == null) {
+                user = registration(login, null, new AuthPlainPassword(""), null);
+            }
+            return user;
+        }
+        return getUserByUsername(login);
+    }
+
+    @Override
     public User getUserByUUID(UUID uuid) {
         return getUser(uuid);
     }
