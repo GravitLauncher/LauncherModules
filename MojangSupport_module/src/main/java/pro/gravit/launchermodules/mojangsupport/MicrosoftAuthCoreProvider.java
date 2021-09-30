@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider { // Work in progress
+public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     private transient MojangAuthCoreProvider provider;
     private transient LaunchServer server;
     private transient final HttpClient client = HttpClient.newBuilder().build();
@@ -81,7 +81,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider { // Work 
         ));
     }
 
-    @Override
+    /*@Override
     public AuthManager.AuthReport refreshAccessToken(String refreshToken, AuthResponse.AuthContext context) {
         try {
             var result = sendMicrosoftOAuthRefreshTokenRequest(refreshToken);
@@ -93,7 +93,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider { // Work 
             logger.error("Microsoft refresh failed", e);
             return null;
         }
-    }
+    }*/
 
     @Override
     public PasswordVerifyReport verifyPassword(User user, AuthRequest.AuthPasswordInterface password) {
@@ -120,7 +120,12 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider { // Work 
             throw new AuthException("Microsoft auth error: oauth token");
         }
         if(minecraftAccess) {
-            return AuthManager.AuthReport.ofOAuthWithMinecraft(getMinecraftTokenByMicrosoftToken(token.access_token), token.access_token, token.refresh_token, token.expires_in);
+
+            try {
+                return AuthManager.AuthReport.ofOAuthWithMinecraft(getMinecraftTokenByMicrosoftToken(token.access_token), token.access_token, token.refresh_token, token.expires_in, getUserSessionByOAuthAccessToken(token.access_token));
+            } catch (OAuthAccessTokenExpired e) {
+                throw new IOException(e);
+            }
         } else {
             return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in);
         }
