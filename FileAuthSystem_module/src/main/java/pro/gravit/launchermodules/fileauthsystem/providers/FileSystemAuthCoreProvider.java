@@ -60,7 +60,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 if (entity == null)
                     throw new IllegalArgumentException(String.format("User %s not found", args[0]));
                 entity.setPassword(passwordVerifier.encrypt(args[1]));
-                LogHelper.info("Password changed");
+                logger.info("Password changed");
             }
         });
         commands.put("xconvertpassword", new SubCommand("[]", "Convert 5.2.2 and lower base64 sha256 passwords") {
@@ -82,6 +82,17 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             @Override
             public void invoke(String... args) throws Exception {
                 save();
+            }
+        });
+        commands.put("addpermission", new SubCommand("[username] [permission]", "add user permission") {
+            @Override
+            public void invoke(String... args) throws Exception {
+                verifyArgs(args, 2);
+                UserEntity entity = getUser(args[0]);
+                if (entity == null)
+                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                entity.getPermissions().addAction(args[1]);
+                logger.info("Permission added");
             }
         });
         return commands;

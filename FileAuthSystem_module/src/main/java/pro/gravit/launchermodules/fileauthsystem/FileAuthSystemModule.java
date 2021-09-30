@@ -9,6 +9,7 @@ import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCorePro
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
+import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.SecurityHelper;
 
@@ -27,6 +28,10 @@ public class FileAuthSystemModule extends LauncherModule {
 
     public void preConfig(PreConfigPhase preConfigPhase) {
         AuthCoreProvider.providers.register("fileauthsystem", FileSystemAuthCoreProvider.class);
+    }
+
+    public void finish(LaunchServerFullInitEvent event) {
+        event.server.commandHandler.registerCommand("fileauthsystem", new FileAuthSystemCommand(event.server, this));
     }
 
     @Override

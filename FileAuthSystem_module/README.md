@@ -6,24 +6,12 @@
 
 1. Скопировать модуль **FileAuthSystem_module.jar** в папку **/LaunchServer/modules/**
 2. Запустить LaunchServer и прописать команду `fileauthsystem install`
-3. Зарегистрируйте пользователей командой `fileauthsystem register [username] [password]`
+3. Зарегистрируйте пользователей командой `config auth.std.core register [username] email [password]`
 4. Всё!
 
 #### Команды
 
-Выполните `help fileauthsystem` для просмотра доступных команд:
-
-```
-fileauthsystem changepassword [username] [password] - сменить пароль пользователя
-fileauthsystem reload (path) - загрузить базу данных из файла
-fileauthsystem getuser [username] - просмотр пользователя
-fileauthsystem getusers  - просмотр всех пользователей
-fileauthsystem install (authid) - установка FileAuthSystem
-fileauthsystem save (path) - сохранить базу данных в файл
-fileauthsystem givepermission [username] [permission] [true/false] - выдача прав пользователю
-fileauthsystem register [username] [password] - зарегистрировать пользователя
-fileauthsystem giveflag [username] [flag] [true/false] - выдача флагов пользователю
-```
+Введите `config auth.std.core` и нажмите TAB для просмотра доступных команд
 
 #### Конфигурация
 
