@@ -20,6 +20,7 @@ public class ModuleImpl extends LauncherModule {
     public void preInit(PreConfigPhase preConfigPhase) {
         if (!registred) {
             AuthCoreProvider.providers.register("mojang", MojangAuthCoreProvider.class);
+            AuthCoreProvider.providers.register("microsoft", MicrosoftAuthCoreProvider.class);
             registred = true;
         }
     }
