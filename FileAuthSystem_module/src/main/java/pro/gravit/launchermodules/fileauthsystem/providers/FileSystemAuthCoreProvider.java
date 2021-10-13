@@ -67,7 +67,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             @Override
             public void invoke(String... args) throws Exception {
                 for (var e : users.entrySet()) {
-                    byte[] rawPassword = Base64.getDecoder().decode(e.getValue().password);
+                    byte[] rawPassword = Base64.getUrlDecoder().decode(e.getValue().password);
                     e.getValue().setPassword(SecurityHelper.toHex(rawPassword));
                 }
             }
@@ -91,7 +91,18 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 UserEntity entity = getUser(args[0]);
                 if (entity == null)
                     throw new IllegalArgumentException(String.format("User %s not found", args[0]));
-                entity.getPermissions().addAction(args[1]);
+                entity.getPermissions().addPerm(args[1]);
+                logger.info("Permission added");
+            }
+        });
+        commands.put("removepermission", new SubCommand("[username] [permission]", "remove user permission") {
+            @Override
+            public void invoke(String... args) throws Exception {
+                verifyArgs(args, 2);
+                UserEntity entity = getUser(args[0]);
+                if (entity == null)
+                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                entity.getPermissions().removePerm(args[1]);
                 logger.info("Permission added");
             }
         });
