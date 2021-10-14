@@ -37,6 +37,7 @@ public class FileAuthSystemModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preConfig, PreConfigPhase.class);
+        registerEvent(this::finish, LaunchServerFullInitEvent.class);
         dbPath = modulesConfigManager.getModuleConfigDir(moduleInfo.name);
         jsonConfigurable = modulesConfigManager.getConfigurable(FileAuthSystemConfig.class, moduleInfo.name);
     }
