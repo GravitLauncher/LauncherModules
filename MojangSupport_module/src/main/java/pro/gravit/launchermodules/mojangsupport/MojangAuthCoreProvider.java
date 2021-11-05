@@ -209,16 +209,35 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    public void verifyAuth(AuthResponse.AuthContext context) throws AuthException {
-
-    }
-
-    static class MojangPasswordVerifyReport extends PasswordVerifyReport {
-        private final String accessToken;
-
-        public MojangPasswordVerifyReport(String accessToken) {
-            super(true);
-            this.accessToken = accessToken;
+    public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
+        if(login == null) {
+            throw AuthException.userNotFound();
+        }
+        if(password == null) {
+            throw AuthException.wrongPassword();
+        }
+        MojangAuthRequest request = new MojangAuthRequest(login, ((AuthPlainPassword) password).password);
+        try {
+            var result =
+                    mojangRequest("POST", "https://authserver.mojang.com/authenticate", null, request, MojangAuthResponse.class);
+            if (result == null) {
+                throw AuthException.wrongPassword();
+            }
+            MojangUser mojangUser = new MojangUser();
+            mojangUser.username = result.selectedProfile.username;
+            mojangUser.uuid = getUUIDFromMojangHash(result.selectedProfile.id);
+            mojangUser.accessToken = result.accessToken;
+            MojangUser userWithProfile = getUserByHash(result.selectedProfile.id);
+            if (userWithProfile != null) {
+                mojangUser.username = userWithProfile.username;
+                mojangUser.uuid = userWithProfile.uuid;
+                mojangUser.skin = userWithProfile.skin;
+                mojangUser.cloak = userWithProfile.cloak;
+            }
+            MojangUserSession session = new MojangUserSession(mojangUser, result.accessToken);
+            return AuthManager.AuthReport.ofOAuth(result.accessToken, null, 0, session);
+        } catch (IOException | URISyntaxException | InterruptedException e) {
+            throw AuthException.wrongPassword();
         }
     }
 
@@ -258,46 +277,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
             public List<AbstractMojangPropertiesResponse.MojangProfileProperty> properties;
             public String id;
         }
-    }
-
-    @Override
-    public PasswordVerifyReport verifyPassword(User user, AuthRequest.AuthPasswordInterface password) {
-        if (!(password instanceof AuthPlainPassword)) {
-            return PasswordVerifyReport.FAILED;
-        }
-        MojangUser mojangUser = (MojangUser) user;
-        MojangAuthRequest request = new MojangAuthRequest(user.getUsername(), ((AuthPlainPassword) password).password);
-        try {
-            var result =
-                    mojangRequest("POST", "https://authserver.mojang.com/authenticate", null, request, MojangAuthResponse.class);
-            if (result == null) {
-                return PasswordVerifyReport.FAILED;
-            }
-            mojangUser.username = result.selectedProfile.username;
-            mojangUser.uuid = getUUIDFromMojangHash(result.selectedProfile.id);
-            mojangUser.accessToken = result.accessToken;
-            MojangUser userWithProfile = getUserByHash(result.selectedProfile.id);
-            if (userWithProfile != null) {
-                mojangUser.username = userWithProfile.username;
-                mojangUser.uuid = userWithProfile.uuid;
-                mojangUser.skin = userWithProfile.skin;
-                mojangUser.cloak = userWithProfile.cloak;
-            }
-            return new MojangPasswordVerifyReport(result.accessToken);
-        } catch (IOException | URISyntaxException | InterruptedException e) {
-            return PasswordVerifyReport.FAILED;
-        }
-    }
-
-    @Override
-    public AuthManager.AuthReport createOAuthSession(User user, AuthResponse.AuthContext context, PasswordVerifyReport report, boolean minecraftAccess) throws IOException {
-        if (report == null) {
-            throw new UnsupportedOperationException("Mojang authorization not be ignored");
-        }
-        MojangPasswordVerifyReport mojangReport = (MojangPasswordVerifyReport) report;
-        MojangUser mojangUser = (MojangUser) user;
-        MojangUserSession session = new MojangUserSession(mojangUser, mojangReport.accessToken);
-        return AuthManager.AuthReport.ofOAuth(mojangReport.accessToken, null, 0, session);
     }
 
     @Override

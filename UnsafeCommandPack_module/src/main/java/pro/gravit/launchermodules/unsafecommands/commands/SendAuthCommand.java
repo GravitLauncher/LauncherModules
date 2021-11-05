@@ -49,7 +49,7 @@ public class SendAuthCommand extends Command {
         String minecraftAccessToken;
         AuthRequestEvent.OAuthRequestEvent oauth;
         if (user != null) {
-            AuthManager.AuthReport report = pair.core.createOAuthSession(user, null, null, true);
+            AuthManager.AuthReport report = pair.core.authorize(user, null, null, true);
             if (report == null) throw new UnsupportedOperationException("AuthCoreProvider not supported sendAuth");
             minecraftAccessToken = report.minecraftAccessToken();
 

@@ -45,7 +45,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     public PasswordVerifier passwordVerifier;
     private final transient Logger logger = LogManager.getLogger();
     private transient Map<UUID, UserEntity> users = new ConcurrentHashMap<>();
-    private transient Set<FileAuthSystemModule.UserSessionEntity> sessions = ConcurrentHashMap.newKeySet();
+    private transient Set<UserSessionEntity> sessions = ConcurrentHashMap.newKeySet();
     private transient FileAuthSystemModule module;
     private transient Path dbPath;
 
@@ -133,7 +133,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
     @Override
     public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
-        FileAuthSystemModule.UserSessionEntity session = getSessionByAccessToken(accessToken);
+        UserSessionEntity session = getSessionByAccessToken(accessToken);
         if (session == null) return null;
         if (session.expireMillis != 0 && session.expireMillis < System.currentTimeMillis())
             throw new OAuthAccessTokenExpired();
@@ -143,47 +143,42 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     @Override
     public AuthManager.AuthReport refreshAccessToken(String refreshToken, AuthResponse.AuthContext context) {
         FileAuthSystemConfig config = module.jsonConfigurable.getConfig();
-        FileAuthSystemModule.UserSessionEntity session = getSessionByRefreshToken(refreshToken);
+        UserSessionEntity session = getSessionByRefreshToken(refreshToken);
         if (session == null) return null;
         session.refreshToken = SecurityHelper.randomStringToken();
         session.accessToken = SecurityHelper.randomStringToken();
         if (oauthTokenExpire != 0) {
             session.update(oauthTokenExpire);
         }
-        return AuthManager.AuthReport.ofOAuth(session.accessToken, session.refreshToken, oauthTokenExpire);
+        return AuthManager.AuthReport.ofOAuth(session.accessToken, session.refreshToken, oauthTokenExpire, session);
     }
 
     @Override
-    public void verifyAuth(AuthResponse.AuthContext context) throws AuthException {
-        // None
-    }
-
-    @Override
-    public PasswordVerifyReport verifyPassword(User user, AuthRequest.AuthPasswordInterface password) {
-        UserEntity entity = (UserEntity) user;
-        if (!(password instanceof AuthPlainPassword plainPassword)) {
-            return PasswordVerifyReport.FAILED;
+    public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
+        UserEntity user = getUser(login);
+        if(user == null) {
+            throw AuthException.userNotFound();
         }
-        if (passwordVerifier.check(entity.password, plainPassword.password)) {
-            return PasswordVerifyReport.OK;
+        if(context != null) {
+            AuthPlainPassword plainPassword = (AuthPlainPassword) password;
+            if(password == null) {
+                throw AuthException.wrongPassword();
+            }
+            if(!passwordVerifier.check(user.password, plainPassword.password)) {
+                throw AuthException.wrongPassword();
+            }
         }
-        return PasswordVerifyReport.FAILED;
-    }
-
-    @Override
-    public AuthManager.AuthReport createOAuthSession(User user, AuthResponse.AuthContext context, PasswordVerifyReport report, boolean minecraftAccess) throws IOException {
-        FileAuthSystemConfig config = module.jsonConfigurable.getConfig();
-        FileAuthSystemModule.UserSessionEntity entity = new FileAuthSystemModule.UserSessionEntity((UserEntity) user);
-        addNewSession(entity);
+        UserSessionEntity session = new UserSessionEntity(user);
+        addNewSession(session);
         if (oauthTokenExpire != 0) {
-            entity.update(oauthTokenExpire);
+            session.update(oauthTokenExpire);
         }
         if (minecraftAccess) {
             String minecraftAccessToken = SecurityHelper.randomStringToken();
-            ((UserEntity) user).accessToken = minecraftAccessToken;
-            return AuthManager.AuthReport.ofOAuthWithMinecraft(minecraftAccessToken, entity.accessToken, entity.refreshToken, oauthTokenExpire);
+            user.accessToken = minecraftAccessToken;
+            return AuthManager.AuthReport.ofOAuthWithMinecraft(minecraftAccessToken, session.accessToken, session.refreshToken, oauthTokenExpire, session);
         }
-        return AuthManager.AuthReport.ofOAuth(entity.accessToken, entity.refreshToken, oauthTokenExpire);
+        return AuthManager.AuthReport.ofOAuth(session.accessToken, session.refreshToken, oauthTokenExpire, session);
     }
 
     @Override
@@ -236,7 +231,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
     @Override
     public boolean deleteSession(UserSession session) {
-        return deleteSession((FileAuthSystemModule.UserSessionEntity) session);
+        return deleteSession((UserSessionEntity) session);
     }
 
     @Override
@@ -264,14 +259,14 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         {
             Path sessionsPath = path.resolve("Sessions.json");
             if (!Files.exists(sessionsPath)) return;
-            Type sessionsType = new TypeToken<Set<FileAuthSystemModule.UserSessionEntity>>() {
+            Type sessionsType = new TypeToken<Set<UserSessionEntity>>() {
             }.getType();
             try (Reader reader = IOHelper.newReader(sessionsPath)) {
                 this.sessions = Launcher.gsonManager.configGson.fromJson(reader, sessionsType);
             } catch (IOException e) {
                 LogHelper.error(e);
             }
-            for (FileAuthSystemModule.UserSessionEntity sessionEntity : sessions) {
+            for (UserSessionEntity sessionEntity : sessions) {
                 if (sessionEntity.userEntityUUID != null) {
                     sessionEntity.entity = getUser(sessionEntity.userEntityUUID);
                 }
@@ -297,7 +292,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         }
         {
             Path sessionsPath = path.resolve("Sessions.json");
-            Type sessionsType = new TypeToken<Set<FileAuthSystemModule.UserSessionEntity>>() {
+            Type sessionsType = new TypeToken<Set<UserSessionEntity>>() {
             }.getType();
             try (Writer writer = IOHelper.newWriter(sessionsPath)) {
                 Launcher.gsonManager.configGson.toJson(sessions, sessionsType, writer);
@@ -316,15 +311,15 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         return null;
     }
 
-    private FileAuthSystemModule.UserSessionEntity getSessionByAccessToken(String accessToken) {
+    private UserSessionEntity getSessionByAccessToken(String accessToken) {
         return sessions.stream().filter(e -> e.accessToken != null && e.accessToken.equals(accessToken)).findFirst().orElse(null);
     }
 
-    private FileAuthSystemModule.UserSessionEntity getSessionByRefreshToken(String refreshToken) {
+    private UserSessionEntity getSessionByRefreshToken(String refreshToken) {
         return sessions.stream().filter(e -> e.accessToken != null && e.refreshToken.equals(refreshToken)).findFirst().orElse(null);
     }
 
-    private void addNewSession(FileAuthSystemModule.UserSessionEntity session) {
+    private void addNewSession(UserSessionEntity session) {
         sessions.add(session);
     }
 
@@ -351,7 +346,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         users.remove(uuid);
     }
 
-    private boolean deleteSession(FileAuthSystemModule.UserSessionEntity entity) {
+    private boolean deleteSession(UserSessionEntity entity) {
         return sessions.remove(entity);
     }
 
@@ -419,6 +414,67 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     "username='" + username + '\'' +
                     ", uuid=" + uuid +
                     ", permissions=" + permissions +
+                    '}';
+        }
+    }
+
+    public static class UserSessionEntity implements UserSession {
+        private final UUID uuid;
+        public transient UserEntity entity;
+        public UUID userEntityUUID;
+        public String accessToken;
+        public String refreshToken;
+        public long expireMillis;
+
+        public UserSessionEntity(UserEntity entity) {
+            this.uuid = UUID.randomUUID();
+            this.entity = entity;
+            this.accessToken = SecurityHelper.randomStringToken();
+            this.refreshToken = SecurityHelper.randomStringToken();
+            this.expireMillis = 0;
+            this.userEntityUUID = entity.uuid;
+        }
+
+        public void update(long expireMillis) {
+            this.expireMillis = System.currentTimeMillis() + expireMillis;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UserSessionEntity entity = (UserSessionEntity) o;
+            return Objects.equals(uuid, entity.uuid);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(uuid);
+        }
+
+        @Override
+        public String getID() {
+            return uuid.toString();
+        }
+
+        @Override
+        public User getUser() {
+            return entity;
+        }
+
+        @Override
+        public long getExpireIn() {
+            return expireMillis;
+        }
+
+        @Override
+        public String toString() {
+            return "UserSessionEntity{" +
+                    "uuid=" + uuid +
+                    ", entity=" + entity +
+                    ", accessToken='" + accessToken + '\'' +
+                    ", refreshToken='" + refreshToken + '\'' +
+                    ", expireMillis=" + expireMillis +
                     '}';
         }
     }

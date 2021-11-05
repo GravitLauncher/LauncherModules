@@ -96,38 +96,28 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     }*/
 
     @Override
-    public PasswordVerifyReport verifyPassword(User user, AuthRequest.AuthPasswordInterface password) {
-        return new MicrosoftPasswordVerifyReport(((AuthCodePassword)password).code);
-    }
-
-    private static class MicrosoftPasswordVerifyReport extends PasswordVerifyReport {
-        private final String microsoftCode;
-
-        public MicrosoftPasswordVerifyReport(String code) {
-            super(true);
-            this.microsoftCode = code;
+    public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
+        if(login == null) {
+            throw AuthException.userNotFound();
         }
-    }
-
-    @Override
-    public AuthManager.AuthReport createOAuthSession(User user, AuthResponse.AuthContext context, PasswordVerifyReport report, boolean minecraftAccess) throws IOException {
-        if(report == null) {
-            throw new AuthException("Microsoft authorization not be ignored");
+        if(password == null) {
+            throw AuthException.wrongPassword();
         }
-        var code = ((MicrosoftPasswordVerifyReport)report).microsoftCode;
+        AuthCodePassword codePassword = (AuthCodePassword) password;
+        var code = codePassword.code;
         var token = sendMicrosoftOAuthTokenRequest(code);
         if(token == null) {
             throw new AuthException("Microsoft auth error: oauth token");
         }
-        if(minecraftAccess) {
-
-            try {
-                return AuthManager.AuthReport.ofOAuthWithMinecraft(getMinecraftTokenByMicrosoftToken(token.access_token), token.access_token, token.refresh_token, token.expires_in, getUserSessionByOAuthAccessToken(token.access_token));
-            } catch (OAuthAccessTokenExpired e) {
-                throw new IOException(e);
+        try {
+            var session = getUserSessionByOAuthAccessToken(token.access_token);
+            if(minecraftAccess) {
+                return AuthManager.AuthReport.ofOAuthWithMinecraft(getMinecraftTokenByMicrosoftToken(token.access_token), token.access_token, token.refresh_token, token.expires_in, session);
+            } else {
+                return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in, session);
             }
-        } else {
-            return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in);
+        } catch (OAuthAccessTokenExpired e) {
+            throw new AuthException("Internal Auth Error: Token invalid");
         }
     }
 
