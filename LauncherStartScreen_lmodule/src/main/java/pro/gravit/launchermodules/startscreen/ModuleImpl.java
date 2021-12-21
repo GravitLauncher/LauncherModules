@@ -34,7 +34,7 @@ public class ModuleImpl extends LauncherModule {
         try {
             if (!GraphicsEnvironment.isHeadless()) {
                 Config c = new Config();
-                screen = new ImageDisplay(ImageIO.read(IOHelper.getResourceURL(c.imageURL)),
+                screen = new ImageDisplay(IOHelper.getResourceURL(c.imageURL),
                         (c.faviconURL != null && !c.faviconURL.equalsIgnoreCase("null"))/* Because of low-skilled admins */ ? ImageIO.read(IOHelper.getResourceURL(c.faviconURL))
                                 : null, c);
             }
