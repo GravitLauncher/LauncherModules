@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.events.request.GetAvailabilityAuthRequestEvent;
+import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.details.AuthWebViewDetails;
 import pro.gravit.launcher.request.auth.password.AuthCodePassword;
@@ -19,8 +20,10 @@ import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,6 +57,13 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         }
     }
 
+    public record MicrosoftError(String error, String error_description, String correlation_id) {
+        @Override
+        public String toString() {
+            return error_description;
+        }
+    }
+
     private static class XSTSErrorHandler<T> implements HttpHelper.HttpJsonErrorHandler<T, XSTSError> {
         private final Class<T> type;
 
@@ -65,6 +75,23 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         public HttpHelper.HttpOptional<T, XSTSError> applyJson(JsonElement response, int statusCode) {
             if(statusCode < 200 || statusCode >= 300) {
                 return new HttpHelper.HttpOptional<>(null, Launcher.gsonManager.gson.fromJson(response, XSTSError.class), statusCode);
+            } else {
+                return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(response, type), null, statusCode);
+            }
+        }
+    }
+
+    private static class MicrosoftErrorHandler<T> implements HttpHelper.HttpJsonErrorHandler<T, MicrosoftError> {
+        private final Class<T> type;
+
+        private MicrosoftErrorHandler(Class<T> type) {
+            this.type = type;
+        }
+
+        @Override
+        public HttpHelper.HttpOptional<T, MicrosoftError> applyJson(JsonElement response, int statusCode) {
+            if(statusCode < 200 || statusCode >= 300) {
+                return new HttpHelper.HttpOptional<>(null, Launcher.gsonManager.gson.fromJson(response, MicrosoftError.class), statusCode);
             } else {
                 return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(response, type), null, statusCode);
             }
@@ -97,27 +124,29 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
 
     @Override
     public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
-        if(login == null) {
-            throw AuthException.userNotFound();
-        }
         if(password == null) {
             throw AuthException.wrongPassword();
         }
         AuthCodePassword codePassword = (AuthCodePassword) password;
         var code = codePassword.code;
-        var token = sendMicrosoftOAuthTokenRequest(code);
-        if(token == null) {
-            throw new AuthException("Microsoft auth error: oauth token");
-        }
         try {
-            var session = getUserSessionByOAuthAccessToken(token.access_token);
-            if(minecraftAccess) {
-                return AuthManager.AuthReport.ofOAuthWithMinecraft(getMinecraftTokenByMicrosoftToken(token.access_token), token.access_token, token.refresh_token, token.expires_in, session);
-            } else {
-                return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in, session);
+            var token = sendMicrosoftOAuthTokenRequest(code);
+            if(token == null) {
+                throw new AuthException("Microsoft auth error: oauth token");
             }
-        } catch (OAuthAccessTokenExpired e) {
-            throw new AuthException("Internal Auth Error: Token invalid");
+            try {
+                var minecraftToken = getMinecraftTokenByMicrosoftToken(token.access_token);
+                var session = getUserSessionByOAuthAccessToken(minecraftToken);
+                if(minecraftAccess) {
+                    return AuthManager.AuthReport.ofOAuthWithMinecraft(minecraftToken, token.access_token, token.refresh_token, token.expires_in, session);
+                } else {
+                    return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in, session);
+                }
+            } catch (OAuthAccessTokenExpired e) {
+                throw new AuthException("Internal Auth Error: Token invalid");
+            }
+        } catch (RequestException e) {
+            throw new AuthException(e.toString());
         }
     }
 
@@ -135,9 +164,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         URI uri;
         try {
             if(clientSecret != null) {
-                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code", clientId, clientSecret, code));
+                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s", clientId, clientSecret, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
             } else {
-                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&code=%s&grant_type=authorization_code", clientId, code));
+                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&code=%s&grant_type=authorization_code&redirect_uri=%s", clientId, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
             }
         } catch (URISyntaxException e) {
             throw new IOException(e);
@@ -162,10 +191,10 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     private MicrosoftOAuthTokenResponse sendMicrosoftOAuthTokenRequest(String code) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(makeOAuthTokenRequestURI(code))
-                .POST(HttpRequest.BodyPublishers.noBody())
+                .GET()
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
-        var e = HttpHelper.send(client, request, new HttpHelper.BasicJsonHttpErrorHandler<>(MicrosoftOAuthTokenResponse.class));
+        var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
         return e.getOrThrow();
     }
 
@@ -175,7 +204,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
-        var e = HttpHelper.send(client, request, new HttpHelper.BasicJsonHttpErrorHandler<>(MicrosoftOAuthTokenResponse.class));
+        var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
         return e.getOrThrow();
     }
 
@@ -225,7 +254,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
 
     public record MicrosoftXBoxLivePropertiesRequest(String AuthMethod, String SiteName, String RpsTicket) {
         public MicrosoftXBoxLivePropertiesRequest(String accessToken) {
-            this("RPC", "user.auth.xboxlive.com", "d=".concat(accessToken));
+            this("RPS", "user.auth.xboxlive.com", "d=".concat(accessToken));
         }
     }
 
