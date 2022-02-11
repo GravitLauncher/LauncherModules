@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launcher.request.RequestException;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.password.AuthPlainPassword;
@@ -17,12 +18,15 @@ import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportExit;
 import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportRegistration;
+import pro.gravit.launchserver.auth.core.interfaces.user.UserSupportTextures;
 import pro.gravit.launchserver.auth.password.DigestPasswordVerifier;
 import pro.gravit.launchserver.auth.password.PasswordVerifier;
+import pro.gravit.launchserver.auth.texture.RequestTextureProvider;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import pro.gravit.utils.command.Command;
 import pro.gravit.utils.command.SubCommand;
+import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.SecurityHelper;
@@ -43,11 +47,14 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     public boolean autoReg = false;
     public long oauthTokenExpire = 60 * 60 * 1000;
     public PasswordVerifier passwordVerifier;
+    public String skinUrl;
+    public String cloakUrl;
     private final transient Logger logger = LogManager.getLogger();
     private transient Map<UUID, UserEntity> users = new ConcurrentHashMap<>();
     private transient Set<UserSessionEntity> sessions = ConcurrentHashMap.newKeySet();
     private transient FileAuthSystemModule module;
     private transient Path dbPath;
+    private transient LaunchServer server;
 
     @Override
     public Map<String, Command> getCommands() {
@@ -104,6 +111,73 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     throw new IllegalArgumentException(String.format("User %s not found", args[0]));
                 entity.getPermissions().removePerm(args[1]);
                 logger.info("Permission added");
+            }
+        });
+        commands.put("updateskin", new SubCommand("[username] [slim (true/false)] (url or path)", "update skin for user") {
+            @Override
+            public void invoke(String... args) throws Exception {
+                verifyArgs(args, 2);
+                UserEntity entity = getUser(args[0]);
+                if (entity == null)
+                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                boolean isSlim = Boolean.parseBoolean(args[1]);
+                Texture texture;
+                if(args.length >= 3) {
+                    String textureUrl = args[2];
+                    if(!textureUrl.startsWith("http://") && !textureUrl.startsWith("https://")) {
+                        Path pathToSkin = Paths.get(textureUrl);
+                        byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
+                        String hexDigest = SecurityHelper.toHex(digest);
+                        Path target = server.updatesDir.resolve("skins").resolve(hexDigest);
+                        IOHelper.createParentDirs(target);
+                        if(Files.notExists(target)) {
+                            Files.copy(pathToSkin, target);
+                        }
+                        String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
+                        texture = new Texture(url, digest, isSlim ? Map.of("model", "slim") : null);
+                    } else {
+                        texture = new Texture(textureUrl, false);
+                    }
+                } else if(skinUrl != null) {
+                    String textureUrl = RequestTextureProvider.getTextureURL(skinUrl, entity.uuid, entity.username, "");
+                    texture = new Texture(textureUrl, false);
+                } else {
+                    throw new IllegalArgumentException("Please provide url or path");
+                }
+                entity.skin = texture;
+            }
+        });
+        commands.put("updatecloak", new SubCommand("[username] (url or path)", "update cloak for user") {
+            @Override
+            public void invoke(String... args) throws Exception {
+                verifyArgs(args, 1);
+                UserEntity entity = getUser(args[0]);
+                if (entity == null)
+                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                Texture texture;
+                if(args.length >= 2) {
+                    String textureUrl = args[1];
+                    if(!textureUrl.startsWith("http://") && !textureUrl.startsWith("https://")) {
+                        Path pathToSkin = Paths.get(textureUrl);
+                        byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
+                        String hexDigest = SecurityHelper.toHex(digest);
+                        Path target = server.updatesDir.resolve("skins").resolve(hexDigest);
+                        IOHelper.createParentDirs(target);
+                        if(Files.notExists(target)) {
+                            Files.copy(pathToSkin, target);
+                        }
+                        String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
+                        texture = new Texture(url, digest, null);
+                    } else {
+                        texture = new Texture(textureUrl, true);
+                    }
+                } else if(cloakUrl != null) {
+                    String textureUrl = RequestTextureProvider.getTextureURL(cloakUrl, entity.uuid, entity.username, "");
+                    texture = new Texture(textureUrl, true);
+                } else {
+                    throw new IllegalArgumentException("Please provide url or path");
+                }
+                entity.cloak = texture;
             }
         });
         return commands;
@@ -183,6 +257,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
     @Override
     public void init(LaunchServer server) {
+        this.server = server;
         module = server.modulesManager.getModule(FileAuthSystemModule.class);
         dbPath = module.getDatabasePath();
         if (passwordVerifier == null) {
@@ -354,12 +429,14 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         return sessions.removeIf(e -> e.entity == user);
     }
 
-    public static class UserEntity implements User {
+    public static class UserEntity implements User, UserSupportTextures {
         public String username;
         public UUID uuid;
         public ClientPermissions permissions;
         public String serverId;
         public String accessToken;
+        public Texture skin;
+        public Texture cloak;
         private String password;
 
         public UserEntity() {
@@ -415,6 +492,16 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     ", uuid=" + uuid +
                     ", permissions=" + permissions +
                     '}';
+        }
+
+        @Override
+        public Texture getSkinTexture() {
+            return skin;
+        }
+
+        @Override
+        public Texture getCloakTexture() {
+            return cloak;
         }
     }
 
