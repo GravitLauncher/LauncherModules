@@ -29,6 +29,7 @@ public class UnsafeCommandsModule extends LauncherModule {
         category.registerCommand("cipherList", new CipherListCommand(server));
         category.registerCommand("launchinstaller", new LaunchInstallerCommand(server));
         category.registerCommand("deduplibraries", new DeDupLibrariesCommand(server));
+        category.registerCommand("patchauthlib", new PatchAuthlibCommand(server));
         server.commandHandler.registerCategory(new CommandHandler.Category(category, "Unsafe"));
     }
 
