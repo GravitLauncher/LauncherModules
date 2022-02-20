@@ -5,8 +5,8 @@
 #### Установка модуля
 
 1. Скопировать модуль **Sentry_module.jar** в папку **/LaunchServer/modules/**
-2. Скопировать библиотеки https://repo1.maven.org/maven2/io/sentry/sentry/5.0.0-beta.4/sentry-5.0.0-beta.4.jar
-   и https://repo1.maven.org/maven2/io/sentry/sentry-log4j2/5.0.0-beta.4/sentry-log4j2-5.0.0-beta.4.jar в папку
+2. Скопировать библиотеки https://repo1.maven.org/maven2/io/sentry/sentry/5.1.2/sentry-5.1.2.jar
+   и https://repo1.maven.org/maven2/io/sentry/sentry-log4j2/5.1.2/sentry-log4j2-5.1.2.jar в папку
    libraries
 3. Запустить и остановить **LaunchServer.jar** для создания файла конфигурации.
 4. Зарегистрироваться на сайте **Sentry.io** и создайте там проект.
