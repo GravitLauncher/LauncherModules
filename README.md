@@ -4,8 +4,8 @@
 
 Набор стандартных, публичных модулей для [GravitLauncher]. Подробное описание и конфигурацию каждого из них можно найти в папке с этим модулем. Некоторые инструкции модулей могут быть устаревшими, первостепенным источником является [Wiki]
 
-- Модули для LaunchServer, именуемые далее как **\_module** находятся в архиве **LaunchServerModules.zip** и помещаются в папку `modules/` [Releases]
-- Модули для LauncherRuntime, именуемые далее как **\_lmodule** находятся в архиве **LauncherModules.zip** и помещаются в папку `launcher-modules/` [Releases]
+- Модули для LaunchServer, именуемые далее как **\_module**, находятся в архиве **LaunchServerModules.zip** и помещаются в папку `modules/` [Releases]
+- Модули для LauncherRuntime, именуемые далее как **\_lmodule**, находятся в архиве **LauncherModules.zip** и помещаются в папку `launcher-modules/` [Releases]
 - Если вы компилируете [GravitLauncher] скриптом, модули так же собираются и находятся в своих папках:
   */LaunchServer/src/modules/ModuleServerName_module/build/libs/ModuleServerName_module.jar*
   */LaunchServer/src/modules/ModuleRuntimeName_lmodule/build/libs/ModuleRuntimeName_lmodule.jar*
