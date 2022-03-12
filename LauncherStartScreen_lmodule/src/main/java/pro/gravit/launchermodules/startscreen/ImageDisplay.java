@@ -17,11 +17,11 @@ public class ImageDisplay implements Closeable {
         JLabel lbl = new JLabel();
         lbl.setIcon(new ImageIcon(img));
         frame.add(lbl);
-        frame.setLocationRelativeTo(null);
         frame.setBackground(new Color(config.colorR, config.colorG, config.colorB, config.colorA));
         frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
     }
 
     @Override
