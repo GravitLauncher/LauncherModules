@@ -30,12 +30,12 @@ public class LwjglDownloadCommand extends Command {
 
     @Override
     public String getArgsDescription() {
-        return null;
+        return "[version] [client dir]";
     }
 
     @Override
     public String getUsageDescription() {
-        return null;
+        return "download lwjgl 3.3.0+";
     }
 
     @Override
@@ -43,13 +43,13 @@ public class LwjglDownloadCommand extends Command {
         verifyArgs(args, 2);
         String version = args[0];
         Path clientDir = server.updatesDir.resolve(args[1]);
-        Path lwjglDir = clientDir.resolve("libraries").resolve("com").resolve("org").resolve("lwjgl");
+        Path lwjglDir = clientDir.resolve("libraries").resolve("org").resolve("lwjgl");
         Path natives = clientDir.resolve("natives");
         List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc");
         List<String> archs = List.of("linux", "windows", "windows-x86", "macos");
         String mirror = "https://repo1.maven.org/maven2/org/lwjgl/";
         for(String component : components) {
-            Path jarPath = lwjglDir.resolve(component).resolve(version).resolve(component.concat("-").concat(version).concat("jar"));
+            Path jarPath = lwjglDir.resolve(component).resolve(version).resolve(component.concat("-").concat(version).concat(".jar"));
             Path jarDirPath = jarPath.getParent();
             Files.createDirectories(jarDirPath);
             String prepareUrl = mirror
