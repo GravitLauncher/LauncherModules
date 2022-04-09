@@ -1,0 +1,30 @@
+# DiscordBotConsole
+
+Позволяет управлять лаунчсервером удаленно через Discord бота
+
+#### Установка модуля
+
+1. Скопировать модуль **DiscordBotConsole_module.jar** в папку **/LaunchServer/modules/**
+2. Скачать и положить в `libraries` библиотеку https://github.com/DV8FromTheWorld/JDA/releases/download/v5.0.0-alpha.9/JDA-5.0.0-alpha.9-withDependencies.jar
+3. Создать бота в панели управления разработчика https://discord.com/developers/applications и скопировать его токен
+4. Настроить конфигурацию
+
+#### Конфигурация
+
+```json
+{
+   "token": "TOKEN",
+   "prefix": "!",
+   "eventGuildId": 1111111,
+   "eventChannelId": 111111,
+   "allowUsers": [ 123456, 123457 ],
+   "allowRoles": [ 7654321, 7654322 ]
+}
+```
+
+- **token**: ваш токен бота
+- **prefix**: префикс команд
+- **eventGuildId**: ID вашего Discord сервера
+- **eventChannelId**: ID канала для уведомлений от лаунчсервера
+- **allowUsers**: ID пользователей, которым разрешено выполнять команды
+- **allowRoles**: ID ролей, участникам которых разрешено выполнять команды
