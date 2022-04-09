@@ -68,7 +68,7 @@ public class DiscordBotListener extends ListenerAdapter {
                 String[] args = new String[cmd.length];
                 System.arraycopy(cmd, 1, args, 0, cmd.length-1);
                 command.invoke(args);
-                String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception)).collect(Collectors.joining("\n"));
+                String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception == null ? "" : x.exception)).collect(Collectors.joining("\n"));
                 channel.sendMessage(new MessageBuilder()
                         .append("Команда выполнена успешно. Лог: ")
                         .appendCodeBlock(fullLog, "")
