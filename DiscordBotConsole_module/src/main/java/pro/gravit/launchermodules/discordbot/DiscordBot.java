@@ -13,6 +13,8 @@ import pro.gravit.launchserver.LaunchServer;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DiscordBot {
     private static final Logger logger = LogManager.getLogger(DiscordBot.class);
@@ -59,5 +61,11 @@ public class DiscordBot {
         public long eventChannelId = 12345;
         public List<String> allowUsers = new ArrayList<>();
         public List<String> allowRoles = new ArrayList<>();
+        public EventsConfig events = new EventsConfig();
+    }
+
+    public static class EventsConfig {
+        public boolean login;
+        public boolean checkServer;
     }
 }

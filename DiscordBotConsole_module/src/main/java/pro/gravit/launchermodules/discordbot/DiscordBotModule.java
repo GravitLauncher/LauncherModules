@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.discordbot;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,9 +31,6 @@ public class DiscordBotModule extends LauncherModule {
 
     public void finish(LaunchServerFullInitEvent event) {
         init(event.server);
-        DiscordBot.sendEvent(new MessageBuilder()
-                        .append("LaunchServer запущен")
-                .build());
     }
 
     @Override
@@ -72,6 +70,33 @@ public class DiscordBotModule extends LauncherModule {
             DiscordBot.initialize(config, server);
         } catch (LoginException e) {
             logger.error("DiscordBotModule disabled. Please set 'token'", e);
+        }
+        if(config.events.login) {
+            server.authHookManager.postHook.registerHook((context, client) -> {
+                DiscordBot.sendEvent(new MessageBuilder()
+                                .append(String.format("Пользователь %s авторизовался в лаунчере", client.username))
+                                .setEmbeds(new EmbedBuilder()
+                                        .addField("UUID", String.format("%s", client.uuid), false)
+                                        .addField("AuthId", String.format("%s", client.auth.displayName), false)
+                                        .build())
+                        .build());
+                return false;
+            });
+        }
+        if(config.events.checkServer) {
+            server.authHookManager.postCheckServerHook.registerHook((report, client) -> {
+                String serverName = client.getSerializableProperty("launchserver.serverName");
+                if(serverName == null) {
+                    serverName = "Unknown";
+                }
+                DiscordBot.sendEvent(new MessageBuilder()
+                                .append(String.format("Пользователь %s входит на сервер %s", report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(), serverName))
+                                .setEmbeds(new EmbedBuilder()
+                                        .addField("UUID", String.format("%s", report.uuid), false)
+                                        .build())
+                        .build());
+                return false;
+            });
         }
     }
 }

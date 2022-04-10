@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LogEvent;
 import org.jetbrains.annotations.NotNull;
 import pro.gravit.launchserver.LaunchServer;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class DiscordBotListener extends ListenerAdapter {
     private final DiscordBot.Config config;
     private final LaunchServer server;
+    private final Logger logger = LogManager.getLogger(DiscordBotListener.class);
 
     public DiscordBotListener(DiscordBot.Config config, LaunchServer server) {
         this.config = config;
@@ -65,7 +68,7 @@ public class DiscordBotListener extends ListenerAdapter {
                 if(command == null) {
                     throw new CommandException(String.format("Command '%s' not found", cmd[0]));
                 }
-                String[] args = new String[cmd.length];
+                String[] args = new String[cmd.length-1];
                 System.arraycopy(cmd, 1, args, 0, cmd.length-1);
                 command.invoke(args);
                 String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception == null ? "" : x.exception)).collect(Collectors.joining("\n"));
