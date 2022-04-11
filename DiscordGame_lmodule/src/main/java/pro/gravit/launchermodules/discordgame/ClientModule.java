@@ -52,7 +52,7 @@ public class ClientModule extends LauncherModule {
         try {
             DiscordBridge.init(config.appId);
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
-            Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);
+            Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
             LogHelper.error(e);
         }
@@ -67,7 +67,7 @@ public class ClientModule extends LauncherModule {
         try {
             DiscordBridge.init(config.appId);
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);
-            Request.service.registerEventHandler(RequestEventWatcher.INSTANCE);
+            Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
             LogHelper.error(e);
         }
@@ -75,7 +75,7 @@ public class ClientModule extends LauncherModule {
 
     private void exitHandler(ClientExitPhase phase) {
         if (isClosed(true)) return;
-        if (RequestEventWatcher.INSTANCE != null) Request.service.unregisterEventHandler(RequestEventWatcher.INSTANCE);
+        if (RequestEventWatcher.INSTANCE != null) Request.getRequestService().unregisterEventHandler(RequestEventWatcher.INSTANCE);
         DiscordBridge.close();
     }
 

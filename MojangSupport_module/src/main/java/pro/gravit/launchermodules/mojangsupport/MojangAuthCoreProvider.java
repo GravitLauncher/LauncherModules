@@ -438,7 +438,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
 
         @Override
         public ClientPermissions getPermissions() {
-            return new ClientPermissions(0);
+            return new ClientPermissions();
         }
 
         @Override

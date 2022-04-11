@@ -13,6 +13,7 @@ import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 public class SendAuthCommand extends Command {
@@ -37,7 +38,7 @@ public class SendAuthCommand extends Command {
         String username = args[1];
         AuthResponse.ConnectTypes type = AuthResponse.ConnectTypes.valueOf(args[3]);
         AuthProviderPair pair = server.config.getAuthProviderPair(args[2]);
-        ClientPermissions permissions = args.length > 4 ? new ClientPermissions(Long.parseLong(args[4])) : ClientPermissions.DEFAULT;
+        ClientPermissions permissions = args.length > 4 ? new ClientPermissions(List.of(), List.of(args[4])) : ClientPermissions.DEFAULT;
         User user = pair.core.getUserByLogin(username);
         UUID uuid;
         if (user == null) {
@@ -71,11 +72,8 @@ public class SendAuthCommand extends Command {
             client.coreObject = user;
             client.sessionObject = session;
             server.authManager.internalAuth(client, type, pair, username, uuid, permissions, oauth != null);
-            if (oauth == null) { // Set legacy session
-                client.session = UUID.randomUUID();
-            }
             PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
-            AuthRequestEvent request = new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, oauth == null ? client.session : null, oauth);
+            AuthRequestEvent request = new AuthRequestEvent(permissions, playerProfile, minecraftAccessToken, null, null, oauth);
             request.requestUUID = RequestEvent.eventUUID;
             server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, request);
         });

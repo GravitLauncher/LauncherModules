@@ -1,10 +1,11 @@
 package pro.gravit.launchermodules.discordgame;
 
 import pro.gravit.launcher.events.request.AuthRequestEvent;
+import pro.gravit.launcher.request.RequestService;
 import pro.gravit.launcher.request.WebSocketEvent;
 import pro.gravit.launcher.request.websockets.ClientWebSocketService;
 
-public class RequestEventWatcher implements ClientWebSocketService.EventHandler {
+public class RequestEventWatcher implements RequestService.EventHandler {
     public static RequestEventWatcher INSTANCE;
     public final boolean isClientInstance;
 

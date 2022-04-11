@@ -4,6 +4,7 @@ import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.client.ClientLauncherProcess;
 import pro.gravit.launcher.profiles.PlayerProfile;
+import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchermodules.discordgame.ClientModule;
 import pro.gravit.launchermodules.discordgame.Config;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
@@ -204,11 +205,13 @@ public class DiscordActivityService {
     public void onPlayerProfile(PlayerProfile playerProfile) {
         setParam("username", playerProfile.username);
         setParam("uuid", playerProfile.uuid.toString());
-        if (playerProfile.skin != null) {
-            setParam("skinurl", playerProfile.skin.url);
+        Texture skin = playerProfile.assets.get("SKIN");
+        if(skin != null) {
+            setParam("skinurl", skin.url);
         }
-        if (playerProfile.cloak != null) {
-            setParam("cloakurl", playerProfile.cloak.url);
+        Texture cape = playerProfile.assets.get("CAPE");
+        if(cape != null) {
+            setParam("cloakurl", cape.url);
         }
     }
 
