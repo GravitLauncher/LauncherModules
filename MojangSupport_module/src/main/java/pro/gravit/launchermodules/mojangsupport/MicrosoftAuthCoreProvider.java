@@ -12,6 +12,7 @@ import pro.gravit.launcher.request.auth.password.AuthCodePassword;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.core.User;
+import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.helper.HttpHelper;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.Client;
@@ -108,19 +109,30 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         ));
     }
 
-    /*@Override
+    @Override
+    public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
+        try {
+            var minecraftAccessToken = getMinecraftTokenByMicrosoftToken(accessToken);
+            return super.getUserSessionByOAuthAccessToken(minecraftAccessToken);
+        } catch (IOException e) {
+            logger.error("getMinecraftTokenByMicrosoftToken failed", e);
+            return null;
+        }
+    }
+
+    @Override
     public AuthManager.AuthReport refreshAccessToken(String refreshToken, AuthResponse.AuthContext context) {
         try {
             var result = sendMicrosoftOAuthRefreshTokenRequest(refreshToken);
             if(result == null) {
                 return null;
             }
-            return AuthManager.AuthReport.ofOAuth(result.access_token, result.refresh_token, result.expires_in);
+            return AuthManager.AuthReport.ofOAuth(result.access_token, result.refresh_token, result.expires_in, null);
         } catch (IOException e) {
             logger.error("Microsoft refresh failed", e);
             return null;
         }
-    }*/
+    }
 
     @Override
     public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
@@ -196,19 +208,6 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 .build();
         var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
         return e.getOrThrow();
-    }
-
-    @Override
-    public AuthManager.AuthReport refreshAccessToken(String refreshToken, AuthResponse.AuthContext context) {
-        if(refreshToken == null) {
-            return null;
-        }
-        try {
-            var result = sendMicrosoftOAuthRefreshTokenRequest(refreshToken);
-            return AuthManager.AuthReport.ofOAuth(result.access_token, result.refresh_token, result.expires_in * 1000, null);
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     private MicrosoftOAuthTokenResponse sendMicrosoftOAuthRefreshTokenRequest(String refreshToken) throws IOException {
