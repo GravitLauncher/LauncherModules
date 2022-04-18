@@ -138,9 +138,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 var minecraftToken = getMinecraftTokenByMicrosoftToken(token.access_token);
                 var session = getUserSessionByOAuthAccessToken(minecraftToken);
                 if(minecraftAccess) {
-                    return AuthManager.AuthReport.ofOAuthWithMinecraft(minecraftToken, token.access_token, token.refresh_token, token.expires_in, session);
+                    return AuthManager.AuthReport.ofOAuthWithMinecraft(minecraftToken, token.access_token, token.refresh_token, token.expires_in * 1000, session);
                 } else {
-                    return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in, session);
+                    return AuthManager.AuthReport.ofOAuth(token.access_token, token.refresh_token, token.expires_in * 1000, session);
                 }
             } catch (OAuthAccessTokenExpired e) {
                 throw new AuthException("Internal Auth Error: Token invalid");
@@ -196,6 +196,19 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 .build();
         var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
         return e.getOrThrow();
+    }
+
+    @Override
+    public AuthManager.AuthReport refreshAccessToken(String refreshToken, AuthResponse.AuthContext context) {
+        if(refreshToken == null) {
+            return null;
+        }
+        try {
+            var result = sendMicrosoftOAuthRefreshTokenRequest(refreshToken);
+            return AuthManager.AuthReport.ofOAuth(result.access_token, result.refresh_token, result.expires_in * 1000, null);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private MicrosoftOAuthTokenResponse sendMicrosoftOAuthRefreshTokenRequest(String refreshToken) throws IOException {
