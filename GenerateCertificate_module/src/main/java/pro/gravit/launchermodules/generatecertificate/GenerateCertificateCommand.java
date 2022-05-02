@@ -126,7 +126,7 @@ public class GenerateCertificateCommand extends Command {
         certs[1] = caCertBagBuilder.build();
         certs[0] = endingCertBagBuilder.build();
         pkcsBuilder.addData(keyBagBuilder.build());
-        pkcsBuilder.addEncryptedData(new BcPKCS12PBEOutputEncryptorBuilder(PKCSObjectIdentifiers.pbeWithSHAAnd40BitRC2_CBC, new CBCBlockCipher(new RC2Engine())).build(passwd.toCharArray()), certs);
+        pkcsBuilder.addEncryptedData(new BcPKCS12PBEOutputEncryptorBuilder(PKCSObjectIdentifiers.pbeWithSHAAnd3_KeyTripleDES_CBC, new CBCBlockCipher(new DESedeEngine())).build(passwd.toCharArray()), certs);
         PKCS12PfxPdu pfx = pkcsBuilder.build(new BcPKCS12MacCalculatorBuilder(), passwd.toCharArray());
         LogHelper.info("Save PKCS#12 keystore");
         try (OutputStream output = IOHelper.newOutput(server.dir.resolve(projectName.concat("CodeSign.p12")))) {
