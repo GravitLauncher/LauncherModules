@@ -65,7 +65,7 @@ public class TelegramBotListener extends TelegramLongPollingBot {
             message.setChatId(String.valueOf(update.getMyChatMember().getChat().getId()));
             message.setText("channelID: " + update.getMyChatMember().getChat().getId());
             send(message);
-        } else if (update.hasMessage() && update.getMessage().isUserMessage()) {
+        } else if (update.hasMessage() && (update.getMessage().isUserMessage() || update.getMessage().isGroupMessage())) {
             if (config.logging)
                 logger.debug("TelegramBot << ({}, id:{}) message: {}",
                         update.getMessage().getFrom().getUserName(),
