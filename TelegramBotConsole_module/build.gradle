@@ -1,0 +1,12 @@
+def mainClassName = "pro.gravit.launchermodules.telegrambot.TelegramBotModule"
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+dependencies {
+    implementation group: 'org.telegram', name: 'telegrambots', version: '6.0.1'
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
