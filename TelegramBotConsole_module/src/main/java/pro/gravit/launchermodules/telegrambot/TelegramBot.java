@@ -38,6 +38,7 @@ public class TelegramBot {
         public String channelID = "";
         public List<String> allowUsers = new ArrayList<>();
         public EventsConfig events = new EventsConfig();
+        public boolean logging = true;
     }
 
     public static class EventsConfig {

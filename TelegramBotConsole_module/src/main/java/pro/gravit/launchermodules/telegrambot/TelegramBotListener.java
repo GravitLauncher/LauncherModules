@@ -66,6 +66,11 @@ public class TelegramBotListener extends TelegramLongPollingBot {
             message.setText("channelID: " + update.getMyChatMember().getChat().getId());
             send(message);
         } else if (update.hasMessage() && update.getMessage().isUserMessage()) {
+            if (config.logging)
+                logger.debug("TelegramBot << ({}, id:{}) message: {}",
+                        update.getMessage().getFrom().getUserName(),
+                        update.getMessage().getFrom().getId(),
+                        update.getMessage().getText());
             messageHandler(update);
         }
     }
@@ -114,7 +119,7 @@ public class TelegramBotListener extends TelegramLongPollingBot {
     }
 
     public void sendNotify(String text) {
-        if(config.channelID.isEmpty())
+        if (config.channelID.isEmpty())
             return;
         SendMessage message = new SendMessage();
         message.enableMarkdown(true);
