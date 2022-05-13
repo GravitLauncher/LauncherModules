@@ -67,7 +67,7 @@ public class TelegramBotModule extends LauncherModule {
         try {
             TelegramBot.initialize(config, server);
         } catch (LoginException e) {
-            logger.error("DiscordBotModule disabled. Please set 'token'", e);
+            logger.error("TelegramBotModule disabled. Please set 'token'", e);
         }
         if (config.events.login) {
             server.authHookManager.postHook.registerHook((context, client) -> {
