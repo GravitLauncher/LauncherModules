@@ -113,7 +113,7 @@ public class DiscordBotListener extends ListenerAdapter {
 
         public LogEventView(LogEvent event) {
             level = event.getLevel().toString();
-            message = event.getMessage().getFormattedMessage();
+            message = event.getMessage().getFormattedMessage().replaceAll("\u001B\\[[;\\d]*m", "");
             Throwable throwable = event.getMessage().getThrowable();
             if (throwable != null) {
                 exception = String.format("%s: %s", throwable.getClass().getName(), throwable.getMessage());
