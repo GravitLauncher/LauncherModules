@@ -14,18 +14,18 @@
 | Module | Description |
 | ------ | ------ |
 | [AdditionalHash] | Добавляет новый тип **AuthProvider**. Позволяет проверять хеш паролей *bcrypt* и *phpass*.  |
+| [DiscordBotConsole] | Модуль позволяет взаимодействовать с LaunchServer через Discord клиент. |
 | [FileAuthSystem]\* | Система авторизации с хранением базы пользователей в файле json |
 | [GenerateCertificate] | Создает сертификаты для подписи **Launcher.**(*jar\|exe*). |
+| [LauncherStartScreen] | *(launcher-modules)* Добавляет окно загрузки *Launcher'а* до полной инициализации **runtime**. |
 | [MojangSupport] | Добавляет *[GravitLauncher]* поддержку **mojang**. |
 | [OneLauncher] | Запрещает запуск двух и более копий лаунчера |
 | [OpenSSLSignCode] | Позволяет подписывать **exe** файлы своим сертификатом. |
 | [Sentry LaunchServer] | Интеграция *[GravitLauncher]* с Sentry. |
 | [SystemdNotifer] |  Служит для правильного порядка загрузки **LaunchServer** утилитой **systemd**. |
-| [UnsafeCommandPack] | Добавляет дополнительные команды в *[GravitLauncher]*. |
-| [DiscordRPC] | *(launcher-modules)* Добавляет *Launcher'у* интеграцию с **Discord**. |
-| [LauncherStartScreen] | *(launcher-modules)* Добавляет окно загрузки *Launcher'а* до полной инициализации **
-runtime**. |
 | [Sentry Launcher] | *(launcher-modules)* Интеграция *Launcher'a* с Sentry. |
+| [TelegramBotConsole] | Модуль позволяет взаимодействовать с LaunchServer через Telegram клиент. |
+| [UnsafeCommandPack] | Добавляет дополнительные команды в *[GravitLauncher]*. |
 
 **рекомендуется к использованию.*
 
@@ -52,6 +52,10 @@ runtime**. |
 [LauncherStartScreen]: https://github.com/GravitLauncher/LauncherModules/tree/master/LauncherStartScreen_lmodule
 
 [Sentry Launcher]: https://github.com/GravitLauncher/LauncherModules/tree/master/Sentry_lmodule
+
+[DiscordBotConsole]: https://github.com/GravitLauncher/LauncherModules/tree/master/DiscordBotConsole_module
+
+[TelegramBotConsole]: https://github.com/GravitLauncher/LauncherModules/tree/master/TelegramBotConsole_module
 
 [Wiki]: https://launcher.gravit.pro
 

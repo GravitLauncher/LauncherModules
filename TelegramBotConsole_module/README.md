@@ -1,14 +1,13 @@
 # TelegramBotConsole
 
-Позволяет управлять лаунчсервером удаленно через Telegram бота
+Позволяет управлять лаунчсервером удаленно через Telegram бота. \
+Модуль использует библиотеку [TelegramBots](https://repo1.maven.org/maven2/org/telegram/telegrambots/6.0.1/telegrambots-6.0.1.jar).
 
 #### Установка модуля
 
 1. Скопировать модуль **TelegramBotConsole_module.jar** в папку **/LaunchServer/modules/**
-2. Скачать и положить в `libraries`
-   библиотеку https://repo1.maven.org/maven2/org/telegram/telegrambots/6.0.1/telegrambots-6.0.1.jar
-3. Создать бота в панели управления разработчика https://t.me/botfather и скопировать его токен
-4. Настроить конфигурацию
+2. Создать бота в панели управления разработчика https://t.me/botfather и скопировать его токен
+3. Настроить конфигурацию
 
 #### Описание работы
 

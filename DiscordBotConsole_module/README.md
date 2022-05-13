@@ -1,13 +1,13 @@
 # DiscordBotConsole
 
-Позволяет управлять лаунчсервером удаленно через Discord бота
+Позволяет управлять лаунчсервером удаленно через Discord бота.\
+Модуль использует библиотеку [JDA](https://github.com/DV8FromTheWorld/JDA/releases/download/v5.0.0-alpha.9/JDA-5.0.0-alpha.9-withDependencies.jar).
 
 #### Установка модуля
 
 1. Скопировать модуль **DiscordBotConsole_module.jar** в папку **/LaunchServer/modules/**
-2. Скачать и положить в `libraries` библиотеку https://github.com/DV8FromTheWorld/JDA/releases/download/v5.0.0-alpha.9/JDA-5.0.0-alpha.9-withDependencies.jar
-3. Создать бота в панели управления разработчика https://discord.com/developers/applications и скопировать его токен
-4. Настроить конфигурацию
+2. Создать бота в панели управления разработчика https://discord.com/developers/applications и скопировать его токен
+3. Настроить конфигурацию
 
 #### Конфигурация
 
