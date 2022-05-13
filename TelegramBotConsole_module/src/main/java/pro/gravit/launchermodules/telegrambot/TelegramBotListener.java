@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LogEvent;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -128,13 +129,33 @@ public class TelegramBotListener extends TelegramLongPollingBot {
         send(message);
     }
 
-    public void send(SendMessage message) {
+    public void send(SendMessage send_message) {
+        StringBuilder result = new StringBuilder();
+        String msg = send_message.getText();
         try {
-            execute(message);
+            for (String line : msg.split("\n")) {
+                if ((result + line).length() > 1500) {
+                    execute(SendMessage.builder()
+                            .text(result + "```")
+                            .chatId(send_message.getChatId())
+                            .parseMode(ParseMode.MARKDOWN)
+                            .build());
+                    result = new StringBuilder("```" + line + "\n");
+                } else {
+                    result.append(line).append("\n");
+                }
+            }
+            execute(SendMessage.builder()
+                    .text(result.toString())
+                    .chatId(send_message.getChatId())
+                    .parseMode(ParseMode.MARKDOWN)
+                    .build());
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+
     }
+
 
     public static class LogLinesContainer implements Consumer<LogEvent> {
         public List<LogEventView> lines = new ArrayList<>();
