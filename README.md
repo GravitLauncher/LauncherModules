@@ -15,6 +15,7 @@
 | ------ | ------ |
 | [AdditionalHash] | Добавляет новый тип **AuthProvider**. Позволяет проверять хеш паролей *bcrypt* и *phpass*.  |
 | [DiscordBotConsole] | Модуль позволяет взаимодействовать с LaunchServer через Discord клиент. |
+| [DiscordGame] | *(launcher-modules)* Добавляет **Launcher'у** интеграцию с *Discord'ом*. |
 | [FileAuthSystem]\* | Система авторизации с хранением базы пользователей в файле json |
 | [GenerateCertificate] | Создает сертификаты для подписи **Launcher.**(*jar\|exe*). |
 | [LauncherStartScreen] | *(launcher-modules)* Добавляет окно загрузки *Launcher'а* до полной инициализации **runtime**. |
@@ -56,6 +57,8 @@
 [DiscordBotConsole]: https://github.com/GravitLauncher/LauncherModules/tree/master/DiscordBotConsole_module
 
 [TelegramBotConsole]: https://github.com/GravitLauncher/LauncherModules/tree/master/TelegramBotConsole_module
+
+[DiscordGame]: https://github.com/GravitLauncher/LauncherModules/tree/master/DiscordGame_lmodule
 
 [Wiki]: https://launcher.gravit.pro
 
