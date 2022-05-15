@@ -17,3 +17,71 @@
 - Файл `lib/x86_64/discord_game_sdk.dll` в `natives/windows/amd64/discord_game_sdk.dll`
 - Файл `lib/x86_64/discord_game_sdk.so` в `natives/linux/amd64/discord_game_sdk.so`
 - Файл `lib/x86_64/discord_game_sdk.dylib` в `natives/macos/amd64/discord_game_sdk.dylib`
+
+---
+
+## Настройка модуля
+
+#### Конфигурационный файл с комментариями:
+```json
+{
+  "enable": true,
+  "appId": 810913859371532298, //APPLICATION ID
+  "launcherDetails": "Лучший проект Minecraft", //Текст при запущенном лаунчере (не авторизован)
+  "launcherState": "В лаунчере", //Вторичный текст при запущенном лаунчере (не авторизован)
+  "largeKey": "large", //Имя главной картинки
+  "smallKey": "small", //Имя вторичной (маленько) кортинки
+  "largeText": "Everything", //Текст большой картинки
+  "smallText": "Everything", //Тект вторичной (маленько) кортинки
+  "clientDetails": "Лучший проект Minecraft", //Текст при запущенном клиенте
+  "clientState": "Играет на %profileName%", //Вторичный текст при запущенном клиенте
+  "authorizedDetails": "Лучший проект Minecraft", //Текст при запущенном лаунчере (авторизован)
+  "authorizedState": "Выбирает сервер", //Вторичный текст при запущенном лаунчере (авторизован)
+  "clientLargeKey": "large", //Имя главной картинки клиента
+  "clientSmallKey": "small", //Имя вторичной (маленько) кортинки клиента
+  "clientLargeText": "Everything", //Текст большой картинки
+  "clientSmallText": "Everything", //Тект вторичной (маленько) кортинки
+  "profileNameKeyMappings": {} //Не работает! Ранее, должен бы применять изображения к профилям
+}
+```
+**Копировать не рекомендуется!**
+
+### Немного пояснений:
+ - Имя приложения, отображается как название игры!
+ - `%profileName%` - это плейсхолдер, заменяющий собой, имя запущенного клиента (больше плейсхолдеров ниже)
+
+### Получаем "APPLICATION ID":
+1. Заходим на сайт: https://discord.com/developers/applications
+2. Создаём новое приложение
+3. Копируем `APPLICATION ID` в `appId` конфигурации модуля
+
+### Своя картинка, под каждый профиль:
+1. В `clientLargeKey` или `clientSmallKey` вставляем один из плейсхолдеров: `%profileUUID%` или `%profileHash%`
+2. Называем изображение профиля, соответствующему ему UUID или Hash
+
+### Как загрузить необходимое изображение:
+1. Переходим в настройки вашего приложения на сайте: https://discord.com/developers/applications
+2. Переходим в раздел "Rich Presence" и попадаем сразу на "Art Assets"
+3. Нажимаем на кнопку "Add Image(s)" и загружаем необходимые вам изображения
+4. Переименовываем загруженные изображения в более удобный вид (Не обязательно)
+
+**Модуль игнорирует аватар вашего приложение!**
+
+---
+
+## Все плейсхолдеры:
+
+```json
+%uuid% - UUID пользователя
+%profileVersion% - Версия профиля
+%profileName% - Имя профиля (title)
+%profileUUID% - UUID профиля
+%profileHash% - Hash профиля (UUID без `-`)
+%username% - Имя пользователя
+%skinurl% - URL скина
+%cloakurl% - URL плаща
+%launcherVersion% - Версия лаунчера
+%javaVersion% - Версия используемой Java
+%javaBits% - Разрядность используемой Java
+%os% - Операционная система
+```
