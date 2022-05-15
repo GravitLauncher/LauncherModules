@@ -47,8 +47,8 @@
 **Копировать не рекомендуется!**
 
 ### Немного пояснений:
- - Имя приложения, отображается как название игры!
- - `%profileName%` - это плейсхолдер, заменяющий собой, имя запущенного клиента (больше плейсхолдеров ниже)
+- Имя приложения, отображается как название игры!
+- `%profileName%` - это плейсхолдер, заменяющий собой, имя запущенного клиента (больше плейсхолдеров ниже)
 
 ### Получаем "APPLICATION ID":
 1. Заходим на сайт: https://discord.com/developers/applications
@@ -71,17 +71,15 @@
 
 ## Все плейсхолдеры:
 
-```json
-%uuid% - UUID пользователя
-%profileVersion% - Версия профиля
-%profileName% - Имя профиля (title)
-%profileUUID% - UUID профиля
-%profileHash% - Hash профиля (UUID без `-`)
-%username% - Имя пользователя
-%skinurl% - URL скина
-%cloakurl% - URL плаща
-%launcherVersion% - Версия лаунчера
-%javaVersion% - Версия используемой Java
-%javaBits% - Разрядность используемой Java
-%os% - Операционная система
-```
+- `%uuid%` - UUID пользователя
+- `%profileVersion%` - Версия профиля
+- `%profileName%` - Имя профиля (title)
+- `%profileUUID%` - UUID профиля
+- `%profileHash%` - Hash профиля (UUID без `-`)
+- `%username%` - Имя пользователя
+- `%skinurl%` - URL скина
+- `%cloakurl%` - URL плаща
+- `%launcherVersion%` - Версия лаунчера
+- `%javaVersion%` - Версия используемой Java
+- `%javaBits%` - Разрядность используемой Java
+- `%os%` - Операционная система
