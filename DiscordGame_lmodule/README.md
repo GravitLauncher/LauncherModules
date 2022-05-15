@@ -2,13 +2,16 @@
 
 Добавляет **Launcher'у** интеграцию с *Discord'ом*. То есть, при наличии *Discord'а* на компьютере игрока, запустившего
 один из ваших игровых клиентов, в его аккаунте *Discord'а* будет показывать, что он играет именно у вас.  
-Альтернативная, более современная реализация модуля DiscordRPC. **В настоящее время находится в разработке. Инструкция и
-функционал может быть неполным**
+Альтернативная, более современная реализация модуля DiscordRPC. 
 
-#### Установка модуля
+**В настоящее время находится в разработке. Инструкция и функционал могут быть неполным!**
+
+---
+
+## Установка модуля
 
 1. Скопировать модуль **DiscordGame_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
-2. Скачать последнюю версию библиотеки **discord-game-sdk4j**(https://github.com/JnCrMx/discord-game-sdk4j/releases) и
+2. Скачать последнюю версию библиотеки **discord-game-sdk4j** (https://github.com/JnCrMx/discord-game-sdk4j/releases) и
    положить в папку **/LaunchServer/launcher-libraries/**
 3. Добавить в **discord-game-sdk4j-0.5.X.jar** файлы из архива
    DiscordSDK ( https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip ):
