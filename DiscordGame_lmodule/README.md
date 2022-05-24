@@ -1,23 +1,20 @@
 # DiscordGame
 
 Добавляет **Launcher'у** интеграцию с *Discord'ом*. То есть, при наличии *Discord'а* на компьютере игрока, запустившего
-один из ваших игровых клиентов, в его аккаунте *Discord'а* будет показывать, что он играет именно у вас.  
-Альтернативная, более современная реализация модуля DiscordRPC.
+один из ваших игровых клиентов, в его аккаунте *Discord'а* будет показывать, что он играет именно у вас
 
 ---
 
 ## Установка модуля
 
 1. Скопировать модуль **DiscordGame_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
-2. Скачать последнюю версию библиотеки **discord-game-sdk4j** (https://github.com/JnCrMx/discord-game-sdk4j/releases) и
-   положить в папку **/LaunchServer/launcher-libraries/**
-3. Добавить в **discord-game-sdk4j-0.5.X.jar** файлы из архива
-   DiscordSDK ( https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip ):
-
+2. Скачать последнюю версию библиотеки **[discord-game-sdk4j-0.5.x.jar]**
+3. Добавить в **discord-game-sdk4j-0.5.x.jar** следующие файлы из архива **[Discord Game SDK 2.5.6 ZIP]**:
 - Файл `lib/x86/discord_game_sdk.dll` в `natives/windows/x86/discord_game_sdk.dll`
 - Файл `lib/x86_64/discord_game_sdk.dll` в `natives/windows/amd64/discord_game_sdk.dll`
 - Файл `lib/x86_64/discord_game_sdk.so` в `natives/linux/amd64/discord_game_sdk.so`
 - Файл `lib/x86_64/discord_game_sdk.dylib` в `natives/macos/amd64/discord_game_sdk.dylib`
+4. Библиотеку **discord-game-sdk4j-0.5.x.jar** поместить в папку **/LaunchServer/launcher-libraries/**
 
 ---
 
@@ -84,3 +81,7 @@
 - `%javaVersion%` - Версия используемой Java
 - `%javaBits%` - Разрядность используемой Java
 - `%os%` - Операционная система
+
+[discord-game-sdk4j-0.5.x.jar]: https://github.com/JnCrMx/discord-game-sdk4j/releases
+
+[Discord Game SDK 2.5.6 ZIP]: https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip
