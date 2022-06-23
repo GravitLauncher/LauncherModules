@@ -1,0 +1,15 @@
+def mainClassName = "pro.gravit.launchermodules.discordauthsystem.ModuleImpl"
+def configClassName = "pro.gravit.launchermodules.discordauthsystem.Config"
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+dependencies {
+    implementation("org.jsoup:jsoup:1.15.1")
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName,
+            "Module-Config-Class": configClassName,
+    )
+}
