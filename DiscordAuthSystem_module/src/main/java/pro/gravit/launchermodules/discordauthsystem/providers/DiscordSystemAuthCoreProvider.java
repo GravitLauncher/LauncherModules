@@ -196,10 +196,10 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         if (user == null) {
             return null;
         }
+
         String usernameUser = user.getUsername();
-        logger.info("checkServer username: " + usernameUser);
         String serverId = user.getServerId();
-        logger.info("checkServer serverId: " + serverId);
+
         if (usernameUser != null && usernameUser.equals(username) && serverId != null && serverId.equals(serverID)) {
             return user;
         }
@@ -210,10 +210,10 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
     public boolean joinServer(Client client, String username, String accessToken, String serverID) throws IOException {
         User user = client.getUser();
         if (user == null) return false;
+
         String usernameUser = user.getUsername();
-        logger.info("joinServer username: " + usernameUser);
         String userAccessToken = user.getAccessToken();
-        logger.info("joinServer userAccessToken: " + userAccessToken);
+
         return usernameUser != null && usernameUser.equals(username) && userAccessToken != null && userAccessToken.equals(accessToken) && updateServerID(user, serverID);
     }
 
@@ -476,7 +476,6 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
             s.executeUpdate();
             try (ResultSet generatedKeys = s.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    //writeHwidLog(connection, generatedKeys.getLong(1), publicKey);
                     long id = generatedKeys.getLong(1);
                     return new DiscordUserHardware(hardwareInfo, publicKey, id, false);
                 }
