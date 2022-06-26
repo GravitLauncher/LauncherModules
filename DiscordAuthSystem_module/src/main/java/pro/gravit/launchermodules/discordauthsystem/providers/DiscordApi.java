@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.discordauthsystem.providers;
 
+import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Connection;
@@ -8,6 +9,7 @@ import pro.gravit.launcher.Launcher;
 import pro.gravit.launchermodules.discordauthsystem.Config;
 
 import java.io.IOException;
+import java.util.List;
 
 public class DiscordApi {
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
@@ -62,6 +64,47 @@ public class DiscordApi {
                 request.get().body().text(),
                 OauthMeResponse.class
         );
+    }
+
+    public static List<UserGuildResponse> getUserGuilds(String accessToken) throws IOException {
+        org.jsoup.Connection request = Jsoup.connect(config.discordApiEndpoint + "/users/@me/guilds")
+                .header("Authorization", "Bearer " + accessToken)
+                .ignoreContentType(true);
+
+        return Launcher.gsonManager.gson.fromJson(
+                request.get().body().text(),
+                new TypeToken<List<UserGuildResponse>>(){}.getType()
+        );
+    }
+
+    public static MemberGuildResponse getUserGuildMember(String accessToken, String guildId) throws IOException {
+        org.jsoup.Connection request = Jsoup.connect(config.discordApiEndpoint + "/users/@me/guilds/" + guildId + "/member")
+                .header("Authorization", "Bearer " + accessToken)
+                .ignoreContentType(true);
+
+        return Launcher.gsonManager.gson.fromJson(
+                request.get().body().text(),
+                MemberGuildResponse.class
+        );
+    }
+
+    public static class UserGuildResponse {
+        public String id;
+
+        public String name;
+
+        public UserGuildResponse (String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    public static class MemberGuildResponse {
+        public String nick;
+
+        public MemberGuildResponse (String nick) {
+            this.nick = nick;
+        }
     }
 
     public static class DiscordUserResponse {

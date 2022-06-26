@@ -196,10 +196,8 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         if (user == null) {
             return null;
         }
-
         String usernameUser = user.getUsername();
         String serverId = user.getServerId();
-
         if (usernameUser != null && usernameUser.equals(username) && serverId != null && serverId.equals(serverID)) {
             return user;
         }
@@ -210,10 +208,8 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
     public boolean joinServer(Client client, String username, String accessToken, String serverID) throws IOException {
         User user = client.getUser();
         if (user == null) return false;
-
         String usernameUser = user.getUsername();
         String userAccessToken = user.getAccessToken();
-
         return usernameUser != null && usernameUser.equals(username) && userAccessToken != null && userAccessToken.equals(accessToken) && updateServerID(user, serverID);
     }
 
@@ -379,9 +375,9 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         String state = UUID.randomUUID().toString();
         client.setProperty("state", state);
         String responseType = "code";
-        String[] scope = new String[]{"identify", "guilds.join", "email"};
+        String[] scope = new String[]{"identify", "guilds", "guilds.members.read", "email"};
         String url = String.format("%s?response_type=%s&client_id=%s&scope=%s&state=%s&redirect_uri=%s&prompt=consent", module.config.discordAuthorizeUrl, responseType, module.config.clientId, String.join("%20", scope), state, module.config.redirectUrl);
-        return List.of(new AuthWebViewDetails(url, "https://google.com", true, true));
+        return List.of(new AuthWebViewDetails(url, "", true, true));
     }
 
     private DiscordUserHardware fetchHardwareInfo(ResultSet set) throws SQLException, IOException {
@@ -476,6 +472,7 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
             s.executeUpdate();
             try (ResultSet generatedKeys = s.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
+                    //writeHwidLog(connection, generatedKeys.getLong(1), publicKey);
                     long id = generatedKeys.getLong(1);
                     return new DiscordUserHardware(hardwareInfo, publicKey, id, false);
                 }
