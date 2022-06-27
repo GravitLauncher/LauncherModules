@@ -1,16 +1,16 @@
-From 14be66edc2e037b803c4688100021e28212c88c6 Mon Sep 17 00:00:00 2001
+From 2dff3aada7bd37142c77a7e78c92c18e45f011c5 Mon Sep 17 00:00:00 2001
 From: Meido <popenkodaniil@mail.ru>
-Date: Sun, 26 Jun 2022 03:03:55 +0700
-Subject: [PATCH] feat: DiscordAuthSystem_module
+Date: Sun, 26 Jun 2022 15:13:30 +0700
+Subject: [PATCH] DiscordAuthSystemRuntime
 
 ---
- .../client/gui/impl/GuiEventHandler.java      | 17 ++++++++++
- .../client/gui/scenes/login/LoginScene.java   |  4 +++
+ .../client/gui/impl/GuiEventHandler.java      | 18 +++++++++--
+ .../client/gui/scenes/login/LoginScene.java   |  8 +++++
  .../scenes/login/methods/WebAuthMethod.java   | 31 ++++++++++++++-----
- 3 files changed, 44 insertions(+), 8 deletions(-)
+ 3 files changed, 47 insertions(+), 10 deletions(-)
 
 diff --git a/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java b/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
-index c817abe..5dd3e8c 100644
+index c817abe..038886e 100644
 --- a/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
 +++ b/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
 @@ -3,12 +3,15 @@ package pro.gravit.launcher.client.gui.impl;
@@ -29,37 +29,45 @@ index c817abe..5dd3e8c 100644
  public class GuiEventHandler implements RequestService.EventHandler {
      private final JavaFXApplication application;
  
-@@ -32,6 +35,20 @@ public class GuiEventHandler implements RequestService.EventHandler {
-                 if (isNextScene && ((LoginScene) application.getCurrentScene()).isLoginStarted)
+@@ -26,11 +29,22 @@ public class GuiEventHandler implements RequestService.EventHandler {
+         try {
+             if (event instanceof AuthRequestEvent) {
+                 boolean isNextScene = application.getCurrentScene() instanceof LoginScene;
++                AuthRequestEvent rawAuthResult = (AuthRequestEvent) event;
+                 ((LoginScene) application.getCurrentScene()).isLoginStarted = true;
+                 LogHelper.dev("Receive auth event. Send next scene %s", isNextScene ? "true" : "false");
+-                application.stateService.setAuthResult(null, (AuthRequestEvent) event);
+-                if (isNextScene && ((LoginScene) application.getCurrentScene()).isLoginStarted)
++                application.stateService.setAuthResult(null, rawAuthResult);
++                if (isNextScene && ((LoginScene) application.getCurrentScene()).isLoginStarted) {
                      ((LoginScene) application.getCurrentScene()).onGetProfiles();
-             }
-+            if (event instanceof AdditionalDataRequestEvent) {
-+                AdditionalDataRequestEvent dataRequest = (AdditionalDataRequestEvent) event;
-+                Map<String, String> data = dataRequest.data;
 +
-+                String type = data.get("type");
-+
-+                if (type != null && type.equals("ChangeRuntimeSettings")) {
-+                    application.runtimeSettings.login = data.get("login");
-+                    application.runtimeSettings.oauthAccessToken = data.get("oauthAccessToken");
-+                    application.runtimeSettings.oauthRefreshToken = data.get("oauthRefreshToken");
-+                    application.runtimeSettings.oauthExpire = System.currentTimeMillis() + Integer.parseInt(data.get("oauthExpire"));
-+                    application.runtimeSettings.lastAuth = ((LoginScene) application.getCurrentScene()).getAuthAvailability();
++                    if (((LoginScene) application.getCurrentScene()).getSavePasswordCheckBox().isSelected()) {
++                        application.runtimeSettings.login = rawAuthResult.playerProfile.username;
++                        application.runtimeSettings.oauthAccessToken = rawAuthResult.oauth.accessToken;
++                        application.runtimeSettings.oauthRefreshToken = rawAuthResult.oauth.refreshToken;
++                        application.runtimeSettings.oauthExpire = System.currentTimeMillis() + rawAuthResult.oauth.expire;
++                        application.runtimeSettings.lastAuth = ((LoginScene) application.getCurrentScene()).getAuthAvailability();
++                    }
 +                }
-+            }
++
+             }
          } catch (Throwable e) {
              LogHelper.error(e);
-         }
 diff --git a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
-index 80cf2ed..0b9aa9d 100644
+index 80cf2ed..b20984e 100644
 --- a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
 +++ b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
-@@ -146,6 +146,10 @@ public class LoginScene extends AbstractScene {
+@@ -146,6 +146,14 @@ public class LoginScene extends AbstractScene {
          LogHelper.info("Selected auth: %s", authAvailability.name);
      }
  
 +    public GetAvailabilityAuthRequestEvent.AuthAvailability getAuthAvailability() {
 +        return this.authAvailability;
++    }
++
++    public CheckBox getSavePasswordCheckBox() {
++        return this.savePasswordCheckBox;
 +    }
 +
      public void addAuthAvailability(GetAvailabilityAuthRequestEvent.AuthAvailability authAvailability) {

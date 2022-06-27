@@ -6,6 +6,8 @@ targetCompatibility = '17'
 
 dependencies {
     implementation("org.jsoup:jsoup:1.15.1")
+    implementation("com.ibm.icu:icu4j:71.1")
+    implementation("com.github.slugify:slugify:3.0.1")
 }
 
 jar {

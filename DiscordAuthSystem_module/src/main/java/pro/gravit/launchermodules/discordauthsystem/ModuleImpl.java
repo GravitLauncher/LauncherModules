@@ -1,6 +1,5 @@
 package pro.gravit.launchermodules.discordauthsystem;
 
-import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.config.JsonConfigurable;
@@ -10,10 +9,11 @@ import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.discordauthsystem.providers.DiscordApi;
 import pro.gravit.launchermodules.discordauthsystem.providers.DiscordSystemAuthCoreProvider;
+import pro.gravit.launchermodules.discordauthsystem.responses.ExitResponse;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
-import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
+import pro.gravit.launchserver.socket.WebSocketService;
 import pro.gravit.launchserver.socket.handlers.NettyWebAPIHandler;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
@@ -34,6 +34,8 @@ public class ModuleImpl extends LauncherModule {
     public void preConfig(PreConfigPhase preConfigPhase) {
         if (!registred) {
             AuthCoreProvider.providers.register("discordauthsystem", DiscordSystemAuthCoreProvider.class);
+            WebSocketService.providers.unregister("exit");
+            WebSocketService.providers.register("exit", ExitResponse.class);
             registred = true;
         }
     }

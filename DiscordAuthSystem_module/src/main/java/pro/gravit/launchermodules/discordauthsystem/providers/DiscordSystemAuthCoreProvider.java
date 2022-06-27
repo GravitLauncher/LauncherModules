@@ -127,6 +127,15 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         }
     }
 
+    public DiscordUser updateDataUser(String discordId, String accessToken) {
+        try (Connection connection = mySQLHolder.getConnection()) {
+            return updateDataUser(connection, discordId, accessToken);
+        } catch (SQLException e) {
+            logger.error("updateDataUser SQL error", e);
+            return null;
+        }
+    }
+
     public DiscordUser updateDataUser(String discordId, String accessToken, String refreshToken, Long expiresIn) {
         try (Connection connection = mySQLHolder.getConnection()) {
             return updateDataUser(connection, discordId, accessToken, refreshToken, expiresIn);
@@ -136,41 +145,23 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         }
     }
 
+    private DiscordUser updateDataUser(Connection connection, String discordId, String accessToken) throws SQLException {
+        String sql = String.format("UPDATE %s SET %s=? WHERE %s = %s", table, accessTokenColumn, discordIdColumn, discordId);
+        PreparedStatement s = connection.prepareStatement(sql);
+        s.setString(1, accessToken);
+        s.executeUpdate();
+
+        return getUserByDiscordId(discordId);
+    }
+
     private DiscordUser updateDataUser(Connection connection, String discordId, String accessToken, String refreshToken, Long expiresIn) throws SQLException {
 
-        ArrayList<String> setList = new ArrayList<String>();
-
-        if (accessToken != null) {
-            if (accessToken.length() == 0) {
-                setList.add(accessTokenColumn + " = " + null);
-            } else {
-                setList.add(accessTokenColumn + " = '" + accessToken + "'");
-            }
-        }
-
-        if (refreshToken != null) {
-            if (refreshToken.length() == 0) {
-                setList.add(refreshTokenColumn + " = " + null);
-            } else {
-                setList.add(refreshTokenColumn + " = '" + refreshToken + "'");
-            }
-        }
-
-        if (expiresIn != null) {
-            if (expiresIn == 0) {
-                setList.add(expiresInColumn + " = " + null);
-            } else {
-                setList.add(expiresInColumn + " = " + expiresIn);
-            }
-        }
-
-        String sqlSet = String.join(", ", setList);
-
-        if (sqlSet.length() != 0) {
-            String sql = String.format("UPDATE %s SET %s WHERE %s = %s", table, sqlSet, discordIdColumn, discordId);
-            PreparedStatement s = connection.prepareStatement(sql);
-            s.executeUpdate();
-        }
+        String sql = String.format("UPDATE %s SET %s=?, %s=?, %s=? WHERE %s = %s", table, accessTokenColumn, refreshTokenColumn, expiresInColumn, discordIdColumn, discordId);
+        PreparedStatement s = connection.prepareStatement(sql);
+        s.setString(1, accessToken);
+        s.setString(2, refreshToken);
+        s.setLong(3, expiresIn);
+        s.executeUpdate();
 
         return getUserByDiscordId(discordId);
     }
@@ -331,7 +322,7 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         if (discordUser == null) {
             return true;
         }
-        return updateDataUser(discordUser.getDiscordId(), "", null, null) != null;
+        return updateDataUser(discordUser.getDiscordId(), null) != null;
     }
 
     private void setUserHardwareId(Connection connection, String discordId, long hwidId) throws SQLException {

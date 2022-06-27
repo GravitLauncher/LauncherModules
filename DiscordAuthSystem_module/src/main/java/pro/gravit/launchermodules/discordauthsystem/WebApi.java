@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.discordauthsystem;
 
+import com.github.slugify.Slugify;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,6 +39,7 @@ public class WebApi implements NettyWebAPIHandler.SimpleSeverletHandler {
     private final ModuleImpl module;
     private final LaunchServer server;
     private transient final Logger logger = LogManager.getLogger();
+    private final Slugify slg = Slugify.builder().underscoreSeparator(true).lowerCase(false).transliterator(true).build();
 
     public WebApi(ModuleImpl module, LaunchServer server) {
         this.module = module;
@@ -127,19 +129,21 @@ public class WebApi implements NettyWebAPIHandler.SimpleSeverletHandler {
         DiscordSystemAuthCoreProvider.DiscordUser user = core.getUserByDiscordId(response.user.id);
 
         if (user == null) {
-            String username;
+            String username = response.user.username;
             if (module.config.guildIdGetNick.length() > 0) {
                 try {
                     var member = DiscordApi.getUserGuildMember(accessTokenResponse.access_token, module.config.guildIdGetNick);
-                    username = member.nick;
+                    if (member.nick != null) {
+                        username = member.nick;
+                    }
                 } catch (Exception e) {
                     logger.error("DiscordApi.getUserGuildMember: " + e);
                     sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred!"));
                     return;
                 }
-            } else {
-                username = toSlug(response.user.username);
             }
+
+            username = slg.slugify(username);
 
             var usernameLength = username.length();
 
@@ -148,8 +152,11 @@ public class WebApi implements NettyWebAPIHandler.SimpleSeverletHandler {
                 return;
             }
 
-            if (usernameLength > module.config.usernameLimit) {
-                username = username.substring(0, usernameLength-1);
+            if (module.config.usernameRegex.length() > 0) {
+                if (!username.matches(module.config.usernameRegex)) {
+                    sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.NOT_ACCEPTABLE, "Your nickname does not meet the requirements. Please change it."));
+                    return;
+                }
             }
 
             if (core.getUserByUsername(username) != null) {
@@ -204,19 +211,6 @@ public class WebApi implements NettyWebAPIHandler.SimpleSeverletHandler {
             request.requestUUID = RequestEvent.eventUUID;
 
             server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, request);
-
-            Map<String, String> data = new HashMap<String, String>();
-
-            data.put("type", "ChangeRuntimeSettings");
-            data.put("login", finalUser.getUsername());
-            data.put("oauthAccessToken", finalUser.getAccessToken());
-            data.put("oauthRefreshToken", finalUser.getRefreshToken());
-            data.put("oauthExpire", finalUser.getExpiresIn().toString());
-
-            AdditionalDataRequestEvent dataRequestEvent = new AdditionalDataRequestEvent(data);
-            dataRequestEvent.requestUUID = RequestEvent.eventUUID;
-
-            server.nettyServerSocketHandler.nettyServer.service.sendObject(ch, dataRequestEvent);
         });
         sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.OK, "You are successfully authorized! Please return to the launcher."));
     }

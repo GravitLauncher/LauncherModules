@@ -10,12 +10,9 @@ public class Config {
     public String discordAuthorizeUrl = "https://discord.com/oauth2/authorize";
     public String discordApiEndpointVersion = "https://discord.com/api/v10";
     public String discordApiEndpoint = "https://discord.com/api";
-
     public List<DiscordGuild> guildIdsJoined = new ArrayList<>();
-
     public String guildIdGetNick = "";
-
-    public int usernameLimit = 32;
+    public String usernameRegex = "";
 
     public static class DiscordGuild {
         public String id;
