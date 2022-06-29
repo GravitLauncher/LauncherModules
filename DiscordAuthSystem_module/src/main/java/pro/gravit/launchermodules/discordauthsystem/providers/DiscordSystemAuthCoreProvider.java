@@ -1,15 +1,19 @@
 package pro.gravit.launchermodules.discordauthsystem.providers;
 
+import com.github.slugify.Slugify;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.ClientPermissions;
 import pro.gravit.launcher.events.request.GetAvailabilityAuthRequestEvent;
 import pro.gravit.launcher.request.auth.AuthRequest;
 import pro.gravit.launcher.request.auth.details.AuthWebViewDetails;
+import pro.gravit.launcher.request.auth.password.AuthCodePassword;
 import pro.gravit.launcher.request.secure.HardwareReportRequest;
 import pro.gravit.launchermodules.discordauthsystem.ModuleImpl;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
+import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.MySQLSourceConfig;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.auth.core.User;
@@ -31,6 +35,7 @@ import java.util.*;
 
 public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements AuthSupportExit, AuthSupportHardware {
     private final transient Logger logger = LogManager.getLogger();
+    private final transient Slugify slg = Slugify.builder().underscoreSeparator(true).lowerCase(false).transliterator(true).build();
     public MySQLSourceConfig mySQLHolder;
     public double criticalCompareLevel = 1.0;
     public String uuidColumn;
@@ -146,9 +151,10 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
     }
 
     private DiscordUser updateDataUser(Connection connection, String discordId, String accessToken) throws SQLException {
-        String sql = String.format("UPDATE %s SET %s=? WHERE %s = %s", table, accessTokenColumn, discordIdColumn, discordId);
+        String sql = String.format("UPDATE %s SET %s=? WHERE %s=?", table, accessTokenColumn, discordIdColumn);
         PreparedStatement s = connection.prepareStatement(sql);
         s.setString(1, accessToken);
+        s.setString(2, discordId);
         s.executeUpdate();
 
         return getUserByDiscordId(discordId);
@@ -156,11 +162,12 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
 
     private DiscordUser updateDataUser(Connection connection, String discordId, String accessToken, String refreshToken, Long expiresIn) throws SQLException {
 
-        String sql = String.format("UPDATE %s SET %s=?, %s=?, %s=? WHERE %s = %s", table, accessTokenColumn, refreshTokenColumn, expiresInColumn, discordIdColumn, discordId);
+        String sql = String.format("UPDATE %s SET %s=?, %s=?, %s=? WHERE %s=?", table, accessTokenColumn, refreshTokenColumn, expiresInColumn, discordIdColumn);
         PreparedStatement s = connection.prepareStatement(sql);
         s.setString(1, accessToken);
         s.setString(2, refreshToken);
         s.setLong(3, expiresIn);
+        s.setString(4, discordId);
         s.executeUpdate();
 
         return getUserByDiscordId(discordId);
@@ -273,18 +280,101 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
 
     @Override
     public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws AuthException {
-        if (login == null) {
-            throw AuthException.userNotFound();
+
+        DiscordApi.DiscordAccessTokenResponse accessTokenResponse;
+
+        AuthCodePassword codePassword = (AuthCodePassword) password;
+        var code = codePassword.code;
+
+        try {
+            accessTokenResponse = DiscordApi.getAccessTokenByCode(code);
+        } catch (Exception e) {
+            throw new AuthException("Discord authorization denied your code.");
         }
 
-        DiscordUser user = getDiscordUserByUsername(login);
+        DiscordApi.OauthMeResponse response;
+
+        try{
+            response = DiscordApi.getDiscordUserByAccessToken(accessTokenResponse.access_token);
+        } catch (IOException e) {
+            throw new AuthException("Discord authorization denied your access_token.");
+        }
+
+        if (!module.config.guildIdsJoined.isEmpty()) {
+
+            List<DiscordApi.UserGuildResponse> guilds;
+
+            try {
+                guilds = DiscordApi.getUserGuilds(accessTokenResponse.access_token);
+            } catch (IOException e) {
+                throw new AuthException("Error getting user guilds.");
+            }
+
+
+            var needGuilds = module.config.guildIdsJoined;
+
+            for (var guild : guilds) {
+                needGuilds.removeIf(g -> Objects.equals(g.id, guild.id));
+            }
+
+            if (!needGuilds.isEmpty()) {
+                String body = "To enter the server you must be a member of these guilds: ";
+                List<String> guildData = new ArrayList<>();
+                for (var g : needGuilds) {
+                    guildData.add("<a href=\"" + g.url + "\">" + g.name + "</a>");
+                }
+                throw new AuthException(body + String.join(", ", guildData));
+            }
+        }
+
+        DiscordSystemAuthCoreProvider.DiscordUser user = getUserByDiscordId(response.user.id);
 
         if (user == null) {
-            return null;
+            String username = response.user.username;
+            if (module.config.guildIdGetNick.length() > 0) {
+                try {
+                    var member = DiscordApi.getUserGuildMember(accessTokenResponse.access_token, module.config.guildIdGetNick);
+                    if (member.nick != null) {
+                        username = member.nick;
+                    }
+                } catch (IOException e) {
+                    throw new AuthException("An unexpected error occurred!");
+                }
+            }
+
+            username = slg.slugify(username);
+
+            var usernameLength = username.length();
+
+            if (usernameLength == 0) {
+                throw new AuthException("Your nickname does not meet the requirements. Please change it.");
+            }
+
+            if (module.config.usernameRegex.length() > 0) {
+                if (!username.matches(module.config.usernameRegex)) {
+                    throw new AuthException("Your nickname does not meet the requirements. Please change it.");
+                }
+            }
+
+            if (getUserByUsername(username) != null) {
+                username = username.substring(0, usernameLength-1-response.user.discriminator.length());
+                username += "_" + response.user.discriminator;
+            }
+
+            user = createUser(
+                    UUID.randomUUID().toString(),
+                    username,
+                    accessTokenResponse.access_token,
+                    accessTokenResponse.refresh_token,
+                    accessTokenResponse.expires_in * 1000,
+                    response.user.id
+            );
+        } else {
+            user = updateDataUser(response.user.id, accessTokenResponse.access_token, accessTokenResponse.refresh_token, accessTokenResponse.expires_in * 1000);
         }
 
-        if (user.accessToken == null) {
-            return null;
+        if (user.isBanned()) {
+            throw new AuthException("You have been banned!");
         }
 
         DiscordUserSession session = new DiscordUserSession(user, user.accessToken);
@@ -368,7 +458,7 @@ public class DiscordSystemAuthCoreProvider extends AuthCoreProvider implements A
         String responseType = "code";
         String[] scope = new String[]{"identify", "guilds", "guilds.members.read", "email"};
         String url = String.format("%s?response_type=%s&client_id=%s&scope=%s&state=%s&redirect_uri=%s&prompt=consent", module.config.discordAuthorizeUrl, responseType, module.config.clientId, String.join("%20", scope), state, module.config.redirectUrl);
-        return List.of(new AuthWebViewDetails(url, "", true, true));
+        return List.of(new AuthWebViewDetails(url, module.config.redirectUrl, true, true));
     }
 
     private DiscordUserHardware fetchHardwareInfo(ResultSet set) throws SQLException, IOException {

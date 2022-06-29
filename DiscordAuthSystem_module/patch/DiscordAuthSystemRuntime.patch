@@ -1,16 +1,16 @@
-From 2dff3aada7bd37142c77a7e78c92c18e45f011c5 Mon Sep 17 00:00:00 2001
+From ddeb1507e0a6e74737877906db56c62769dd9b2b Mon Sep 17 00:00:00 2001
 From: Meido <popenkodaniil@mail.ru>
-Date: Sun, 26 Jun 2022 15:13:30 +0700
+Date: Wed, 29 Jun 2022 12:17:57 +0700
 Subject: [PATCH] DiscordAuthSystemRuntime
 
 ---
  .../client/gui/impl/GuiEventHandler.java      | 18 +++++++++--
- .../client/gui/scenes/login/LoginScene.java   |  8 +++++
+ .../client/gui/scenes/login/LoginScene.java   |  9 ++++++
  .../scenes/login/methods/WebAuthMethod.java   | 31 ++++++++++++++-----
- 3 files changed, 47 insertions(+), 10 deletions(-)
+ 3 files changed, 48 insertions(+), 10 deletions(-)
 
 diff --git a/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java b/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
-index c817abe..038886e 100644
+index c817abe..c9b5f02 100644
 --- a/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
 +++ b/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
 @@ -3,12 +3,15 @@ package pro.gravit.launcher.client.gui.impl;
@@ -42,7 +42,7 @@ index c817abe..038886e 100644
 +                if (isNextScene && ((LoginScene) application.getCurrentScene()).isLoginStarted) {
                      ((LoginScene) application.getCurrentScene()).onGetProfiles();
 +
-+                    if (((LoginScene) application.getCurrentScene()).getSavePasswordCheckBox().isSelected()) {
++                    if (((LoginScene) application.getCurrentScene()).getSavePasswordCheckBoxSelected()) {
 +                        application.runtimeSettings.login = rawAuthResult.playerProfile.username;
 +                        application.runtimeSettings.oauthAccessToken = rawAuthResult.oauth.accessToken;
 +                        application.runtimeSettings.oauthRefreshToken = rawAuthResult.oauth.refreshToken;
@@ -55,10 +55,10 @@ index c817abe..038886e 100644
          } catch (Throwable e) {
              LogHelper.error(e);
 diff --git a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
-index 80cf2ed..b20984e 100644
+index 80cf2ed..d12f6c0 100644
 --- a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
 +++ b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
-@@ -146,6 +146,14 @@ public class LoginScene extends AbstractScene {
+@@ -146,6 +146,15 @@ public class LoginScene extends AbstractScene {
          LogHelper.info("Selected auth: %s", authAvailability.name);
      }
  
@@ -66,8 +66,9 @@ index 80cf2ed..b20984e 100644
 +        return this.authAvailability;
 +    }
 +
-+    public CheckBox getSavePasswordCheckBox() {
-+        return this.savePasswordCheckBox;
++    public boolean getSavePasswordCheckBoxSelected() {
++        CheckBox checkBox = this.savePasswordCheckBox;
++        return checkBox != null && checkBox.isSelected();
 +    }
 +
      public void addAuthAvailability(GetAvailabilityAuthRequestEvent.AuthAvailability authAvailability) {

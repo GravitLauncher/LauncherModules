@@ -13,9 +13,11 @@ import pro.gravit.launcher.events.RequestEvent;
 import pro.gravit.launcher.events.request.AdditionalDataRequestEvent;
 import pro.gravit.launcher.events.request.AuthRequestEvent;
 import pro.gravit.launcher.profiles.PlayerProfile;
+import pro.gravit.launcher.request.auth.password.AuthCodePassword;
 import pro.gravit.launchermodules.discordauthsystem.providers.DiscordApi;
 import pro.gravit.launchermodules.discordauthsystem.providers.DiscordSystemAuthCoreProvider;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.Client;
@@ -92,105 +94,21 @@ public class WebApi implements NettyWebAPIHandler.SimpleSeverletHandler {
             return;
         }
 
-        DiscordApi.DiscordAccessTokenResponse accessTokenResponse = null;
+        AuthProviderPair pair = server.config.getAuthProviderPair();
+        AuthManager.AuthReport report;
 
         try {
-            accessTokenResponse = DiscordApi.getAccessTokenByCode(code);
-        } catch (Exception e) {
-            sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.FORBIDDEN, "Discord authorization denied your code."));
+            report = pair.core.authorize("", null, new AuthCodePassword(code), true);
+        } catch (AuthException e) {
+            sendHttpResponse(ctx, simpleHtmlResponse(HttpResponseStatus.FORBIDDEN, e.getMessage()));
             return;
         }
 
-        var response = DiscordApi.getDiscordUserByAccessToken(accessTokenResponse.access_token);
+        String minecraftAccessToken = report.minecraftAccessToken();
+        AuthRequestEvent.OAuthRequestEvent oauth = new AuthRequestEvent.OAuthRequestEvent(report.oauthAccessToken(), report.oauthRefreshToken(), report.oauthExpire());
 
-        if (!module.config.guildIdsJoined.isEmpty()) {
-            var guilds = DiscordApi.getUserGuilds(accessTokenResponse.access_token);
+        DiscordSystemAuthCoreProvider.DiscordUser user = (DiscordSystemAuthCoreProvider.DiscordUser) report.session().getUser();
 
-            var needGuilds = module.config.guildIdsJoined;
-
-            for (var guild : guilds) {
-                needGuilds.removeIf(g -> Objects.equals(g.id, guild.id));
-            }
-
-            if (!needGuilds.isEmpty()) {
-                String body = "To enter the server you must be a member of these guilds: ";
-                List<String> guildData = new ArrayList<>();
-                for (var g : needGuilds) {
-                    guildData.add("<a href=\"" + g.url + "\">" + g.name + "</a>");
-                }
-                sendHttpResponse(ctx, simpleHtmlResponse(HttpResponseStatus.FORBIDDEN, body + String.join(", ", guildData)));
-                return;
-            }
-        }
-
-        AuthProviderPair pair = server.config.getAuthProviderPair();
-        DiscordSystemAuthCoreProvider core = (DiscordSystemAuthCoreProvider) pair.core;
-
-        DiscordSystemAuthCoreProvider.DiscordUser user = core.getUserByDiscordId(response.user.id);
-
-        if (user == null) {
-            String username = response.user.username;
-            if (module.config.guildIdGetNick.length() > 0) {
-                try {
-                    var member = DiscordApi.getUserGuildMember(accessTokenResponse.access_token, module.config.guildIdGetNick);
-                    if (member.nick != null) {
-                        username = member.nick;
-                    }
-                } catch (Exception e) {
-                    logger.error("DiscordApi.getUserGuildMember: " + e);
-                    sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred!"));
-                    return;
-                }
-            }
-
-            username = slg.slugify(username);
-
-            var usernameLength = username.length();
-
-            if (usernameLength == 0) {
-                sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.NOT_ACCEPTABLE, "Your nickname does not meet the requirements. Please change it."));
-                return;
-            }
-
-            if (module.config.usernameRegex.length() > 0) {
-                if (!username.matches(module.config.usernameRegex)) {
-                    sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.NOT_ACCEPTABLE, "Your nickname does not meet the requirements. Please change it."));
-                    return;
-                }
-            }
-
-            if (core.getUserByUsername(username) != null) {
-                username = username.substring(0, usernameLength-1-response.user.discriminator.length());
-                username += "_" + response.user.discriminator;
-            }
-
-            user = core.createUser(
-                    state,
-                    username,
-                    accessTokenResponse.access_token,
-                    accessTokenResponse.refresh_token,
-                    accessTokenResponse.expires_in * 1000,
-                    response.user.id
-            );
-        } else {
-            user = core.updateDataUser(response.user.id, accessTokenResponse.access_token, accessTokenResponse.refresh_token, accessTokenResponse.expires_in * 1000);
-        }
-
-        if (user.isBanned()) {
-            sendHttpResponse(ctx, simpleResponse(HttpResponseStatus.FORBIDDEN, "You have been banned!"));
-            return;
-        }
-
-
-
-        String minecraftAccessToken;
-        AuthRequestEvent.OAuthRequestEvent oauth;
-
-        AuthManager.AuthReport report = pair.core.authorize(user.getUsername(), null, null, true);
-        minecraftAccessToken = report.minecraftAccessToken();
-        oauth = new AuthRequestEvent.OAuthRequestEvent(report.oauthAccessToken(), report.oauthRefreshToken(), report.oauthExpire());
-
-        DiscordSystemAuthCoreProvider.DiscordUser finalUser = user;
         server.nettyServerSocketHandler.nettyServer.service.forEachActiveChannels((ch, ws) -> {
 
             Client client = ws.getClient();
@@ -203,9 +121,9 @@ public class WebApi implements NettyWebAPIHandler.SimpleSeverletHandler {
                 return;
             }
 
-            client.coreObject = finalUser;
+            client.coreObject = user;
             client.sessionObject = report.session();
-            server.authManager.internalAuth(client, AuthResponse.ConnectTypes.CLIENT, pair, finalUser.getUsername(), finalUser.getUUID(), ClientPermissions.DEFAULT, true);
+            server.authManager.internalAuth(client, AuthResponse.ConnectTypes.CLIENT, pair, user.getUsername(), user.getUUID(), ClientPermissions.DEFAULT, true);
             PlayerProfile playerProfile = server.authManager.getPlayerProfile(client);
             AuthRequestEvent request = new AuthRequestEvent(ClientPermissions.DEFAULT, playerProfile, minecraftAccessToken, null, null, oauth);
             request.requestUUID = RequestEvent.eventUUID;
