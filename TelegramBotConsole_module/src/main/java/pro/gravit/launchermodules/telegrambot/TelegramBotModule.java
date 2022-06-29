@@ -83,7 +83,7 @@ public class TelegramBotModule extends LauncherModule {
         }
         if (config.events.checkServer) {
             server.authHookManager.postCheckServerHook.registerHook((report, client) -> {
-                String serverName = client.getSerializableProperty("launchserver.serverName");
+                String serverName = client.getProperty("launchserver.serverName");
                 if (serverName == null) {
                     serverName = "Unknown";
                 }

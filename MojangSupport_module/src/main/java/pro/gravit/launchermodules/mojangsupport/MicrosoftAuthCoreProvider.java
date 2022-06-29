@@ -11,7 +11,6 @@ import pro.gravit.launcher.request.auth.details.AuthWebViewDetails;
 import pro.gravit.launcher.request.auth.password.AuthCodePassword;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
-import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.helper.HttpHelper;
 import pro.gravit.launchserver.manangers.AuthManager;
@@ -102,7 +101,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     @Override
     public List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client) {
         String uuid = UUID.randomUUID().toString();
-        client.setSerializableProperty("microsoftCode", uuid);
+        client.setStaticProperty("microsoftCode", uuid);
         return List.of(new AuthWebViewDetails(
                 String.format(AUTH_CODE_URL, clientId, String.format(redirectUrl, uuid)),
                 String.format(redirectUrl, uuid)
