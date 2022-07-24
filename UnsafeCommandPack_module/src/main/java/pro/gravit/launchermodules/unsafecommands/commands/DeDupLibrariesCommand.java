@@ -25,7 +25,7 @@ public class DeDupLibrariesCommand extends Command {
 
     @Override
     public String getArgsDescription() {
-        return "[clientDir]";
+        return "[clientDir] (ignore lwjgl)";
     }
 
     @Override
@@ -40,6 +40,10 @@ public class DeDupLibrariesCommand extends Command {
         Path dir = server.updatesDir.resolve(args[0]).resolve("libraries");
         if (!Files.isDirectory(dir)) {
             throw new FileNotFoundException(dir.toString());
+        }
+        boolean isIgnoreLwjgl = true;
+        if(args.length > 1) {
+            isIgnoreLwjgl = Boolean.parseBoolean(args[1]);
         }
         Map<String, List<Path>> map = new HashMap<>(16);
         IOHelper.walk(dir, new FileVisitor<>() {
@@ -73,11 +77,11 @@ public class DeDupLibrariesCommand extends Command {
             var key = entry.getKey();
             var value = entry.getValue();
             if (value.size() > 1) {
-                if (key.contains("lwjgl")) {
+                if (isIgnoreLwjgl && key.contains("lwjgl")) {
                     logger.trace("Path {} skipped (lwjgl found)", key);
                     continue;
                 }
-                //logger.info("In path {} found {} libraries", key, value.size());
+                logger.info("In path {} found {} libraries", key, value.size());
                 var version = value.stream()
                         .map(this::convertStringToVersion)
                         .max(Comparator.naturalOrder()).orElse(null);

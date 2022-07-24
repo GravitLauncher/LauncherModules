@@ -83,7 +83,7 @@ public class FetchClientCommand extends Command {
         server.syncUpdatesDir(Collections.singleton(dirName));
         try {
             ClientProfile.Version clientVersion = ClientProfile.Version.byName(version);
-            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientDir, clientVersion);
+            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientDir, clientVersion, Files.exists(server.updatesDir.resolve("assets")));
             ClientProfile profile = MakeProfileHelper.makeProfile(clientVersion, dirName, options);
             try (Writer w = IOHelper.newWriter(server.profilesDir.resolve(dirName + ".json"))) {
                 Launcher.gsonManager.configGson.toJson(profile, w);

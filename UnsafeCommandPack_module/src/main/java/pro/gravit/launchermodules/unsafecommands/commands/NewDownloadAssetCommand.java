@@ -40,11 +40,16 @@ public class NewDownloadAssetCommand extends Command {
         Path assetDir = server.updatesDir.resolve(dirName);
 
         // Create asset dir
-        LogHelper.subInfo("Creating asset dir: '%s'", dirName);
-        Files.createDirectory(assetDir);
+        if(Files.notExists(assetDir)) {
+            LogHelper.subInfo("Creating asset dir: '%s'", dirName);
+            Files.createDirectory(assetDir);
+        }
 
         LogHelper.subInfo("Getting asset index, it may take some time");
         List<AsyncDownloader.SizedFile> applies = AssetDownloader.listAssets(assetDir, version);
+        applies.removeIf((f) -> {
+            return Files.exists(assetDir.resolve(f.filePath));
+        });
         // Download required asset
         LogHelper.subInfo("Downloading asset, it may take some time");
         long total = 0;
