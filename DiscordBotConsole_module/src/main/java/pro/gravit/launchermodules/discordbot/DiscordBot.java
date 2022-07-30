@@ -41,11 +41,6 @@ public class DiscordBot {
         if(jda == null) {
             return;
         }
-        Guild guild = jda.getGuildById(config.eventGuildId);
-        if(guild == null) {
-            logger.error("Guild {} not found", config.eventGuildId);
-            return;
-        }
         TextChannel channel = jda.getTextChannelById(config.eventChannelId);
         if(channel == null) {
             logger.error("Channel {} not found", config.eventChannelId);
@@ -60,7 +55,6 @@ public class DiscordBot {
         public String color = "";
         public boolean avatarEnable = false;
         public String avatar_url = "https://minotar.net/cube/user/%s.png";
-        public long eventGuildId = 12345;
         public long eventChannelId = 12345;
         public List<String> allowUsers = new ArrayList<>();
         public List<String> allowRoles = new ArrayList<>();
