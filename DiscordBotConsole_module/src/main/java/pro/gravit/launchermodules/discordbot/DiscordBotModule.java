@@ -14,8 +14,10 @@ import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
 import javax.security.auth.login.LoginException;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DiscordBotModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.STABLE);
@@ -81,6 +83,12 @@ public class DiscordBotModule extends LauncherModule {
                 if (config.avatarEnable)
                     embedAuth.setThumbnail(String.format(config.avatar_url, client.username));
 
+                if (config.color.isEmpty()) {
+                    embedAuth.setColor(new Color(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF)));
+                } else if (config.color.startsWith("#")) {
+                    embedAuth.setColor(Color.decode(config.color));
+                }
+
                 DiscordBot.sendEvent(new MessageBuilder().setEmbeds(embedAuth.build()).build());
                 return false;
             });
@@ -98,6 +106,12 @@ public class DiscordBotModule extends LauncherModule {
 
                 if (config.avatarEnable)
                     embedLogin.setThumbnail(String.format(config.avatar_url, client.username));
+
+                if (config.color.isEmpty()) {
+                    embedLogin.setColor(new Color(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF)));
+                } else if (config.color.startsWith("#")) {
+                    embedLogin.setColor(Color.decode(config.color));
+                }
 
                 DiscordBot.sendEvent(new MessageBuilder().setEmbeds(embedLogin.build()).build());
                 return false;
