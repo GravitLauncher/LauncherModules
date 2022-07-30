@@ -73,13 +73,15 @@ public class DiscordBotModule extends LauncherModule {
         }
         if(config.events.login) {
             server.authHookManager.postHook.registerHook((context, client) -> {
-                DiscordBot.sendEvent(new MessageBuilder()
-                                .append(String.format("Пользователь %s авторизовался в лаунчере", client.username))
-                                .setEmbeds(new EmbedBuilder()
-                                        .addField("UUID", String.format("%s", client.uuid), false)
-                                        .addField("AuthId", String.format("%s", client.auth.displayName), false)
-                                        .build())
-                        .build());
+                EmbedBuilder embedAuth = new EmbedBuilder()
+                        .setTitle(String.format("Пользователь %s авторизовался в лаунчере", client.username))
+                        .addField("UUID", String.format("%s", client.uuid), false)
+                        .addField("AuthId", String.format("%s", client.auth.displayName), false);
+
+                if (config.avatarEnable)
+                    embedAuth.setThumbnail(String.format(config.avatar_url, client.username));
+
+                DiscordBot.sendEvent(new MessageBuilder().setEmbeds(embedAuth.build()).build());
                 return false;
             });
         }
@@ -89,12 +91,15 @@ public class DiscordBotModule extends LauncherModule {
                 if(serverName == null) {
                     serverName = "Unknown";
                 }
-                DiscordBot.sendEvent(new MessageBuilder()
-                                .append(String.format("Пользователь %s входит на сервер %s", report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(), serverName))
-                                .setEmbeds(new EmbedBuilder()
-                                        .addField("UUID", String.format("%s", report.uuid), false)
-                                        .build())
-                        .build());
+
+                EmbedBuilder embedLogin = new EmbedBuilder()
+                        .setTitle(String.format("Пользователь %s входит на сервер %s", report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(), serverName))
+                        .addField("UUID", String.format("%s", report.uuid), false);
+
+                if (config.avatarEnable)
+                    embedLogin.setThumbnail(String.format(config.avatar_url, client.username));
+
+                DiscordBot.sendEvent(new MessageBuilder().setEmbeds(embedLogin.build()).build());
                 return false;
             });
         }

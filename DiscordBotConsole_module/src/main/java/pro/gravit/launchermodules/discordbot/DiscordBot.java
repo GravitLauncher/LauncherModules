@@ -57,6 +57,8 @@ public class DiscordBot {
     public static class Config {
         public String token = "";
         public String prefix = "!";
+        boolean avatarEnable = false;
+        public String avatar_url = "https://minotar.net/cube/user/%s.png";
         public long eventGuildId = 12345;
         public long eventChannelId = 12345;
         public List<String> allowUsers = new ArrayList<>();
