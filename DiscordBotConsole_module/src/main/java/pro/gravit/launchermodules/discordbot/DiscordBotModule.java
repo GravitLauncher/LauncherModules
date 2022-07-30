@@ -93,6 +93,24 @@ public class DiscordBotModule extends LauncherModule {
                 return false;
             });
         }
+        if (config.events.selectProfile) {
+            server.authHookManager.setProfileHook.registerHook((report, client) -> {
+                EmbedBuilder embedLogin = new EmbedBuilder()
+                        .setTitle(String.format("Пользователь %s выбрал клиент %s", client.username, report.client));
+
+                if (config.avatarEnable)
+                    embedLogin.setThumbnail(String.format(config.avatar_url, client.username));
+
+                if (config.color.isEmpty()) {
+                    embedLogin.setColor(new Color(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF)));
+                } else if (config.color.startsWith("#")) {
+                    embedLogin.setColor(Color.decode(config.color));
+                }
+
+                DiscordBot.sendEvent(new MessageBuilder().setEmbeds(embedLogin.build()).build());
+                return false;
+            });
+        }
         if(config.events.checkServer) {
             server.authHookManager.postCheckServerHook.registerHook((report, client) -> {
                 String serverName = client.getProperty("launchserver.serverName");

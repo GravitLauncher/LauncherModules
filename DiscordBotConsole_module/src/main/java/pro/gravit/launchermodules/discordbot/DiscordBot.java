@@ -69,6 +69,7 @@ public class DiscordBot {
 
     public static class EventsConfig {
         public boolean login;
+        public boolean selectProfile;
         public boolean checkServer;
     }
 }
