@@ -56,7 +56,8 @@ public class DiscordBotListener extends ListenerAdapter {
     @Override
     public void onReady(@Nonnull ReadyEvent event) {
         EmbedBuilder embedStarted = new EmbedBuilder()
-                .setTitle(String.format("Лаунчер v%s успешно запущен!", Version.getVersion()));
+                .setTitle("Лаунчер успешно запущен!")
+                .setFooter(String.format("GravitLauncher v%s", Version.getVersion()), "https://launcher.gravit.pro/images/hero.png");
 
         if (config.color.isEmpty()) {
             embedStarted.setColor(new Color(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF)));

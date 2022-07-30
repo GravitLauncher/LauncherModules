@@ -78,7 +78,8 @@ public class DiscordBotModule extends LauncherModule {
                 EmbedBuilder embedAuth = new EmbedBuilder()
                         .setTitle(String.format("Пользователь %s авторизовался в лаунчере", client.username))
                         .addField("UUID", String.format("%s", client.uuid), false)
-                        .addField("AuthId", String.format("%s", client.auth.displayName), false);
+                        .addField("AuthId", String.format("%s", client.auth.displayName), false)
+                        .setFooter(String.format("GravitLauncher v%s", Version.getVersion()), "https://launcher.gravit.pro/images/hero.png");
 
                 if (config.avatarEnable)
                     embedAuth.setThumbnail(String.format(config.avatar_url, client.username));
@@ -96,7 +97,8 @@ public class DiscordBotModule extends LauncherModule {
         if (config.events.selectProfile) {
             server.authHookManager.setProfileHook.registerHook((report, client) -> {
                 EmbedBuilder embedLogin = new EmbedBuilder()
-                        .setTitle(String.format("Пользователь %s выбрал клиент %s", client.username, report.client));
+                        .setTitle(String.format("Пользователь %s выбрал клиент %s", client.username, report.client))
+                        .setFooter(String.format("GravitLauncher v%s", Version.getVersion()), "https://launcher.gravit.pro/images/hero.png");
 
                 if (config.avatarEnable)
                     embedLogin.setThumbnail(String.format(config.avatar_url, client.username));
@@ -120,7 +122,8 @@ public class DiscordBotModule extends LauncherModule {
 
                 EmbedBuilder embedLogin = new EmbedBuilder()
                         .setTitle(String.format("Пользователь %s входит на сервер %s", report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(), serverName))
-                        .addField("UUID", String.format("%s", report.uuid), false);
+                        .addField("UUID", String.format("%s", report.uuid), false)
+                        .setFooter(String.format("GravitLauncher v%s", Version.getVersion()), "https://launcher.gravit.pro/images/hero.png");
 
                 if (config.avatarEnable)
                     embedLogin.setThumbnail(String.format(config.avatar_url, client.username));
