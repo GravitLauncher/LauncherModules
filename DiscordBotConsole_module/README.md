@@ -16,14 +16,14 @@
    "token": "TOKEN",
    "prefix": "!",
    "color": "",
-   "avatarEnable": "true",
-   "avatar_url": "https://minotar.net/cube/user/%s.png",
+   "avatarEnable": false,
+   "avatar_url": "",
    "eventChannelId": 111111,
    "allowUsers": [ 123456, 123457 ],
    "allowRoles": [ 7654321, 7654322 ],
    "events" : {
      "login": true,
-     "selectProfile": "true",
+     "selectProfile": true,
      "checkServer": true
    }
 }

@@ -21,7 +21,6 @@ import pro.gravit.utils.command.Command;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.CommonHelper;
 
-import javax.annotation.Nonnull;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class DiscordBotListener extends ListenerAdapter {
     }
 
     @Override
-    public void onReady(@Nonnull ReadyEvent event) {
+    public void onReady(ReadyEvent event) {
         EmbedBuilder embedStarted = new EmbedBuilder()
                 .setTitle("Лаунчер успешно запущен!")
                 .setFooter(String.format("GravitLauncher v%s", Version.getVersion()), "https://launcher.gravit.pro/images/hero.png");
