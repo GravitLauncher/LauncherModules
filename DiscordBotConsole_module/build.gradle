@@ -4,7 +4,7 @@ sourceCompatibility = '17'
 targetCompatibility = '17'
 
 dependencies {
-    implementation("net.dv8tion:JDA:5.0.0-alpha.9")
+    implementation("net.dv8tion:JDA:5.0.0-alpha.17")
 }
 
 jar {

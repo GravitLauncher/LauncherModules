@@ -1,7 +1,7 @@
 # DiscordBotConsole
 
 Позволяет управлять лаунчсервером удаленно через Discord бота.\
-Модуль использует библиотеку [JDA](https://github.com/DV8FromTheWorld/JDA/releases/download/v5.0.0-alpha.9/JDA-5.0.0-alpha.9-withDependencies.jar).
+Модуль использует библиотеку [JDA](https://github.com/DV8FromTheWorld/JDA/releases/download/v5.0.0-alpha.17/JDA-5.0.0-alpha.17-withDependencies.jar).
 
 #### Установка модуля
 
@@ -15,20 +15,25 @@
 {
    "token": "TOKEN",
    "prefix": "!",
-   "eventGuildId": 1111111,
+   "color": "",
+   "avatarEnable": "true",
+   "avatar_url": "https://minotar.net/cube/user/%s.png",
    "eventChannelId": 111111,
    "allowUsers": [ 123456, 123457 ],
    "allowRoles": [ 7654321, 7654322 ],
    "events" : {
      "login": true,
+	 "selectProfile": "true",
      "checkServer": true
    }
 }
 ```
 
-- **token**: ваш токен бота
-- **prefix**: префикс команд
-- **eventGuildId**: ID вашего Discord сервера
+- **token**: Ваш токен бота
+- **prefix**: Префикс команд
+- **color**: Цвет embed, по умолчанию - рандом
+- **avatarEnable**: Включены ли аватарки в embed
+- **avatar_url**: Ссылка на скрипт раздачи аватарок
 - **eventChannelId**: ID канала для уведомлений от лаунчсервера
 - **allowUsers**: ID пользователей, которым разрешено выполнять команды
 - **allowRoles**: ID ролей, участникам которых разрешено выполнять команды
