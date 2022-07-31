@@ -23,7 +23,7 @@
    "allowRoles": [ 7654321, 7654322 ],
    "events" : {
      "login": true,
-	 "selectProfile": "true",
+     "selectProfile": "true",
      "checkServer": true
    }
 }
