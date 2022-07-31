@@ -73,7 +73,7 @@ public class DiscordBotModule extends LauncherModule {
         } catch (LoginException e) {
             logger.error("DiscordBotModule disabled. Please set 'token'", e);
         }
-        if(config.events.login) {
+        if (config.events.login) {
             server.authHookManager.postHook.registerHook((context, client) -> {
                 EmbedBuilder embedAuth = new EmbedBuilder()
                         .setTitle(String.format("Пользователь %s авторизовался в лаунчере", client.username))
@@ -113,10 +113,10 @@ public class DiscordBotModule extends LauncherModule {
                 return false;
             });
         }
-        if(config.events.checkServer) {
+        if (config.events.checkServer) {
             server.authHookManager.postCheckServerHook.registerHook((report, client) -> {
                 String serverName = client.getProperty("launchserver.serverName");
-                if(serverName == null) {
+                if (serverName == null) {
                     serverName = "Unknown";
                 }
 

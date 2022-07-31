@@ -40,12 +40,12 @@ public class DiscordBotListener extends ListenerAdapter {
     }
 
     public boolean check(User user, Member member) {
-        if(config.allowUsers != null && config.allowUsers.contains(user.getId())) {
+        if (config.allowUsers != null && config.allowUsers.contains(user.getId())) {
             return true;
         }
-        if(config.allowRoles != null && member != null) {
-            for(var e : member.getRoles()) {
-                if(config.allowRoles.contains(e.getId())) {
+        if (config.allowRoles != null && member != null) {
+            for (var e : member.getRoles()) {
+                if (config.allowRoles.contains(e.getId())) {
                     return true;
                 }
             }
@@ -85,8 +85,8 @@ public class DiscordBotListener extends ListenerAdapter {
         Member member = event.getMember();
         MessageChannel channel = event.getChannel();
         String content = message.getContentRaw();
-        if(content.startsWith(config.prefix)) {
-            if(!check(user, member)) {
+        if (content.startsWith(config.prefix)) {
+            if (!check(user, member)) {
                 channel.sendMessage(new MessageBuilder()
                         .append("У вас недостаточно прав для выполнения команд")
                         .build()).queue();
@@ -97,11 +97,11 @@ public class DiscordBotListener extends ListenerAdapter {
             try {
                 String[] cmd = CommonHelper.parseCommand(content.substring(config.prefix.length()));
                 Command command = server.commandHandler.findCommand(cmd[0]);
-                if(command == null) {
+                if (command == null) {
                     throw new CommandException(String.format("Command '%s' not found", cmd[0]));
                 }
-                String[] args = new String[cmd.length-1];
-                System.arraycopy(cmd, 1, args, 0, cmd.length-1);
+                String[] args = new String[cmd.length - 1];
+                System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
                 command.invoke(args);
                 String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception == null ? "" : x.exception)).collect(Collectors.joining("\n"));
                 channel.sendMessage(new MessageBuilder()
@@ -127,12 +127,12 @@ public class DiscordBotListener extends ListenerAdapter {
     }
 
     public static class LogLinesContainer implements Consumer<LogEvent> {
-        public List<LogEventView> lines = new ArrayList<>();
         private final Thread currentThread = Thread.currentThread();
+        public List<LogEventView> lines = new ArrayList<>();
 
         @Override
         public void accept(LogEvent logEvent) {
-            if(Thread.currentThread() == currentThread) {
+            if (Thread.currentThread() == currentThread) {
                 lines.add(new LogEventView(logEvent));
             }
         }

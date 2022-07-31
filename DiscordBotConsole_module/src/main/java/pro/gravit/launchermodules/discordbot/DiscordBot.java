@@ -2,7 +2,6 @@ package pro.gravit.launchermodules.discordbot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -13,8 +12,6 @@ import pro.gravit.launchserver.LaunchServer;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DiscordBot {
     private static final Logger logger = LogManager.getLogger(DiscordBot.class);
@@ -38,11 +35,11 @@ public class DiscordBot {
     }
 
     public static void sendEvent(Message message) {
-        if(jda == null) {
+        if (jda == null) {
             return;
         }
         TextChannel channel = jda.getTextChannelById(config.eventChannelId);
-        if(channel == null) {
+        if (channel == null) {
             logger.error("Channel {} not found", config.eventChannelId);
             return;
         }
