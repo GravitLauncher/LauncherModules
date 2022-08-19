@@ -6,16 +6,22 @@
 
 1. Скопировать модуль **OpenSSLSignCode_module.jar** в папку **/LaunchServer/modules/**.
 2. Обязательно создать самоподписанный сертификат или же купить его (более подробное описание есть на [Wiki]).
-    - В конфигурации **LaunchServer.json** `"sign": { "enabled": true }`.
+  - В конфигурации **LaunchServer.json** `"sign": { "enabled": true }`.
 3. Установленная программа **osslsigncode**.
-    - Debian-подобные системы: `sudo apt install osslsigncode`.
-    - Для CentOS 7:
-
+  - Debian-подобные системы: `sudo apt install osslsigncode`.
+  - Для CentOS 7:
 ```sh
 cd /etc/yum.repos.d/
 wget https://download.opensuse.org/repositories/home:danimo/CentOS_7/home:danimo.repo
 yum install osslsigncode calc
 ```
+  - Для CentOS 8 Stream:
+```sh
+cd /etc/yum.repos.d/
+wget -O VortexOBS.repo https://download.opensuse.org/repositories/home:VortexOBS/CentOS_8/home:VortexOBS.repo
+dnf -y install osslsigncode
+```
+
 
 4. Выполнить **build** в консоли *LaunchServer*, если всё сделали правильно, **exe** будет подписан сертификатом.
 
