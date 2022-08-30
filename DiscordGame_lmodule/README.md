@@ -84,4 +84,4 @@
 
 [discord-game-sdk4j-0.5.x.jar]: https://github.com/JnCrMx/discord-game-sdk4j/releases
 
-[Discord Game SDK 2.5.6 ZIP]: https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip
+[Discord Game SDK Latest ZIP]: https://dl-game-sdk.discordapp.net/latest/discord_game_sdk.zip
