@@ -9,7 +9,7 @@
 
 1. Скопировать модуль **DiscordGame_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
 2. Скачать последнюю версию библиотеки **[discord-game-sdk4j-0.5.x.jar]**
-3. Добавить в **discord-game-sdk4j-0.5.x.jar** следующие файлы из архива **[Discord Game SDK 2.5.6 ZIP]**:
+3. Добавить в **discord-game-sdk4j-0.5.x.jar** следующие файлы из архива **[Discord Game SDK Latest ZIP]**:
 - Файл `lib/x86/discord_game_sdk.dll` в `natives/windows/x86/discord_game_sdk.dll`
 - Файл `lib/x86_64/discord_game_sdk.dll` в `natives/windows/amd64/discord_game_sdk.dll`
 - Файл `lib/x86_64/discord_game_sdk.so` в `natives/linux/amd64/discord_game_sdk.so`
