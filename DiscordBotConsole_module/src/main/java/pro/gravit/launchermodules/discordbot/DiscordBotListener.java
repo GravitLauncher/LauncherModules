@@ -1,24 +1,30 @@
 package pro.gravit.launchermodules.discordbot;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LogEvent;
 import org.jetbrains.annotations.NotNull;
+import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.log4j.LogAppender;
+import pro.gravit.utils.Version;
 import pro.gravit.utils.command.Command;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.CommonHelper;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -33,17 +39,42 @@ public class DiscordBotListener extends ListenerAdapter {
     }
 
     public boolean check(User user, Member member) {
-        if(config.allowUsers != null && config.allowUsers.contains(user.getId())) {
+        if (config.allowUsers != null && config.allowUsers.contains(user.getId())) {
             return true;
         }
-        if(config.allowRoles != null && member != null) {
-            for(var e : member.getRoles()) {
-                if(config.allowRoles.contains(e.getId())) {
+        if (config.allowRoles != null && member != null) {
+            for (var e : member.getRoles()) {
+                if (config.allowRoles.contains(e.getId())) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    @Override
+    public void onReady(ReadyEvent event) {
+        EmbedBuilder embedStarted = new EmbedBuilder()
+                .setTitle("Лаунчер успешно запущен!")
+                .setFooter(String.format("GravitLauncher v%s", Version.getVersion()), "https://launcher.gravit.pro/images/hero.png");
+
+        if (config.color.isEmpty()) {
+            embedStarted.setColor(new Color(ThreadLocalRandom.current().nextInt(0, 0xFFFFFF)));
+        } else if (config.color.startsWith("#")) {
+            embedStarted.setColor(Color.decode(config.color));
+        }
+
+        StringBuilder profiles = new StringBuilder();
+        if (this.server.getProfiles().size() == 0) {
+            profiles.append("Профили не найдены");
+        } else {
+            for (ClientProfile profile : this.server.getProfiles()) {
+                profiles.append(" - ").append(profile.getTitle()).append("\n");
+            }
+        }
+        embedStarted.addField("Профили:", profiles.toString(), true);
+
+        DiscordBot.sendEvent(new MessageBuilder().setEmbeds(embedStarted.build()).build());
     }
 
     @Override
@@ -53,8 +84,8 @@ public class DiscordBotListener extends ListenerAdapter {
         Member member = event.getMember();
         MessageChannel channel = event.getChannel();
         String content = message.getContentRaw();
-        if(content.startsWith(config.prefix)) {
-            if(!check(user, member)) {
+        if (content.startsWith(config.prefix)) {
+            if (!check(user, member)) {
                 channel.sendMessage(new MessageBuilder()
                         .append("У вас недостаточно прав для выполнения команд")
                         .build()).queue();
@@ -65,11 +96,11 @@ public class DiscordBotListener extends ListenerAdapter {
             try {
                 String[] cmd = CommonHelper.parseCommand(content.substring(config.prefix.length()));
                 Command command = server.commandHandler.findCommand(cmd[0]);
-                if(command == null) {
+                if (command == null) {
                     throw new CommandException(String.format("Command '%s' not found", cmd[0]));
                 }
-                String[] args = new String[cmd.length-1];
-                System.arraycopy(cmd, 1, args, 0, cmd.length-1);
+                String[] args = new String[cmd.length - 1];
+                System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
                 command.invoke(args);
                 String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception == null ? "" : x.exception)).collect(Collectors.joining("\n"));
                 channel.sendMessage(new MessageBuilder()
@@ -95,12 +126,12 @@ public class DiscordBotListener extends ListenerAdapter {
     }
 
     public static class LogLinesContainer implements Consumer<LogEvent> {
-        public List<LogEventView> lines = new ArrayList<>();
         private final Thread currentThread = Thread.currentThread();
+        public List<LogEventView> lines = new ArrayList<>();
 
         @Override
         public void accept(LogEvent logEvent) {
-            if(Thread.currentThread() == currentThread) {
+            if (Thread.currentThread() == currentThread) {
                 lines.add(new LogEventView(logEvent));
             }
         }

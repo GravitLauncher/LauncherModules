@@ -2,7 +2,6 @@ package pro.gravit.launchermodules.discordbot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -13,8 +12,6 @@ import pro.gravit.launchserver.LaunchServer;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DiscordBot {
     private static final Logger logger = LogManager.getLogger(DiscordBot.class);
@@ -38,16 +35,11 @@ public class DiscordBot {
     }
 
     public static void sendEvent(Message message) {
-        if(jda == null) {
-            return;
-        }
-        Guild guild = jda.getGuildById(config.eventGuildId);
-        if(guild == null) {
-            logger.error("Guild {} not found", config.eventGuildId);
+        if (jda == null) {
             return;
         }
         TextChannel channel = jda.getTextChannelById(config.eventChannelId);
-        if(channel == null) {
+        if (channel == null) {
             logger.error("Channel {} not found", config.eventChannelId);
             return;
         }
@@ -57,7 +49,9 @@ public class DiscordBot {
     public static class Config {
         public String token = "";
         public String prefix = "!";
-        public long eventGuildId = 12345;
+        public String color = "";
+        public boolean avatarEnable = false;
+        public String avatar_url = "https://minotar.net/cube/user/%s.png";
         public long eventChannelId = 12345;
         public List<String> allowUsers = new ArrayList<>();
         public List<String> allowRoles = new ArrayList<>();
@@ -66,6 +60,7 @@ public class DiscordBot {
 
     public static class EventsConfig {
         public boolean login;
+        public boolean selectProfile;
         public boolean checkServer;
     }
 }
