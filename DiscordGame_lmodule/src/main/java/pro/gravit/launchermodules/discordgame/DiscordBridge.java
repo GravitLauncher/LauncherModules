@@ -16,6 +16,8 @@ public class DiscordBridge {
     public static final DiscordActivityService activityService = new DiscordActivityService();
     private static Thread thread;
     private static Core core;
+
+    private static CreateParams params;
     private static Activity activity;
 
     private static void initCore() throws IOException {
@@ -55,22 +57,22 @@ public class DiscordBridge {
 
     public static void init(long appId) throws IOException {
         initCore();
-        try (CreateParams params = new CreateParams()) {
-            params.setClientID(appId);
-            //params.setClientID(698611073133051974L);
-            params.setFlags(CreateParams.getDefaultFlags() | 1);
-            // Create the Core
-            core = new Core(params);
-            {
-                // Create the Activity
-                activity = new Activity();
-                activityService.applyToActivity(activity);
-                activityService.resetStartTime();
-                core.activityManager().updateActivity(DiscordBridge.getActivity());
-            }
-            LauncherEngine.modulesManager.invokeEvent(new DiscordInitEvent(core));
-            LogHelper.debug("Initialized Discord Game. Application ID %d", appId);
+        params = new CreateParams();
+        params.setClientID(appId);
+        //params.setClientID(698611073133051974L);
+        params.setFlags(CreateParams.getDefaultFlags() | 1);
+        // Create the Core
+        core = new Core(params);
+        {
+            // Create the Activity
+            activity = new Activity();
+            activityService.applyToActivity(activity);
+            activityService.resetStartTime();
+            core.activityManager().updateActivity(DiscordBridge.getActivity());
         }
+        //params.close();
+        LauncherEngine.modulesManager.invokeEvent(new DiscordInitEvent(core));
+        LogHelper.debug("Initialized Discord Game. Application ID %d", appId);
         thread = CommonHelper.newThread("DiscordGameBridge callbacks", true, new DiscordUpdateTask(core));
         thread.start();
     }
@@ -86,6 +88,21 @@ public class DiscordBridge {
     public static void close() {
         if (core == null) return;
         thread.interrupt();
-        core.close();
+        try {
+            core.close();
+        } catch (Throwable e) {
+            if(LogHelper.isDebugEnabled()) {
+                LogHelper.error(e);
+            }
+            LogHelper.warning("DiscordGame core object not closed correctly. Discord is down?");
+        }
+        try {
+            params.close();
+        } catch (Throwable e) {
+            if(LogHelper.isDebugEnabled()) {
+                LogHelper.error(e);
+            }
+            LogHelper.warning("DiscordGame params object not closed correctly. Discord is down?");
+        }
     }
 }
