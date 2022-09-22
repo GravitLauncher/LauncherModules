@@ -1,0 +1,16 @@
+def mainClassName = "pro.gravit.launchermodules.cfpurge.CloudflarePurgeModule"
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    implementation 'com.github.robinbraemer:cloudflareapi:1.4.1'
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
