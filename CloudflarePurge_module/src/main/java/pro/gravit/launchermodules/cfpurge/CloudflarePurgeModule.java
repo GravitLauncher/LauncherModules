@@ -19,7 +19,7 @@ public class CloudflarePurgeModule extends LauncherModule {
     public CloudflareService.Config config;
 
     public CloudflarePurgeModule() {
-        super(new LauncherModuleInfo("CloudflarePurgeModule", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfo("CloudflarePurge", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
     }
 
     @Override
