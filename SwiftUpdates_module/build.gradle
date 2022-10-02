@@ -1,0 +1,13 @@
+def mainClassName = "pro.gravit.launchermodules.swiftupdates.SwiftUpdatesModule"
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+dependencies {
+    implementation 'com.github.openstack4j.core:openstack4j-core:3.10'
+    implementation 'com.github.openstack4j.core.connectors:openstack4j-httpclient:3.10'
+}
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
