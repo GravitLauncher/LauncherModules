@@ -9,7 +9,7 @@
     - Debian подобные системы `sudo apt install screen`
     - CentOS `sudo yum install screen`
 3. Создаём новый файл **Launcher.service** по пути: `/etc/systemd/system/Launcher.service`.
-4. Копируем конфигурацию указаную ниже с внесением изменений в созданный файл.
+4. Копируем конфигурацию указанную ниже с внесением изменений в созданный файл.
     - `Description` - Описание сервиса (unit'а).
     - `WorkingDirectory` - Полный путь до **LaunchServer**.
     - `User` - Имя пользователя, от имени которого будет запущена служба (LaunchServer.jar).
