@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SwiftUpdatesModule extends LauncherModule {
     private static final Logger logger = LogManager.getLogger(SwiftService.class);
     private SwiftService swiftService = null;
-    private AtomicBoolean isEnabled = new AtomicBoolean(false);
+    private final AtomicBoolean isEnabled = new AtomicBoolean(false);
     public SwiftService.Config config;
 
     public SwiftUpdatesModule() {
@@ -28,14 +28,14 @@ public class SwiftUpdatesModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         if (initContext instanceof LaunchServerInitContext context) {
-            initS3UpdatesModule(context.server);
+            initSwiftUpdatesModule(context.server);
         } else {
             registerEvent(this::finish, LaunchServerFullInitEvent.class);
         }
         registerEvent(this::onUpdatePush, LaunchServerUpdatesSyncEvent.class);
     }
 
-    public void initS3UpdatesModule(LaunchServer server) {
+    public void initSwiftUpdatesModule(LaunchServer server) {
         final var path = modulesConfigManager.getModuleConfig(moduleInfo.name);
         SwiftUpdatesModule module = this;
         JsonConfigurable<SwiftService.Config> configurable = new JsonConfigurable<>(SwiftService.Config.class, path) {
@@ -73,26 +73,24 @@ public class SwiftUpdatesModule extends LauncherModule {
                     config.openStackRegion,
                     config.openStackDomain);
         }
+        server.commandHandler.registerCommand("swiftcleanup", new SwiftUpdatesCleanupCommand(server, swiftService, config));
+        server.commandHandler.registerCommand("swiftupload", new SwiftUpdatesCleanupCommand(server, swiftService, config));
     }
 
     public void finish(LaunchServerFullInitEvent event) {
-        initS3UpdatesModule(event.server);
+        initSwiftUpdatesModule(event.server);
     }
 
     private void onUpdatePush(LaunchServerUpdatesSyncEvent event) {
         if (isEnabled.get()) {
             try {
-                swiftService.uploadDir(event.server.updatesDir, config.openStackContainer, config.prefix);
+                swiftService.uploadDir(event.server.updatesDir, config.openStackContainer, config.behavior.prefix, config.behavior.forceUpload);
             } catch (IOException e) {
                 logger.error("[SwiftUpdates] Error occurred while trying to fetch files for an update", e);
             }
         } else {
             logger.error("SwiftUpdates module is installed but not configured. No data will be pushed to Object Storage");
         }
-    }
-
-    public static String readableTime(long seconds) {
-        return String.format("%02dm%02ds", (seconds % 3600) / 60, (seconds % 60));
     }
 
 }

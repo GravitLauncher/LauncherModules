@@ -19,20 +19,25 @@
 ```json
 {
   "openStackEndpoint": "https://auth.cloud.ovh.net/v3",
-  "openStackUsername": "user-BwgZjmXYBYET",
-  "openStackPassword": "AbcdEfgHijKlMwMRsMb5UjsawDrWwWt",
+  "openStackUsername": "user",
+  "openStackPassword": "password",
   "openStackRegion": "DE",
   "openStackContainer": "public-container",
   "openStackDomain": "Default",
-  "prefix": "updates/"
+  "behavior": {
+    "forceUpload": false,
+    "prefix": "launcher-updates/"
+  }
 }
 ```
-**prefix** - префикс для всех загружаемых объектов (псевдо-директория)
-**openStackContainer** - название контейнера в которые будут загружаться объекты
-Все остальные данные поставляются провайдером, и могут разнится от провайдера к провайдеру
+- **openStackContainer** - название контейнера в которые будут загружаться объекты
+- **forceUpload** - нужно ли модулю сверять ETag файла на хранилище и локального
+- **prefix** - префикс для всех загружаемых объектов (псевдо-директория)
+
+Все остальные данные поставляются провайдером, и могут разниться от провайдера к провайдеру
 
 ## Проверенные провайдеры
-- OVH Гайд (todo)
+- [OVH Гайд (GravitLauncher Discord)](https://discord.com/channels/853340557522370561/853340558328070164/1026257836105269319)
 
 # Важное замечание
 Несмотря на то, что Swift имеет поддержку S3 API, данный модуль использует именно OpenStack Swift API ввиду его
