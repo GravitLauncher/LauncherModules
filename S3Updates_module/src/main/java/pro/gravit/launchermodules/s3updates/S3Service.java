@@ -57,13 +57,11 @@ public class S3Service {
                 final var fileKey = prefix + directory.relativize(file);
                 try (InputStream input = IOHelper.newInput(file)) {
                     if (forceUpload) {
+                        // Force upload everything
                         fileFutures.add(putObject(bucket, fileKey, file));
                     } else {
-                        // Get local file and calculate ETag
-                        final String localETag = DigestUtils.md5Hex(input);
-                        // Make request to get remote ETag
-
-                        fileFutures.add(putObject(bucket, fileKey, file));
+                        // Make request to get remote ETag along with local ETag
+                        fileFutures.add(putCheckedObject(bucket, fileKey, file, DigestUtils.md5Hex(input)));
                     }
                 } catch (IOException e) {
                     logger.error("[S3Updates] Error while trying to fetch local ETag", e);
@@ -113,7 +111,7 @@ public class S3Service {
                 });
     }
 
-    // FIXME_PLS: There are issues when getting HEAD of an object on OVH. Need investigation
+    // FIXED: Works on VK Cloud, but not OVH?
     private CompletableFuture<?> putCheckedObject(String container, String key, Path file, String localETag) {
         final var getObjectRequest = HeadObjectRequest.builder()
                 .bucket(container)
@@ -123,12 +121,13 @@ public class S3Service {
         return s3AsyncClient.headObject(getObjectRequest)
                 .handleAsync((headObjectResponse, throwable) -> {
                     if (throwable instanceof NoSuchKeyException) {
+                        // Case: No such remote object found. For some reason some providers never throw this, and some can throw entirely different error
+                        // (VK Cloud works just fine, OVH has issues)
                         logger.debug("[S3Updates] NOT FOUND: {}", key);
                     } else if (throwable instanceof SdkException ) {
+                        // Case: Some other exception either service returned error code or SDK broke down
                         logger.error("[S3Updates] Other exception occurred while fetching metadata", throwable);
                         return null;
-                    } else if (throwable instanceof S3Exception e) {
-                        logger.error("[S3Updates] Error communicating with S3 Storage {}", e.getMessage());
                     }
                     return headObjectResponse;
                 })
@@ -144,9 +143,6 @@ public class S3Service {
                         // Case: Remote object is present but ETag is different, or other edge case - upload
                         return putObject(container, key, file);
                     }
-                }).exceptionallyAsync(throwable -> {
-                    logger.error("[S3Updates] Error while uploading {} Stacktrace:", key, throwable);
-                    return null;
                 });
     }
 
@@ -168,7 +164,7 @@ public class S3Service {
     }
 
     public static boolean compareETag(String remote, String local) {
-        // Some providers return ETag with quotes (e.g. OVH), no idea why
+        // AWS SDK returns ETag with quotes, no idea why
         if (remote.contains("\"")) {
             local = "\"" + local + "\"";
         }
