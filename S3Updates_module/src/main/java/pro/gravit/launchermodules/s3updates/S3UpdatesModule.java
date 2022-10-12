@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.swiftupdates;
+package pro.gravit.launchermodules.s3updates;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,14 +15,14 @@ import pro.gravit.utils.Version;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class SwiftUpdatesModule extends LauncherModule {
-    private static final Logger logger = LogManager.getLogger(SwiftService.class);
-    private SwiftService swiftService = null;
+public class S3UpdatesModule extends LauncherModule {
+    private static final Logger logger = LogManager.getLogger(S3Service.class);
+    private S3Service s3Service = null;
     private final AtomicBoolean isEnabled = new AtomicBoolean(false);
-    public SwiftService.Config config;
+    public S3Service.Config config;
 
-    public SwiftUpdatesModule() {
-        super(new LauncherModuleInfo("SwiftUpdates", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
+    public S3UpdatesModule() {
+        super(new LauncherModuleInfo("S3Updates", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
     }
 
     @Override
@@ -37,21 +37,21 @@ public class SwiftUpdatesModule extends LauncherModule {
 
     public void initSwiftUpdatesModule(LaunchServer server) {
         final var path = modulesConfigManager.getModuleConfig(moduleInfo.name);
-        SwiftUpdatesModule module = this;
-        JsonConfigurable<SwiftService.Config> configurable = new JsonConfigurable<>(SwiftService.Config.class, path) {
+        S3UpdatesModule module = this;
+        JsonConfigurable<S3Service.Config> configurable = new JsonConfigurable<>(S3Service.Config.class, path) {
             @Override
-            public SwiftService.Config getConfig() {
+            public S3Service.Config getConfig() {
                 return config;
             }
 
             @Override
-            public void setConfig(SwiftService.Config config) {
+            public void setConfig(S3Service.Config config) {
                 module.config = config;
             }
 
             @Override
-            public SwiftService.Config getDefaultConfig() {
-                return new SwiftService.Config();
+            public S3Service.Config getDefaultConfig() {
+                return new S3Service.Config();
             }
         };
         try {
@@ -67,14 +67,10 @@ public class SwiftUpdatesModule extends LauncherModule {
             isEnabled.set(true);
         }
         if (isEnabled.get()) {
-            swiftService = new SwiftService(config.openStackEndpoint,
-                    config.openStackUsername,
-                    config.openStackPassword,
-                    config.openStackRegion,
-                    config.openStackDomain);
+            s3Service = new S3Service(config);
         }
-        server.commandHandler.registerCommand("swiftcleanup", new SwiftUpdatesCleanupCommand(server, swiftService, config));
-        server.commandHandler.registerCommand("swiftupload", new SwiftUpdatesCleanupCommand(server, swiftService, config));
+        server.commandHandler.registerCommand("s3cleanup", new S3UpdatesCleanupCommand(server, s3Service, config));
+        server.commandHandler.registerCommand("s3upload", new S3UpdatesCleanupCommand(server, s3Service, config));
     }
 
     public void finish(LaunchServerFullInitEvent event) {
@@ -84,12 +80,12 @@ public class SwiftUpdatesModule extends LauncherModule {
     private void onUpdatePush(LaunchServerUpdatesSyncEvent event) {
         if (isEnabled.get()) {
             try {
-                swiftService.uploadDir(event.server.updatesDir, config.openStackContainer, config.behavior.prefix, config.behavior.forceUpload);
+                s3Service.uploadDir(event.server.updatesDir, config.s3Bucket, config.behavior.prefix, config.behavior.forceUpload);
             } catch (IOException e) {
-                logger.error("[SwiftUpdates] Error occurred while trying to fetch files for an update", e);
+                logger.error("[S3Updates] Error occurred while trying to fetch files for an update", e);
             }
         } else {
-            logger.error("SwiftUpdates module is installed but not configured. No data will be pushed to Object Storage");
+            logger.error("S3Updates module is installed but not configured. No data will be pushed to Object Storage");
         }
     }
 
