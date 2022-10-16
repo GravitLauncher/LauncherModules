@@ -20,7 +20,7 @@ public class S3UpdatesCleanupCommand extends Command {
 
     @Override
     public String getUsageDescription() {
-        return "clean objects that are present on S3 storage with said prefix (config values as default)";
+        return "cleans objects that are present on S3 storage with said prefix (config values as default)";
     }
 
     @Override

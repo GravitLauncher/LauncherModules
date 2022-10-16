@@ -20,15 +20,15 @@ public class S3UpdatesUploadCommand extends Command {
 
     @Override
     public String getUsageDescription() {
-        return "upload updates files to the S3 storage with specified prefix (config values as defaults)";
+        return "upload update files to the S3 storage with specified prefix (config values as defaults)";
     }
 
     @Override
     public void invoke(String... args) throws Exception {
         if (args.length == 0) {
-            s3Service.uploadDir(server.updatesDir, config.s3Bucket, config.behavior.prefix, config.behavior.forceUpload);
+            s3Service.uploadDir(server.updatesDir, config.s3Bucket, config.behavior.prefix, config.behavior.forceUpload, server.updatesManager);
         } else {
-            s3Service.uploadDir(server.updatesDir, args[0], args[1], Boolean.parseBoolean(args[2]));
+            s3Service.uploadDir(server.updatesDir, args[0], args[1], Boolean.parseBoolean(args[2]), server.updatesManager);
         }
     }
 }

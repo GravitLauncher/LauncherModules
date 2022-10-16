@@ -62,7 +62,7 @@ public class S3UpdatesModule extends LauncherModule {
         }
         config = configurable.getConfig();
         if (config.isEmpty()) {
-            logger.error("SwiftUpdates module is not configured. Please configure it an restart LaunchServer it to enable.");
+            logger.error("S3Updates module is not configured. Please configure it an restart LaunchServer to enable it");
         } else {
             isEnabled.set(true);
         }
@@ -80,12 +80,12 @@ public class S3UpdatesModule extends LauncherModule {
     private void onUpdatePush(LaunchServerUpdatesSyncEvent event) {
         if (isEnabled.get()) {
             try {
-                s3Service.uploadDir(event.server.updatesDir, config.s3Bucket, config.behavior.prefix, config.behavior.forceUpload);
+                s3Service.uploadDir(event.server.updatesDir, config.s3Bucket, config.behavior.prefix, config.behavior.forceUpload, event.server.updatesManager);
             } catch (IOException e) {
                 logger.error("[S3Updates] Error occurred while trying to fetch files for an update", e);
             }
         } else {
-            logger.error("S3Updates module is installed but not configured. No data will be pushed to Object Storage");
+            logger.error("S3Updates module is not configured. No data will be pushed to Object Storage");
         }
     }
 

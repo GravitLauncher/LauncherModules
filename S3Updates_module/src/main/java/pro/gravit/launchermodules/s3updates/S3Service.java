@@ -1,26 +1,25 @@
 package pro.gravit.launchermodules.s3updates;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.utils.helper.IOHelper;
+import pro.gravit.launcher.hasher.HashedDir;
+import pro.gravit.launcher.hasher.HashedEntry;
+import pro.gravit.launcher.hasher.HashedFile;
+import pro.gravit.launchserver.manangers.UpdatesManager;
+import pro.gravit.utils.helper.SecurityHelper;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkException;
-import software.amazon.awssdk.core.exception.SdkServiceException;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.*;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +45,40 @@ public class S3Service {
                 .build();
     }
 
-    public void uploadDir(Path directory, String bucket, String prefix, final boolean forceUpload) throws IOException {
+    public void uploadDir(Path directory, String bucket, String prefix, final boolean forceUpload, UpdatesManager updatesManager) throws IOException {
         logger.info("[S3Updates] Starting to upload updates directory contents to bucket {} with prefix {}", bucket, prefix);
-        List<CompletableFuture<?>> fileFutures = new ArrayList<>();
+        List<CompletableFuture<?>> awsRequestFutures = new ArrayList<>();
         final var startTime = System.currentTimeMillis();
 
+        updatesManager.getUpdatesList().forEach(updateDir -> {
+            try {
+                updatesManager.getUpdate(updateDir).walk(File.separator, (path, name, entry) -> {
+                    // We work only with files skipping directories
+                    if (entry.getType().equals(HashedEntry.Type.FILE)) {
+                        // Figuring out real path to files and S3 file key
+                        final var relativeUpdatePath = Path.of(updateDir, path);
+                        final var relativeRuntimePath = directory.resolve(relativeUpdatePath);
+                        final var fileKey = prefix + relativeUpdatePath;
+
+                        // Make request with local ETag check; instanceof purely for clean cast syntax
+                        if (!forceUpload && entry instanceof HashedFile hashedfile) {
+                            awsRequestFutures.add(putCheckedObject(bucket, fileKey, relativeRuntimePath, SecurityHelper.toHex(hashedfile.getDigest())));
+                            return HashedDir.WalkAction.CONTINUE;
+                        }
+
+                        // Force upload
+                        awsRequestFutures.add(putObject(bucket, fileKey, relativeRuntimePath));
+                        return HashedDir.WalkAction.CONTINUE;
+                    }
+
+                    return HashedDir.WalkAction.CONTINUE;
+                });
+            } catch (IOException e) {
+                logger.error("[S3Updates] Exception occurred while walking update files", e);
+            }
+        });
+
+        /* Old pure Java recursive walk
         IOHelper.walk(directory, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
@@ -58,18 +86,19 @@ public class S3Service {
                 try (InputStream input = IOHelper.newInput(file)) {
                     if (forceUpload) {
                         // Force upload everything
-                        fileFutures.add(putObject(bucket, fileKey, file));
+                        awsRequestFutures.add(putObject(bucket, fileKey, file));
                     } else {
                         // Make request to get remote ETag along with local ETag
-                        fileFutures.add(putCheckedObject(bucket, fileKey, file, DigestUtils.md5Hex(input)));
+                        awsRequestFutures.add(putCheckedObject(bucket, fileKey, file, DigestUtils.md5Hex(input)));
                     }
                 } catch (IOException e) {
                     logger.error("[S3Updates] Error while trying to fetch local ETag", e);
                 }
                 return FileVisitResult.CONTINUE;
             }}, false);
+            */
 
-        CompletableFuture.allOf(fileFutures.toArray(new CompletableFuture[0]))
+        CompletableFuture.allOf(awsRequestFutures.toArray(new CompletableFuture[0]))
                 .thenRun(() -> logger.info("[S3Updates] Uploaded update files with {} prefix in {}",
                         prefix,
                         readableTime(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime))));
@@ -99,8 +128,7 @@ public class S3Service {
                             .exceptionallyAsync(throwable -> {
                                 logger.error("[S3Updates] Other exception occurred while trying to remove objects", throwable);
                                 return null;
-                            })
-                            .thenAcceptAsync(deleteObjectsResponse -> {
+                            }).thenAcceptAsync(deleteObjectsResponse -> {
                                 if (deleteObjectsResponse.hasErrors()) {
                                     logger.error("[S3Updates] Errors occurred while trying to delete objects: \n{}", deleteObjectsResponse.errors());
                                 }
@@ -130,8 +158,7 @@ public class S3Service {
                         return null;
                     }
                     return headObjectResponse;
-                })
-                .thenComposeAsync(headObjectResponse -> {
+                }).thenComposeAsync(headObjectResponse -> {
                     if (headObjectResponse == null) {
                         // Case: No such key or other exception - upload
                         return putObject(container, key, file);
@@ -152,6 +179,7 @@ public class S3Service {
                 .bucket(container)
                 .key(key)
                 .build();
+
         // Put the object
         return s3AsyncClient.putObject(putObjectRequest, AsyncRequestBody.fromFile(file))
                 .whenCompleteAsync((putObjectResponse, throwable) -> {
@@ -163,7 +191,7 @@ public class S3Service {
                 });
     }
 
-    public static boolean compareETag(String remote, String local) {
+    private static boolean compareETag(String remote, String local) {
         // AWS SDK returns ETag with quotes, no idea why
         if (remote.contains("\"")) {
             local = "\"" + local + "\"";
@@ -171,7 +199,7 @@ public class S3Service {
         return remote.equals(local);
     }
 
-    public static String readableTime(long seconds) {
+    private static String readableTime(long seconds) {
         return String.format("%02dm%02ds", (seconds % 3600) / 60, (seconds % 60));
     }
 
