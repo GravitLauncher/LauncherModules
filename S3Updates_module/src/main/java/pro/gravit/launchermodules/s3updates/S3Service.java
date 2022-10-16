@@ -112,7 +112,7 @@ public class S3Service {
     }
 
     // FIXED: Works on VK Cloud, but not OVH?
-    private CompletableFuture<?> putCheckedObject(String container, String key, Path file, String localETag) {
+    private CompletableFuture<PutObjectResponse> putCheckedObject(String container, String key, Path file, String localETag) {
         final var getObjectRequest = HeadObjectRequest.builder()
                 .bucket(container)
                 .key(key)
