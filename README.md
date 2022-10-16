@@ -19,11 +19,14 @@
 | [FileAuthSystem]\* | Система авторизации с хранением базы пользователей в файле json |
 | [GenerateCertificate] | Создает сертификаты для подписи **Launcher.**(*jar\|exe*). |
 | [LauncherStartScreen] | *(launcher-modules)* Добавляет окно загрузки *Launcher'а* до полной инициализации **runtime**. |
+| [OpenSSLSignCode] | Позволяет подписывать **exe** файлы своим сертификатом. |
+| [MirrorHelper] | Сборка клиентов с патчем authlib для *[GravitLauncher]* |
 | [MojangSupport] | Добавляет *[GravitLauncher]* поддержку **mojang**. |
 | [OneLauncher] | Запрещает запуск двух и более копий лаунчера |
 | [OpenSSLSignCode] | Позволяет подписывать **exe** файлы своим сертификатом. |
 | [Sentry LaunchServer] | Интеграция *[GravitLauncher]* с Sentry. |
 | [SystemdNotifer] |  Служит для правильного порядка загрузки **LaunchServer** утилитой **systemd**. |
+| [RemoteControl] | Команды консоли *[GravitLauncher]* при помощи HTTP. |
 | [Sentry Launcher] | *(launcher-modules)* Интеграция *Launcher'a* с Sentry. |
 | [TelegramBotConsole] | Модуль позволяет взаимодействовать с LaunchServer через Telegram клиент. |
 | [UnsafeCommandPack] | Добавляет дополнительные команды в *[GravitLauncher]*. |
@@ -37,6 +40,8 @@
 [FileAuthSystem]: https://github.com/GravitLauncher/LauncherModules/tree/master/FileAuthSystem_module
 
 [GenerateCertificate]: https://github.com/GravitLauncher/LauncherModules/tree/master/GenerateCertificate_module
+
+[MirrorHelper]: https://github.com/GravitLauncher/LauncherModules/tree/master/MirrorHelper_module
 
 [MojangSupport]: https://github.com/GravitLauncher/LauncherModules/tree/master/MojangSupport_module
 
@@ -55,6 +60,8 @@
 [Sentry Launcher]: https://github.com/GravitLauncher/LauncherModules/tree/master/Sentry_lmodule
 
 [DiscordBotConsole]: https://github.com/GravitLauncher/LauncherModules/tree/master/DiscordBotConsole_module
+
+[RemoteControl]: https://github.com/GravitLauncher/LauncherModules/tree/master/RemoteControl_module
 
 [TelegramBotConsole]: https://github.com/GravitLauncher/LauncherModules/tree/master/TelegramBotConsole_module
 
