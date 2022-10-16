@@ -20,7 +20,7 @@ public class AddHashModule extends LauncherModule {
 
     public void preInit(PreConfigPhase preConfigPhase) {
         if (!registred) {
-            PasswordVerifier.providers.register("bcrypt", BCryptPasswordVerifier.class);
+            PasswordVerifier.providers.register("bcrypt-alt", BCryptPasswordVerifier.class);
             PasswordVerifier.providers.register("phpass", PhpHashPasswordVerifier.class);
             registred = true;
         }
