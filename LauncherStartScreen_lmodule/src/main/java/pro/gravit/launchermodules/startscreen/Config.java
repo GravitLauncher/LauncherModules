@@ -5,7 +5,7 @@ import pro.gravit.launcher.LauncherInject;
 public class Config {
     @LauncherInject(value = "modules.startscreen.imageurl")
     public String imageURL;
-    @LauncherInject(value = "modules.startscreen.faviconURL")
+    @LauncherInject(value = "modules.startscreen.faviconurl")
     public String faviconURL;
     @LauncherInject(value = "modules.startscreen.colorr")
     public float colorR;
