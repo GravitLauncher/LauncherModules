@@ -5,8 +5,8 @@
 #### Установка модуля
 
 1. Скопировать модуль **LauncherStartScreen_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
-2. Скопировать изображение *splash.png* в папку **/LaunchServer/runtime/splash.png**
-3. Скопировать иконку *favicon.ico* в папку **/LaunchServer/runtime/favicon.ico**
+2. Скопировать изображение *splash.png* в папку **/LaunchServer/launcher-pack/splash.png**
+3. Скопировать иконку *favicon.ico* в папку **/LaunchServer/launcher-pack/favicon.ico**
 4. Выполнить **build** Launcher.
 
 #### Конфигурация
@@ -15,8 +15,8 @@
 
 ```json
 {
-  "imageURL": "runtime/splash.png",
-  "faviconURL": "runtime/favicon.ico",
+  "imageURL": "splash.png",
+  "faviconURL": "favicon.ico",
   "colorR": 1.0,
   "colorG": 1.0,
   "colorB": 1.0,

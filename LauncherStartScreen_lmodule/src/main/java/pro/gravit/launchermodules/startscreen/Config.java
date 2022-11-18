@@ -18,8 +18,8 @@ public class Config {
 
     public static Object getDefault() {
         Config config = new Config();
-        config.imageURL = "runtime/splash.png";
-        config.faviconURL = "runtime/favicon.ico";
+        config.imageURL = "splash.png";
+        config.faviconURL = "favicon.ico";
         config.colorR = 1.0f;
         config.colorG = 1.0f;
         config.colorB = 1.0f;
