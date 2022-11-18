@@ -17,9 +17,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class S3UpdatesModule extends LauncherModule {
     private static final Logger logger = LogManager.getLogger(S3Service.class);
-    private S3Service s3Service = null;
     private final AtomicBoolean isEnabled = new AtomicBoolean(false);
     public S3Service.Config config;
+    private S3Service s3Service = null;
 
     public S3UpdatesModule() {
         super(new LauncherModuleInfo("S3Updates", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));

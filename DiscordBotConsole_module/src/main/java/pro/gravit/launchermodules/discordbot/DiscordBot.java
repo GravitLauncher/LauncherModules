@@ -13,8 +13,6 @@ import pro.gravit.launchserver.LaunchServer;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DiscordBot {
     private static final Logger logger = LogManager.getLogger(DiscordBot.class);
@@ -38,16 +36,16 @@ public class DiscordBot {
     }
 
     public static void sendEvent(Message message) {
-        if(jda == null) {
+        if (jda == null) {
             return;
         }
         Guild guild = jda.getGuildById(config.eventGuildId);
-        if(guild == null) {
+        if (guild == null) {
             logger.error("Guild {} not found", config.eventGuildId);
             return;
         }
         TextChannel channel = jda.getTextChannelById(config.eventChannelId);
-        if(channel == null) {
+        if (channel == null) {
             logger.error("Channel {} not found", config.eventChannelId);
             return;
         }

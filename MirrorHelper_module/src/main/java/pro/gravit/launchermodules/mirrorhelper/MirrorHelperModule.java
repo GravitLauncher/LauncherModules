@@ -16,7 +16,6 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.command.BaseCommandCategory;
 import pro.gravit.utils.command.CommandCategory;
 import pro.gravit.utils.command.CommandHandler;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
 import java.nio.file.Path;

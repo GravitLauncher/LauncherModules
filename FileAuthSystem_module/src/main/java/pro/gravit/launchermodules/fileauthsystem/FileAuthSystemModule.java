@@ -7,15 +7,10 @@ import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launcher.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
-import pro.gravit.launchserver.auth.core.User;
-import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.SecurityHelper;
 
 import java.nio.file.Path;
-import java.util.Objects;
-import java.util.UUID;
 
 public class FileAuthSystemModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);

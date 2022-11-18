@@ -7,23 +7,18 @@ import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchermodules.unsafecommands.commands.DeDupLibrariesCommand;
-import pro.gravit.launchermodules.unsafecommands.commands.FetchClientCommand;
 import pro.gravit.launchermodules.unsafecommands.commands.installers.FabricInstallerCommand;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.hash.MakeProfileCommand;
-import pro.gravit.utils.Downloader;
-import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -46,9 +41,6 @@ public class InstallClient {
     private final ClientProfile.Version version;
 
     private final List<Long> mods;
-    public enum VersionType {
-        VANILLA, FABRIC, FORGE
-    }
     private VersionType versionType;
 
     public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<Long> mods, VersionType versionType) {
@@ -59,6 +51,20 @@ public class InstallClient {
         this.version = version;
         this.mods = mods;
         this.versionType = versionType;
+    }
+
+    public static Path installMod(CurseforgeAPI api, Path modsDir, long modId, ClientProfile.Version version) throws Exception {
+        var modInfo = api.fetchModById(modId);
+        long fileId = modInfo.findFileIdByGameVersion(version.name);
+        var fileInfo = api.fetchModFileById(modId, fileId);
+        URL url = new URL(fileInfo.downloadUrl());
+        Path path = modsDir.resolve(fileInfo.fileName().replace("+", "-"));
+        logger.info("Download {} {} into {}", fileInfo.fileName(), url, path);
+        try (InputStream input = IOHelper.newInput(url)) {
+            IOHelper.transfer(input, path);
+        }
+        logger.info("{} downloaded", fileInfo.fileName());
+        return path;
     }
 
     private void downloadVanillaTo(Path clientDir) throws Exception {
@@ -72,7 +78,7 @@ public class InstallClient {
         } else {
             IOHelper.createParentDirs(vanillaProfileJson);
             obj = ClientDownloader.gainClient(version.name);
-            try(Writer writer = IOHelper.newWriter(vanillaProfileJson)) {
+            try (Writer writer = IOHelper.newWriter(vanillaProfileJson)) {
                 Launcher.gsonManager.configGson.toJson(obj, writer);
             }
         }
@@ -117,7 +123,7 @@ public class InstallClient {
         Path clientPath = launchServer.updatesDir.resolve(name);
         {
             Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.name);
-            if(Files.notExists(fetchDir)) {
+            if (Files.notExists(fetchDir)) {
                 downloadVanillaTo(fetchDir);
             }
             copyDir(fetchDir, clientPath);
@@ -125,13 +131,13 @@ public class InstallClient {
         Path tmpFile = workdir.resolve("file.tmp");
         {
             Path pathToLauncherAuthlib;
-            if(version.compareTo(ClientProfile.Version.MC1165) < 0) {
+            if (version.compareTo(ClientProfile.Version.MC1165) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib1.jar");
-            } else if(version.compareTo(ClientProfile.Version.MC118) < 0) {
+            } else if (version.compareTo(ClientProfile.Version.MC118) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib2.jar");
-            } else if(version.compareTo(ClientProfile.Version.MC119) < 0) {
+            } else if (version.compareTo(ClientProfile.Version.MC119) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3.jar");
-            } else if(version.compareTo(ClientProfile.Version.MC119) == 0) {
+            } else if (version.compareTo(ClientProfile.Version.MC119) == 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.jar");
             } else {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.1.jar");
@@ -145,13 +151,13 @@ public class InstallClient {
             logger.info("Authlib patched");
         }
         {
-            if(versionType == VersionType.FABRIC) {
+            if (versionType == VersionType.FABRIC) {
                 FabricInstallerCommand fabricInstallerCommand = new FabricInstallerCommand(launchServer);
                 fabricInstallerCommand.invoke(version.name, name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Fabric installed");
-            } else if(versionType == VersionType.FORGE) {
-                Path forgeInstaller = workdir.resolve("installers").resolve("forge-"+version.name+"-installer.jar");
+            } else if (versionType == VersionType.FORGE) {
+                Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version.name + "-installer.jar");
                 Path tmpDir = workdir.resolve("tmp");
                 IOHelper.transfer("{}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
                 int counter = 5;
@@ -164,7 +170,7 @@ public class InstallClient {
                     int code = forgeProcess.waitFor();
                     logger.info("Process return with status code {}", code);
                     counter--;
-                    if(counter <= 0) {
+                    if (counter <= 0) {
                         throw new RuntimeException("Forge not installed");
                     }
                 } while (!Files.isDirectory(tmpDir.resolve("libraries")));
@@ -179,14 +185,14 @@ public class InstallClient {
                         fabricProfile = Launcher.gsonManager.configGson.fromJson(reader, FabricInstallerCommand.MinecraftProfile.class);
                     }
                     for (FabricInstallerCommand.MinecraftProfileLibrary library : fabricProfile.libraries) {
-                        if(library.url == null) {
+                        if (library.url == null) {
                             library.url = "https://libraries.minecraft.net/";
                         }
                         FabricInstallerCommand.NamedURL url = FabricInstallerCommand.makeURL(library.url, library.name);
                         logger.info("Download {} into {}", url.url.toString(), url.name);
                         Path file = clientPath.resolve("libraries").resolve(url.name);
                         IOHelper.createParentDirs(file);
-                        if(Files.exists(file)) {
+                        if (Files.exists(file)) {
                             continue;
                         }
                         try (InputStream stream = IOHelper.newInput(url.url)) {
@@ -204,12 +210,12 @@ public class InstallClient {
         {
             copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
-            if(version.compareTo(ClientProfile.Version.MC113) >= 0) {
+            if (version.compareTo(ClientProfile.Version.MC113) >= 0) {
                 copyDir(workdir.resolve("workdir").resolve("lwjgl3"), clientPath);
             } else {
                 copyDir(workdir.resolve("workdir").resolve("lwjgl2"), clientPath);
             }
-            if(version.compareTo(ClientProfile.Version.MC118) >= 0) {
+            if (version.compareTo(ClientProfile.Version.MC118) >= 0) {
                 copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
             } else {
                 copyDir(workdir.resolve("workdir").resolve("java8"), clientPath);
@@ -218,10 +224,10 @@ public class InstallClient {
             copyDir(workdir.resolve("workdir").resolve(version.name).resolve(versionType.name()), clientPath);
             logger.info("Files copied");
         }
-        if(mods != null && !mods.isEmpty()) {
+        if (mods != null && !mods.isEmpty()) {
             CurseforgeAPI api = new CurseforgeAPI(config.curseforgeApiKey);
             Path modsDir = clientPath.resolve("mods");
-            for(var modId : mods) {
+            for (var modId : mods) {
                 try {
                     installMod(api, modsDir, modId, version);
                 } catch (Throwable e) {
@@ -244,15 +250,15 @@ public class InstallClient {
     }
 
     private void copyDir(Path source, Path target) throws IOException {
-        if(Files.notExists(source)) {
+        if (Files.notExists(source)) {
             return;
         }
         try (Stream<Path> stream = Files.walk(source)) {
             stream.forEach(src -> {
                 try {
                     Path dest = target.resolve(source.relativize(src));
-                    if(Files.isDirectory(src)) {
-                        if(Files.notExists(dest)) {
+                    if (Files.isDirectory(src)) {
+                        if (Files.notExists(dest)) {
                             Files.createDirectories(dest);
                         }
                     } else {
@@ -265,20 +271,6 @@ public class InstallClient {
         }
     }
 
-    public static Path installMod(CurseforgeAPI api, Path modsDir, long modId, ClientProfile.Version version) throws Exception {
-        var modInfo = api.fetchModById(modId);
-        long fileId = modInfo.findFileIdByGameVersion(version.name);
-        var fileInfo = api.fetchModFileById(modId, fileId);
-        URL url = new URL(fileInfo.downloadUrl());
-        Path path = modsDir.resolve(fileInfo.fileName().replace("+", "-"));
-        logger.info("Download {} {} into {}", fileInfo.fileName(), url, path);
-        try(InputStream input = IOHelper.newInput(url)) {
-            IOHelper.transfer(input, path);
-        }
-        logger.info("{} downloaded", fileInfo.fileName());
-        return path;
-    }
-
     private Path findClientAuthlib(Path clientDir) throws IOException {
         try (Stream<Path> stream = Files.walk(clientDir).filter(p -> !Files.isDirectory(p) && p.getFileName().toString().startsWith("authlib-"))) {
             return stream.findFirst().orElseThrow();
@@ -286,12 +278,12 @@ public class InstallClient {
     }
 
     private void merge2Jars(Path source, Path source2, Path target) throws IOException {
-        try(ZipOutputStream output = new ZipOutputStream(IOHelper.newOutput(target))) {
+        try (ZipOutputStream output = new ZipOutputStream(IOHelper.newOutput(target))) {
             Set<String> blacklist = new HashSet<>();
-            try(ZipInputStream input = IOHelper.newZipInput(source2)) {
+            try (ZipInputStream input = IOHelper.newZipInput(source2)) {
                 ZipEntry e = input.getNextEntry();
-                while(e != null) {
-                    if(e.getName().startsWith("META-INF")) {
+                while (e != null) {
+                    if (e.getName().startsWith("META-INF")) {
                         e = input.getNextEntry();
                         continue;
                     }
@@ -302,10 +294,10 @@ public class InstallClient {
                     e = input.getNextEntry();
                 }
             }
-            try(ZipInputStream input = IOHelper.newZipInput(source)) {
+            try (ZipInputStream input = IOHelper.newZipInput(source)) {
                 ZipEntry e = input.getNextEntry();
-                while(e != null) {
-                    if(blacklist.contains(e.getName())) {
+                while (e != null) {
+                    if (blacklist.contains(e.getName())) {
                         e = input.getNextEntry();
                         continue;
                     }
@@ -317,5 +309,9 @@ public class InstallClient {
                 }
             }
         }
+    }
+
+    public enum VersionType {
+        VANILLA, FABRIC, FORGE
     }
 }

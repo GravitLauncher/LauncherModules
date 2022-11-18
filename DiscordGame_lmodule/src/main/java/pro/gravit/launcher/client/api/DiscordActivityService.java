@@ -206,11 +206,11 @@ public class DiscordActivityService {
         setParam("username", playerProfile.username);
         setParam("uuid", playerProfile.uuid.toString());
         Texture skin = playerProfile.assets.get("SKIN");
-        if(skin != null) {
+        if (skin != null) {
             setParam("skinurl", skin.url);
         }
         Texture cape = playerProfile.assets.get("CAPE");
-        if(cape != null) {
+        if (cape != null) {
             setParam("cloakurl", cape.url);
         }
     }

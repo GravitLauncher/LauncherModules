@@ -75,7 +75,8 @@ public class ClientModule extends LauncherModule {
 
     private void exitHandler(ClientExitPhase phase) {
         if (isClosed(true)) return;
-        if (RequestEventWatcher.INSTANCE != null) Request.getRequestService().unregisterEventHandler(RequestEventWatcher.INSTANCE);
+        if (RequestEventWatcher.INSTANCE != null)
+            Request.getRequestService().unregisterEventHandler(RequestEventWatcher.INSTANCE);
         DiscordBridge.close();
     }
 

@@ -36,9 +36,8 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     private transient final Logger logger = LogManager.getLogger();
     private transient HttpClient client;
 
-    private static class MojangUUIDResponse {
-        public String name;
-        public String id;
+    public static UUID getUUIDFromMojangHash(String hash) {
+        return UUID.fromString(UUID_REGEX.matcher(hash).replaceFirst("$1-$2-$3-$4-$5"));
     }
 
     @Override
@@ -60,57 +59,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         MojangUser user = new MojangUser();
         user.username = login;
         return user;
-    }
-
-    public static UUID getUUIDFromMojangHash(String hash) {
-        return UUID.fromString(UUID_REGEX.matcher(hash).replaceFirst("$1-$2-$3-$4-$5"));
-    }
-
-    public static class AbstractMojangPropertiesResponse {
-        public List<MojangProfileProperty> properties;
-
-        public static class MojangProfileProperty {
-            public String name;
-            public String value;
-            public String signature;
-        }
-
-        public static class MojangProfileTexture {
-            public String url;
-            public String digest;
-            public Map<String, String> metadata;
-
-            public Texture toTexture() {
-                return new Texture(url, digest == null ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, url) : SecurityHelper.fromHex(digest), metadata);
-            }
-        }
-
-        public static class MojangProfilePropertyTexture {
-            public String profileId;
-            public String profileName;
-            public boolean signatureRequired;
-            public Map<String, MojangProfileTexture> textures;
-        }
-
-        public MojangProfilePropertyTexture getTextures() {
-            MojangProfileProperty property = null;
-            for (var e : properties) {
-                if ("textures".equals(e.name)) {
-                    property = e;
-                    break;
-                }
-            }
-            if (property == null) {
-                return null;
-            }
-            String jsonData = new String(Base64.getDecoder().decode(property.value), StandardCharsets.UTF_8);
-            return Launcher.gsonManager.gson.fromJson(jsonData, MojangProfileResponse.MojangProfilePropertyTexture.class);
-        }
-    }
-
-    public static class MojangProfileResponse extends AbstractMojangPropertiesResponse {
-        public String id;
-        public String name;
     }
 
     private MojangUser getUserByProfileResponse(MojangProfileResponse response1) {
@@ -148,33 +96,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         return getUserByHash(uuid.toString().replaceAll("-", ""));
     }
 
-    public static class MojangProfileByTokenResponse {
-        public String id;
-        public String name;
-        public List<MojangProfileByTokenTextureResponse> skins;
-        public List<MojangProfileByTokenTextureResponse> capes;
-
-        public static class MojangProfileByTokenTextureResponse {
-            public String id;
-            public String state;
-            public String url;
-            public String digest;
-            public String variant;
-
-            public boolean isActive() {
-                return "ACTIVE".equals(state);
-            }
-
-            public Texture toTexture() {
-                Map<String, String> metadata = null;
-                if (variant != null && variant.equals("SLIM")) {
-                    metadata = Map.of("model", "slim");
-                }
-                return new Texture(url, digest == null ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, url) : SecurityHelper.fromHex(digest), metadata);
-            }
-        }
-    }
-
     @Override
     public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
         try {
@@ -210,10 +131,10 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
 
     @Override
     public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
-        if(login == null) {
+        if (login == null) {
             throw AuthException.userNotFound();
         }
-        if(password == null) {
+        if (password == null) {
             throw AuthException.wrongPassword();
         }
         MojangAuthRequest request = new MojangAuthRequest(login, ((AuthPlainPassword) password).password);
@@ -238,6 +159,155 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
             return AuthManager.AuthReport.ofOAuth(result.accessToken, null, 0, session);
         } catch (IOException | URISyntaxException | InterruptedException e) {
             throw AuthException.wrongPassword();
+        }
+    }
+
+    @Override
+    public void init(LaunchServer server) {
+        client = HttpClient.newBuilder().build();
+    }
+
+    @Override
+    protected boolean updateServerID(User user, String serverID) throws IOException {
+        MojangUser mojangUser = (MojangUser) user;
+        mojangUser.serverId = serverID;
+        return false;
+    }
+
+    @Override
+    public boolean joinServer(Client client, String username, String accessToken, String serverID) throws IOException {
+        MojangUser user = (MojangUser) client.getUser();
+        if (user == null) return false;
+        MojangJoinServerRequest request = new MojangJoinServerRequest(accessToken, user.uuid, serverID);
+        try {
+            mojangRequest("POST", "https://sessionserver.mojang.com/session/minecraft/join", null, request, Void.class);
+            return true;
+        } catch (URISyntaxException | InterruptedException | IOException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public User checkServer(Client client, String username, String serverID) throws IOException {
+        String url = String.format("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", username, serverID);
+        try {
+            MojangProfileResponse result = mojangRequest(url, null, MojangProfileResponse.class);
+            return getUserByProfileResponse(result);
+        } catch (URISyntaxException | InterruptedException | IOException e) {
+            logger.error(e);
+            return null;
+        }
+    }
+
+    protected <T> T mojangRequest(String url, String accessToken, Class<T> clazz) throws IOException, URISyntaxException, InterruptedException {
+        return mojangRequest("GET", url, accessToken, null, clazz);
+    }
+
+    protected <T, V> T mojangRequest(String method, String url, String accessToken, V request, Class<T> clazz) throws IOException, URISyntaxException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .method(method, request == null ? HttpRequest.BodyPublishers.noBody() :
+                        HttpRequest.BodyPublishers.ofString(Launcher.gsonManager.gson.toJson(request)))
+                .uri(new URI(url))
+                .header("Accept", "application/json");
+        if (request != null) {
+            builder = builder.header("Content-Type", "application/json");
+        }
+        if (accessToken != null) {
+            builder = builder.header("Authorization", "Bearer ".concat(accessToken));
+        }
+        HttpRequest request1 = builder.build();
+        HttpResponse<String> response = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            String error = response.body();
+            if (error != null && !error.isEmpty()) {
+                logger.warn("Error {} return {}", url, error);
+            }
+            return null;
+        }
+        return Launcher.gsonManager.gson.fromJson(response.body(), clazz);
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
+
+    private static class MojangUUIDResponse {
+        public String name;
+        public String id;
+    }
+
+    public static class AbstractMojangPropertiesResponse {
+        public List<MojangProfileProperty> properties;
+
+        public MojangProfilePropertyTexture getTextures() {
+            MojangProfileProperty property = null;
+            for (var e : properties) {
+                if ("textures".equals(e.name)) {
+                    property = e;
+                    break;
+                }
+            }
+            if (property == null) {
+                return null;
+            }
+            String jsonData = new String(Base64.getDecoder().decode(property.value), StandardCharsets.UTF_8);
+            return Launcher.gsonManager.gson.fromJson(jsonData, MojangProfileResponse.MojangProfilePropertyTexture.class);
+        }
+
+        public static class MojangProfileProperty {
+            public String name;
+            public String value;
+            public String signature;
+        }
+
+        public static class MojangProfileTexture {
+            public String url;
+            public String digest;
+            public Map<String, String> metadata;
+
+            public Texture toTexture() {
+                return new Texture(url, digest == null ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, url) : SecurityHelper.fromHex(digest), metadata);
+            }
+        }
+
+        public static class MojangProfilePropertyTexture {
+            public String profileId;
+            public String profileName;
+            public boolean signatureRequired;
+            public Map<String, MojangProfileTexture> textures;
+        }
+    }
+
+    public static class MojangProfileResponse extends AbstractMojangPropertiesResponse {
+        public String id;
+        public String name;
+    }
+
+    public static class MojangProfileByTokenResponse {
+        public String id;
+        public String name;
+        public List<MojangProfileByTokenTextureResponse> skins;
+        public List<MojangProfileByTokenTextureResponse> capes;
+
+        public static class MojangProfileByTokenTextureResponse {
+            public String id;
+            public String state;
+            public String url;
+            public String digest;
+            public String variant;
+
+            public boolean isActive() {
+                return "ACTIVE".equals(state);
+            }
+
+            public Texture toTexture() {
+                Map<String, String> metadata = null;
+                if (variant != null && variant.equals("SLIM")) {
+                    metadata = Map.of("model", "slim");
+                }
+                return new Texture(url, digest == null ? SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, url) : SecurityHelper.fromHex(digest), metadata);
+            }
         }
     }
 
@@ -279,18 +349,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         }
     }
 
-    @Override
-    public void init(LaunchServer server) {
-        client = HttpClient.newBuilder().build();
-    }
-
-    @Override
-    protected boolean updateServerID(User user, String serverID) throws IOException {
-        MojangUser mojangUser = (MojangUser) user;
-        mojangUser.serverId = serverID;
-        return false;
-    }
-
     public static class MojangJoinServerRequest {
         public String accessToken;
         public String selectedProfile;
@@ -300,31 +358,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
             this.accessToken = accessToken;
             this.selectedProfile = uuid.toString().replaceAll("-", "");
             this.serverId = serverId;
-        }
-    }
-
-    @Override
-    public boolean joinServer(Client client, String username, String accessToken, String serverID) throws IOException {
-        MojangUser user = (MojangUser) client.getUser();
-        if (user == null) return false;
-        MojangJoinServerRequest request = new MojangJoinServerRequest(accessToken, user.uuid, serverID);
-        try {
-            mojangRequest("POST", "https://sessionserver.mojang.com/session/minecraft/join", null, request, Void.class);
-            return true;
-        } catch (URISyntaxException | InterruptedException | IOException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public User checkServer(Client client, String username, String serverID) throws IOException {
-        String url = String.format("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", username, serverID);
-        try {
-            MojangProfileResponse result = mojangRequest(url, null, MojangProfileResponse.class);
-            return getUserByProfileResponse(result);
-        } catch (URISyntaxException | InterruptedException | IOException e) {
-            logger.error(e);
-            return null;
         }
     }
 
@@ -364,36 +397,8 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         }
     }
 
-    protected <T> T mojangRequest(String url, String accessToken, Class<T> clazz) throws IOException, URISyntaxException, InterruptedException {
-        return mojangRequest("GET", url, accessToken, null, clazz);
-    }
-
     public static class MojangError {
         public String error;
-    }
-
-    protected <T, V> T mojangRequest(String method, String url, String accessToken, V request, Class<T> clazz) throws IOException, URISyntaxException, InterruptedException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .method(method, request == null ? HttpRequest.BodyPublishers.noBody() :
-                        HttpRequest.BodyPublishers.ofString(Launcher.gsonManager.gson.toJson(request)))
-                .uri(new URI(url))
-                .header("Accept", "application/json");
-        if (request != null) {
-            builder = builder.header("Content-Type", "application/json");
-        }
-        if (accessToken != null) {
-            builder = builder.header("Authorization", "Bearer ".concat(accessToken));
-        }
-        HttpRequest request1 = builder.build();
-        HttpResponse<String> response = client.send(request1, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200) {
-            String error = response.body();
-            if (error != null && !error.isEmpty()) {
-                logger.warn("Error {} return {}", url, error);
-            }
-            return null;
-        }
-        return Launcher.gsonManager.gson.fromJson(response.body(), clazz);
     }
 
     public static class MojangUser implements User, UserSupportTextures {
@@ -462,10 +467,5 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
                     ", cloak=" + cloak +
                     '}';
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-
     }
 }

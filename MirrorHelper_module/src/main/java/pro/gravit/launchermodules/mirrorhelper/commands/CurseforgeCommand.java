@@ -13,6 +13,7 @@ public class CurseforgeCommand extends Command {
     private transient final Logger logger = LogManager.getLogger();
     private final Config config;
     private final CurseforgeAPI api;
+
     public CurseforgeCommand(LaunchServer server, Config config) {
         super(server);
         this.config = config;

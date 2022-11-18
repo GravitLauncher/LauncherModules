@@ -1,6 +1,5 @@
 package pro.gravit.launchermodules.mirrorhelper.config;
 
-import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 
 import java.util.ArrayList;
@@ -15,14 +14,14 @@ public class ClientBuildInfo {
     public List<String> removeFiles = new ArrayList<>();
 
     public static ClientBuildInfo merge(ClientBuildInfo base, List<ClientBuildInfo> adds) {
-        for(var b : adds) {
-            if(base.name == null) {
+        for (var b : adds) {
+            if (base.name == null) {
                 base.name = b.name;
             }
-            if(base.version == null) {
+            if (base.version == null) {
                 base.version = b.version;
             }
-            if(base.versionType == null) {
+            if (base.versionType == null) {
                 base.versionType = b.versionType;
             }
             base.mods.addAll(b.mods);

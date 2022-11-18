@@ -45,6 +45,18 @@ public class S3Service {
                 .build();
     }
 
+    private static boolean compareETag(String remote, String local) {
+        // AWS SDK returns ETag with quotes, no idea why
+        if (remote.contains("\"")) {
+            local = "\"" + local + "\"";
+        }
+        return remote.equals(local);
+    }
+
+    private static String readableTime(long seconds) {
+        return String.format("%02dm%02ds", (seconds % 3600) / 60, (seconds % 60));
+    }
+
     public void uploadDir(Path directory, String bucket, String prefix, final boolean forceUpload, UpdatesManager updatesManager) throws IOException {
         logger.info("[S3Updates] Starting to upload updates directory contents to bucket {} with prefix {}", bucket, prefix);
         List<CompletableFuture<?>> awsRequestFutures = new ArrayList<>();
@@ -135,7 +147,8 @@ public class S3Service {
                                 if (deleteObjectsResponse.hasDeleted()) {
                                     logger.info("[S3Updates] Successfully cleaned up {} objects",
                                             deleteObjectsResponse.deleted().size());
-                                }});
+                                }
+                            });
                 });
     }
 
@@ -152,7 +165,7 @@ public class S3Service {
                         // Case: No such remote object found. For some reason some providers never throw this, and some can throw entirely different error
                         // (VK Cloud works just fine, OVH has issues)
                         logger.debug("[S3Updates] NOT FOUND: {}", key);
-                    } else if (throwable instanceof SdkException ) {
+                    } else if (throwable instanceof SdkException) {
                         // Case: Some other exception either service returned error code or SDK broke down
                         logger.error("[S3Updates] Other exception occurred while fetching metadata", throwable);
                         return null;
@@ -189,18 +202,6 @@ public class S3Service {
                         logger.debug("[S3Updates] UPLOAD: {} ETag: {}", key, putObjectResponse.eTag());
                     }
                 });
-    }
-
-    private static boolean compareETag(String remote, String local) {
-        // AWS SDK returns ETag with quotes, no idea why
-        if (remote.contains("\"")) {
-            local = "\"" + local + "\"";
-        }
-        return remote.equals(local);
-    }
-
-    private static String readableTime(long seconds) {
-        return String.format("%02dm%02ds", (seconds % 3600) / 60, (seconds % 60));
     }
 
     public static class Config {

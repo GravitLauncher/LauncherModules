@@ -26,6 +26,11 @@ public class TelegramBotListener extends TelegramLongPollingBot {
     private final LaunchServer server;
     private final Logger logger = LogManager.getLogger(TelegramBotListener.class);
 
+    public TelegramBotListener(TelegramBot.Config config, LaunchServer server) {
+        this.config = config;
+        this.server = server;
+    }
+
     public static TelegramBotListener getInstance(TelegramBot.Config config, LaunchServer server) {
         if (instance == null) {
             instance = new TelegramBotListener(config, server);
@@ -35,11 +40,6 @@ public class TelegramBotListener extends TelegramLongPollingBot {
 
     public static TelegramBotListener getInstance() {
         return instance;
-    }
-
-    public TelegramBotListener(TelegramBot.Config config, LaunchServer server) {
-        this.config = config;
-        this.server = server;
     }
 
     @Override
@@ -158,8 +158,8 @@ public class TelegramBotListener extends TelegramLongPollingBot {
 
 
     public static class LogLinesContainer implements Consumer<LogEvent> {
-        public List<LogEventView> lines = new ArrayList<>();
         private final Thread currentThread = Thread.currentThread();
+        public List<LogEventView> lines = new ArrayList<>();
 
         @Override
         public void accept(LogEvent logEvent) {

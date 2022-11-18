@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.Downloader;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,34 +23,21 @@ import java.util.zip.ZipInputStream;
 
 public class LwjglDownloadCommand extends Command {
     private transient final Logger logger = LogManager.getLogger();
+
     public LwjglDownloadCommand(LaunchServer server) {
         super(server);
-    }
-
-    @Override
-    public String getArgsDescription() {
-        return "[version] [client dir]";
-    }
-
-    @Override
-    public String getUsageDescription() {
-        return "download lwjgl 3.3.0+";
-    }
-
-    public record OSArchPair(JVMHelper.ARCH arch, JVMHelper.OS os) {
-
     }
 
     public static OSArchPair getFromLwjglNativeName(String name) {
         int pos = name.indexOf("-");
         JVMHelper.ARCH arch;
         JVMHelper.OS os;
-        if(pos < 0) {
+        if (pos < 0) {
             arch = JVMHelper.ARCH.X86_64;
             os = getOS(name);
         } else {
             os = getOS(name.substring(0, pos));
-            arch = getArch(name.substring(pos+1));
+            arch = getArch(name.substring(pos + 1));
         }
         return new OSArchPair(arch, os);
     }
@@ -77,6 +62,16 @@ public class LwjglDownloadCommand extends Command {
     }
 
     @Override
+    public String getArgsDescription() {
+        return "[version] [client dir]";
+    }
+
+    @Override
+    public String getUsageDescription() {
+        return "download lwjgl 3.3.0+";
+    }
+
+    @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
         String version = args[0];
@@ -86,7 +81,7 @@ public class LwjglDownloadCommand extends Command {
         List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc");
         List<String> archs = List.of("linux", "windows", "windows-x86", "windows-arm64", "macos", "macos-arm64", "linux-arm64", "linux-arm32");
         String mirror = "https://repo1.maven.org/maven2/org/lwjgl/";
-        for(String component : components) {
+        for (String component : components) {
             Path jarPath = lwjglDir.resolve(component).resolve(version).resolve(component.concat("-").concat(version).concat(".jar"));
             Path jarDirPath = jarPath.getParent();
             Files.createDirectories(jarDirPath);
@@ -99,7 +94,7 @@ public class LwjglDownloadCommand extends Command {
                     .concat(String.format("%s-%s.jar", component, version)));
             logger.info("Download {} to {}", jarUrl, jarPath);
             download(jarUrl, jarPath);
-            for(String arch : archs) {
+            for (String arch : archs) {
                 URL nativesUrl = new URL(prepareUrl
                         .concat(String.format("%s-%s-natives-%s.jar", component, version, arch)));
                 var pair = getFromLwjglNativeName(arch);
@@ -107,16 +102,16 @@ public class LwjglDownloadCommand extends Command {
                 IOHelper.createParentDirs(nativesPath);
                 logger.info("Download natives {}", nativesUrl);
                 List<String> processedFiles = new ArrayList<>();
-                try(ZipInputStream input = new ZipInputStream(IOHelper.newInput(nativesUrl))) {
+                try (ZipInputStream input = new ZipInputStream(IOHelper.newInput(nativesUrl))) {
                     ZipEntry entry = input.getNextEntry();
-                    while(entry != null) {
-                        if(!entry.isDirectory() && !entry.getName().startsWith("META-INF")
+                    while (entry != null) {
+                        if (!entry.isDirectory() && !entry.getName().startsWith("META-INF")
                                 && !entry.getName().endsWith(".sha1") && !entry.getName().endsWith(".git")) {
                             Path path = Paths.get(entry.getName());
                             String filename = path.getFileName().toString();
                             logger.info("Process {}", filename);
-                            if(processedFiles.contains(filename)) {
-                                if("windows-x86".equals(arch)) {
+                            if (processedFiles.contains(filename)) {
+                                if ("windows-x86".equals(arch)) {
                                     String oldName = filename;
                                     int index = filename.indexOf(".");
                                     filename = filename.substring(0, index).concat("32").concat(filename.substring(index));
@@ -137,11 +132,15 @@ public class LwjglDownloadCommand extends Command {
     }
 
     private void download(URL url, Path target) throws IOException {
-        if(Files.exists(target)) return;
-        try(InputStream input = IOHelper.newInput(url)) {
-            try(OutputStream output = new FileOutputStream(target.toFile())) {
+        if (Files.exists(target)) return;
+        try (InputStream input = IOHelper.newInput(url)) {
+            try (OutputStream output = new FileOutputStream(target.toFile())) {
                 IOHelper.transfer(input, output);
             }
         }
+    }
+
+    public record OSArchPair(JVMHelper.ARCH arch, JVMHelper.OS os) {
+
     }
 }

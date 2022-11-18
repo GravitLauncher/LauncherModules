@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FileSystemAuthCoreProvider extends AuthCoreProvider implements AuthSupportRegistration, AuthSupportExit {
+    private final transient Logger logger = LogManager.getLogger();
     public String databaseDir;
     public boolean autoSave = true;
     public boolean autoReg = false;
@@ -49,7 +50,6 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     public PasswordVerifier passwordVerifier;
     public String skinUrl;
     public String cloakUrl;
-    private final transient Logger logger = LogManager.getLogger();
     private transient Map<UUID, UserEntity> users = new ConcurrentHashMap<>();
     private transient Set<UserSessionEntity> sessions = ConcurrentHashMap.newKeySet();
     private transient FileAuthSystemModule module;
@@ -122,15 +122,15 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     throw new IllegalArgumentException(String.format("User %s not found", args[0]));
                 boolean isSlim = Boolean.parseBoolean(args[1]);
                 Texture texture;
-                if(args.length >= 3) {
+                if (args.length >= 3) {
                     String textureUrl = args[2];
-                    if(!textureUrl.startsWith("http://") && !textureUrl.startsWith("https://")) {
+                    if (!textureUrl.startsWith("http://") && !textureUrl.startsWith("https://")) {
                         Path pathToSkin = Paths.get(textureUrl);
                         byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
                         String hexDigest = SecurityHelper.toHex(digest);
                         Path target = server.updatesDir.resolve("skins").resolve(hexDigest);
                         IOHelper.createParentDirs(target);
-                        if(Files.notExists(target)) {
+                        if (Files.notExists(target)) {
                             Files.copy(pathToSkin, target);
                         }
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
@@ -138,7 +138,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     } else {
                         texture = new Texture(textureUrl, false);
                     }
-                } else if(skinUrl != null) {
+                } else if (skinUrl != null) {
                     String textureUrl = RequestTextureProvider.getTextureURL(skinUrl, entity.uuid, entity.username, "");
                     texture = new Texture(textureUrl, false);
                 } else {
@@ -155,15 +155,15 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 if (entity == null)
                     throw new IllegalArgumentException(String.format("User %s not found", args[0]));
                 Texture texture;
-                if(args.length >= 2) {
+                if (args.length >= 2) {
                     String textureUrl = args[1];
-                    if(!textureUrl.startsWith("http://") && !textureUrl.startsWith("https://")) {
+                    if (!textureUrl.startsWith("http://") && !textureUrl.startsWith("https://")) {
                         Path pathToSkin = Paths.get(textureUrl);
                         byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
                         String hexDigest = SecurityHelper.toHex(digest);
                         Path target = server.updatesDir.resolve("skins").resolve(hexDigest);
                         IOHelper.createParentDirs(target);
-                        if(Files.notExists(target)) {
+                        if (Files.notExists(target)) {
                             Files.copy(pathToSkin, target);
                         }
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
@@ -171,7 +171,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     } else {
                         texture = new Texture(textureUrl, true);
                     }
-                } else if(cloakUrl != null) {
+                } else if (cloakUrl != null) {
                     String textureUrl = RequestTextureProvider.getTextureURL(cloakUrl, entity.uuid, entity.username, "");
                     texture = new Texture(textureUrl, true);
                 } else {
@@ -230,15 +230,15 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     @Override
     public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
         UserEntity user = getUser(login);
-        if(user == null) {
+        if (user == null) {
             throw AuthException.userNotFound();
         }
-        if(context != null) {
+        if (context != null) {
             AuthPlainPassword plainPassword = (AuthPlainPassword) password;
-            if(password == null) {
+            if (password == null) {
                 throw AuthException.wrongPassword();
             }
-            if(!passwordVerifier.check(user.password, plainPassword.password)) {
+            if (!passwordVerifier.check(user.password, plainPassword.password)) {
                 throw AuthException.wrongPassword();
             }
         }

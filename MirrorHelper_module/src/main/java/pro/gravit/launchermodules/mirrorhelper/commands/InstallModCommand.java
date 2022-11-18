@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class InstallModCommand extends Command {
 
@@ -40,15 +39,16 @@ public class InstallModCommand extends Command {
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 3);
         Path dir = server.updatesDir.resolve(args[0]);
-        if(Files.notExists(dir)) {
+        if (Files.notExists(dir)) {
             throw new FileNotFoundException(dir.toString());
         }
         ClientProfile.Version version = ClientProfile.Version.byName(args[1]);
-        List<Long> mods = Arrays.stream(args[2].split(",")).map(Long::parseLong).toList();;
-        if(!mods.isEmpty()) {
+        List<Long> mods = Arrays.stream(args[2].split(",")).map(Long::parseLong).toList();
+        ;
+        if (!mods.isEmpty()) {
             CurseforgeAPI api = new CurseforgeAPI(module.config.curseforgeApiKey);
             Path modsDir = dir.resolve("mods");
-            for(var modId : mods) {
+            for (var modId : mods) {
                 InstallClient.installMod(api, modsDir, modId, version);
             }
             logger.info("Mods installed");

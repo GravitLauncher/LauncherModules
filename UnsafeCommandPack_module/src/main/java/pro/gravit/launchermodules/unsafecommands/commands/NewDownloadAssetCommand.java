@@ -40,7 +40,7 @@ public class NewDownloadAssetCommand extends Command {
         Path assetDir = server.updatesDir.resolve(dirName);
 
         // Create asset dir
-        if(Files.notExists(assetDir)) {
+        if (Files.notExists(assetDir)) {
             LogHelper.subInfo("Creating asset dir: '%s'", dirName);
             Files.createDirectory(assetDir);
         }

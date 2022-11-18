@@ -42,7 +42,7 @@ public class DeDupLibrariesCommand extends Command {
             throw new FileNotFoundException(dir.toString());
         }
         boolean isIgnoreLwjgl = true;
-        if(args.length > 1) {
+        if (args.length > 1) {
             isIgnoreLwjgl = Boolean.parseBoolean(args[1]);
         }
         Map<String, List<Path>> map = new HashMap<>(16);
@@ -100,6 +100,15 @@ public class DeDupLibrariesCommand extends Command {
         }
     }
 
+    private InternalLibraryVersion convertStringToVersion(Path path) {
+        String string = path.getFileName().toString();
+        string = string.replaceAll("[^.0-9]", "."); // Replace any non-digit character to .
+        String[] list = string.split("\\.");
+        return new InternalLibraryVersion(Arrays.stream(list)
+                .filter(e -> !e.isEmpty()) // Filter ".."
+                .mapToLong(Long::parseLong).toArray(), path);
+    }
+
     private static class InternalLibraryVersion implements Comparable<InternalLibraryVersion> {
         private final long[] data;
         private final Path originalPath;
@@ -120,14 +129,5 @@ public class DeDupLibrariesCommand extends Command {
             }
             return result;
         }
-    }
-
-    private InternalLibraryVersion convertStringToVersion(Path path) {
-        String string = path.getFileName().toString();
-        string = string.replaceAll("[^.0-9]", "."); // Replace any non-digit character to .
-        String[] list = string.split("\\.");
-        return new InternalLibraryVersion(Arrays.stream(list)
-                .filter(e -> !e.isEmpty()) // Filter ".."
-                .mapToLong(Long::parseLong).toArray(), path);
     }
 }

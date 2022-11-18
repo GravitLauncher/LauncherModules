@@ -20,6 +20,7 @@ import java.util.zip.ZipOutputStream;
 
 public class PatchAuthlibCommand extends Command {
     private static Logger logger = LogManager.getLogger();
+
     public PatchAuthlibCommand(LaunchServer server) {
         super(server);
     }
@@ -39,9 +40,9 @@ public class PatchAuthlibCommand extends Command {
         verifyArgs(args, 2);
         Path dir = server.updatesDir.resolve(args[0]);
         Path originalAuthlib;
-        if(Files.isDirectory(dir)) {
+        if (Files.isDirectory(dir)) {
             Optional<Path> authlibDir = Files.list(dir.resolve("libraries/com/mojang/authlib")).findFirst();
-            if(authlibDir.isEmpty()) {
+            if (authlibDir.isEmpty()) {
                 throw new FileNotFoundException(String.format("Directory %s empty or not found", dir.resolve("com/mojang/authlib")));
             }
             originalAuthlib = Files.list(authlibDir.get()).findFirst().orElseThrow();
@@ -50,28 +51,28 @@ public class PatchAuthlibCommand extends Command {
         }
         String version = originalAuthlib.getFileName().toString();
         Path launcherAuthlib = Paths.get(args[1]);
-        if(Files.isDirectory(launcherAuthlib)) {
+        if (Files.isDirectory(launcherAuthlib)) {
             launcherAuthlib = launcherAuthlib.resolve(version.concat(".jar"));
         }
-        if(Files.notExists(launcherAuthlib)) {
+        if (Files.notExists(launcherAuthlib)) {
             throw new FileNotFoundException(launcherAuthlib.toString());
         }
         Path mergedFile = server.tmpDir.resolve("merged.jar");
         logger.info("Merge {} and {} into {}", launcherAuthlib, originalAuthlib, mergedFile);
-        try(ZipOutputStream output = new ZipOutputStream(new FileOutputStream(mergedFile.toFile()))) {
+        try (ZipOutputStream output = new ZipOutputStream(new FileOutputStream(mergedFile.toFile()))) {
             Set<String> files = new HashSet<>();
-            try(ZipInputStream input = new ZipInputStream(new FileInputStream(launcherAuthlib.toFile()))) {
+            try (ZipInputStream input = new ZipInputStream(new FileInputStream(launcherAuthlib.toFile()))) {
                 ZipEntry entry = input.getNextEntry();
-                while(entry != null) {
+                while (entry != null) {
                     input.transferTo(output);
                     files.add(entry.getName());
                     entry = input.getNextEntry();
                 }
             }
-            try(ZipInputStream input = new ZipInputStream(new FileInputStream(originalAuthlib.toFile()))) {
+            try (ZipInputStream input = new ZipInputStream(new FileInputStream(originalAuthlib.toFile()))) {
                 ZipEntry entry = input.getNextEntry();
-                while(entry != null) {
-                    if(files.contains(entry.getName())) {
+                while (entry != null) {
+                    if (files.contains(entry.getName())) {
                         entry = input.getNextEntry();
                         continue;
                     }

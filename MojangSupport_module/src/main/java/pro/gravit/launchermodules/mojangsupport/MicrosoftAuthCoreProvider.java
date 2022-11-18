@@ -29,74 +29,14 @@ import java.util.Map;
 import java.util.UUID;
 
 public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
-    private transient MojangAuthCoreProvider provider;
-    private transient LaunchServer server;
+    private static final String AUTH_CODE_URL = "https://login.live.com/oauth20_authorize.srf?client_id=%s&response_type=code&redirect_uri=%s&scope=XboxLive.signin offline_access";
     private transient final HttpClient client = HttpClient.newBuilder().build();
     private transient final Logger logger = LogManager.getLogger();
     public String redirectUrl = "https://login.live.com/oauth20_desktop.srf";
     public String clientId = "00000000402b5328";
     public String clientSecret;
-    private static final String AUTH_CODE_URL = "https://login.live.com/oauth20_authorize.srf?client_id=%s&response_type=code&redirect_uri=%s&scope=XboxLive.signin offline_access";
-
-    public record XSTSError(String Identity, long XErr, String Message, String Redirect) {
-        @Override
-        public String toString() {
-            if(Message != null && !Message.isEmpty()) {
-                return Message;
-            }
-            if(XErr == 2148916233L) {
-                return "The account doesn't have an Xbox account.";
-            }
-            if(XErr == 2148916235L) {
-                return "The account is from a country where Xbox Live is not available/banned";
-            }
-            if(XErr == 2148916238L) {
-                return "The account is a child (under 18) and cannot proceed unless the account is added to a Family by an adult";
-            }
-            return String.format("XSTS error: %d", XErr);
-        }
-    }
-
-    public record MicrosoftError(String error, String error_description, String correlation_id) {
-        @Override
-        public String toString() {
-            return error_description;
-        }
-    }
-
-    private static class XSTSErrorHandler<T> implements HttpHelper.HttpJsonErrorHandler<T, XSTSError> {
-        private final Class<T> type;
-
-        private XSTSErrorHandler(Class<T> type) {
-            this.type = type;
-        }
-
-        @Override
-        public HttpHelper.HttpOptional<T, XSTSError> applyJson(JsonElement response, int statusCode) {
-            if(statusCode < 200 || statusCode >= 300) {
-                return new HttpHelper.HttpOptional<>(null, Launcher.gsonManager.gson.fromJson(response, XSTSError.class), statusCode);
-            } else {
-                return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(response, type), null, statusCode);
-            }
-        }
-    }
-
-    private static class MicrosoftErrorHandler<T> implements HttpHelper.HttpJsonErrorHandler<T, MicrosoftError> {
-        private final Class<T> type;
-
-        private MicrosoftErrorHandler(Class<T> type) {
-            this.type = type;
-        }
-
-        @Override
-        public HttpHelper.HttpOptional<T, MicrosoftError> applyJson(JsonElement response, int statusCode) {
-            if(statusCode < 200 || statusCode >= 300) {
-                return new HttpHelper.HttpOptional<>(null, Launcher.gsonManager.gson.fromJson(response, MicrosoftError.class), statusCode);
-            } else {
-                return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(response, type), null, statusCode);
-            }
-        }
-    }
+    private transient MojangAuthCoreProvider provider;
+    private transient LaunchServer server;
 
     @Override
     public List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client) {
@@ -117,7 +57,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     public AuthManager.AuthReport refreshAccessToken(String refreshToken, AuthResponse.AuthContext context) {
         try {
             var result = sendMicrosoftOAuthRefreshTokenRequest(refreshToken);
-            if(result == null) {
+            if (result == null) {
                 return null;
             }
             var response = getMinecraftTokenByMicrosoftToken(result.access_token);
@@ -130,20 +70,20 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
 
     @Override
     public AuthManager.AuthReport authorize(String login, AuthResponse.AuthContext context, AuthRequest.AuthPasswordInterface password, boolean minecraftAccess) throws IOException {
-        if(password == null) {
+        if (password == null) {
             throw AuthException.wrongPassword();
         }
         AuthCodePassword codePassword = (AuthCodePassword) password;
         var code = codePassword.code;
         try {
             var token = sendMicrosoftOAuthTokenRequest(code);
-            if(token == null) {
+            if (token == null) {
                 throw new AuthException("Microsoft auth error: oauth token");
             }
             try {
                 var response = getMinecraftTokenByMicrosoftToken(token.access_token);
                 var session = getUserSessionByOAuthAccessToken(response.access_token);
-                if(minecraftAccess) {
+                if (minecraftAccess) {
                     return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, response.expires_in * 1000, session);
                 } else {
                     return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, response.expires_in * 1000, session);
@@ -169,7 +109,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     private URI makeOAuthTokenRequestURI(String code) throws IOException {
         URI uri;
         try {
-            if(clientSecret != null) {
+            if (clientSecret != null) {
                 uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s", clientId, clientSecret, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
             } else {
                 uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&code=%s&grant_type=authorization_code&redirect_uri=%s", clientId, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
@@ -183,7 +123,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     private URI makeOAuthRefreshTokenRequestURI(String refreshToken) throws IOException {
         URI uri;
         try {
-            if(clientSecret != null) {
+            if (clientSecret != null) {
                 uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token", clientId, clientSecret, refreshToken));
             } else {
                 uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&refresh_token=%s&grant_type=refresh_token", clientId, refreshToken));
@@ -247,7 +187,6 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         return e.getOrThrow();
     }
 
-
     private URI makeURI(String s) throws IOException {
         try {
             return new URI(s);
@@ -256,7 +195,74 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         }
     }
 
-    public record MicrosoftOAuthTokenResponse(String token_type, long expires_in, String scope, String access_token, String refresh_token, String user_id, String foci) {}
+    @Override
+    public void close() throws IOException {
+
+    }
+
+    public record XSTSError(String Identity, long XErr, String Message, String Redirect) {
+        @Override
+        public String toString() {
+            if (Message != null && !Message.isEmpty()) {
+                return Message;
+            }
+            if (XErr == 2148916233L) {
+                return "The account doesn't have an Xbox account.";
+            }
+            if (XErr == 2148916235L) {
+                return "The account is from a country where Xbox Live is not available/banned";
+            }
+            if (XErr == 2148916238L) {
+                return "The account is a child (under 18) and cannot proceed unless the account is added to a Family by an adult";
+            }
+            return String.format("XSTS error: %d", XErr);
+        }
+    }
+
+    public record MicrosoftError(String error, String error_description, String correlation_id) {
+        @Override
+        public String toString() {
+            return error_description;
+        }
+    }
+
+    private static class XSTSErrorHandler<T> implements HttpHelper.HttpJsonErrorHandler<T, XSTSError> {
+        private final Class<T> type;
+
+        private XSTSErrorHandler(Class<T> type) {
+            this.type = type;
+        }
+
+        @Override
+        public HttpHelper.HttpOptional<T, XSTSError> applyJson(JsonElement response, int statusCode) {
+            if (statusCode < 200 || statusCode >= 300) {
+                return new HttpHelper.HttpOptional<>(null, Launcher.gsonManager.gson.fromJson(response, XSTSError.class), statusCode);
+            } else {
+                return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(response, type), null, statusCode);
+            }
+        }
+    }
+
+    private static class MicrosoftErrorHandler<T> implements HttpHelper.HttpJsonErrorHandler<T, MicrosoftError> {
+        private final Class<T> type;
+
+        private MicrosoftErrorHandler(Class<T> type) {
+            this.type = type;
+        }
+
+        @Override
+        public HttpHelper.HttpOptional<T, MicrosoftError> applyJson(JsonElement response, int statusCode) {
+            if (statusCode < 200 || statusCode >= 300) {
+                return new HttpHelper.HttpOptional<>(null, Launcher.gsonManager.gson.fromJson(response, MicrosoftError.class), statusCode);
+            } else {
+                return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(response, type), null, statusCode);
+            }
+        }
+    }
+
+    public record MicrosoftOAuthTokenResponse(String token_type, long expires_in, String scope, String access_token,
+                                              String refresh_token, String user_id, String foci) {
+    }
 
     public record MicrosoftXBoxLivePropertiesRequest(String AuthMethod, String SiteName, String RpsTicket) {
         public MicrosoftXBoxLivePropertiesRequest(String accessToken) {
@@ -264,13 +270,15 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         }
     }
 
-    public record MicrosoftXBoxLiveRequest(MicrosoftXBoxLivePropertiesRequest Properties, String RelyingParty, String TokenType) {
+    public record MicrosoftXBoxLiveRequest(MicrosoftXBoxLivePropertiesRequest Properties, String RelyingParty,
+                                           String TokenType) {
         public MicrosoftXBoxLiveRequest(String accessToken) {
             this(new MicrosoftXBoxLivePropertiesRequest(accessToken), "http://auth.xboxlive.com", "JWT");
         }
     }
 
-    public record MicrosoftXBoxLiveResponse(String IssueInstant, String NotAfter, String Token, Map<String, List<Map<String, String>>> DisplayClaims) { //XBox Live and XSTS
+    public record MicrosoftXBoxLiveResponse(String IssueInstant, String NotAfter, String Token,
+                                            Map<String, List<Map<String, String>>> DisplayClaims) { //XBox Live and XSTS
         public String getUHS() {
             return DisplayClaims.get("xui").get(0).get("uhs");
         }
@@ -282,7 +290,8 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         }
     }
 
-    public record MicrosoftXSTSRequest(MicrosoftXSTSPropertiesRequest Properties, String RelyingParty, String TokenType) {
+    public record MicrosoftXSTSRequest(MicrosoftXSTSPropertiesRequest Properties, String RelyingParty,
+                                       String TokenType) {
         public MicrosoftXSTSRequest(String xblToken) {
             this(new MicrosoftXSTSPropertiesRequest(xblToken), "rp://api.minecraftservices.com/", "JWT");
         }
@@ -294,10 +303,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         }
     }
 
-    public record MinecraftLoginWithXBoxResponse(String username, List<String> roles, String access_token, String token_type, long expires_in) {}
-
-    @Override
-    public void close() throws IOException {
-
+    public record MinecraftLoginWithXBoxResponse(String username, List<String> roles, String access_token,
+                                                 String token_type, long expires_in) {
     }
 }

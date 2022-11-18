@@ -18,25 +18,25 @@ import java.util.List;
 public class CurseforgeAPI {
     private static final String BASE_URL = "https://api.curseforge.com";
     private final String apiKey;
+    private final HttpClient client = HttpClient.newBuilder().build();
 
     public CurseforgeAPI(String apiKey) {
         this.apiKey = apiKey;
     }
 
-    private final HttpClient client = HttpClient.newBuilder().build();
     public Mod fetchModById(long id) throws IOException, URISyntaxException {
         return HttpHelper.send(client, HttpRequest.newBuilder()
-                        .GET()
-                        .uri(new URI(BASE_URL+"/v1/mods/"+ id))
-                        .header("Accept", "application/json")
-                        .header("x-api-key", apiKey)
+                .GET()
+                .uri(new URI(BASE_URL + "/v1/mods/" + id))
+                .header("Accept", "application/json")
+                .header("x-api-key", apiKey)
                 .build(), new CurseForgeErrorHandler<>(Mod.class)).getOrThrow();
     }
 
     public String fetchModDescriptionById(long id) throws IOException, URISyntaxException {
         return HttpHelper.send(client, HttpRequest.newBuilder()
                 .GET()
-                .uri(new URI(BASE_URL+"/v1/mods/"+ id +"/description"))
+                .uri(new URI(BASE_URL + "/v1/mods/" + id + "/description"))
                 .header("Accept", "application/json")
                 .header("x-api-key", apiKey)
                 .build(), new CurseForgeErrorHandler<>(String.class)).getOrThrow();
@@ -45,7 +45,7 @@ public class CurseforgeAPI {
     public Artifact fetchModFileById(long modId, long fileId) throws IOException, URISyntaxException {
         return HttpHelper.send(client, HttpRequest.newBuilder()
                 .GET()
-                .uri(new URI(BASE_URL+"/v1/mods/"+ modId + "/files/" + fileId))
+                .uri(new URI(BASE_URL + "/v1/mods/" + modId + "/files/" + fileId))
                 .header("Accept", "application/json")
                 .header("x-api-key", apiKey)
                 .build(), new CurseForgeErrorHandler<>(Artifact.class)).getOrThrow();
@@ -54,7 +54,7 @@ public class CurseforgeAPI {
     public String fetchModFileUrlById(long modId, long fileId) throws IOException, URISyntaxException {
         return HttpHelper.send(client, HttpRequest.newBuilder()
                 .GET()
-                .uri(new URI(BASE_URL+"/v1/mods/"+ modId + "/files/" + fileId + "/download-url"))
+                .uri(new URI(BASE_URL + "/v1/mods/" + modId + "/files/" + fileId + "/download-url"))
                 .header("Accept", "application/json")
                 .header("x-api-key", apiKey)
                 .build(), new CurseForgeErrorHandler<>(String.class)).getOrThrow();
@@ -69,10 +69,10 @@ public class CurseforgeAPI {
 
         @Override
         public HttpHelper.HttpOptional<T, Void> apply(HttpResponse<InputStream> response) {
-            if(response.statusCode() < 200 || response.statusCode() >= 300) {
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 return new HttpHelper.HttpOptional<>(null, null, response.statusCode());
             }
-            try(Reader reader = new InputStreamReader(response.body())) {
+            try (Reader reader = new InputStreamReader(response.body())) {
                 JsonElement element = Launcher.gsonManager.gson.fromJson(reader, JsonElement.class);
                 return new HttpHelper.HttpOptional<>(Launcher.gsonManager.gson.fromJson(element.getAsJsonObject().get("data"), type), null, response.statusCode());
             } catch (IOException e) {
@@ -81,24 +81,33 @@ public class CurseforgeAPI {
         }
     }
 
-    public record SortableGameVersion(String gameVersionName, String gameVersionPadded, String gameVersion, String gameVersionReleaseDate, int gameVersionTypeId) {
+    public record SortableGameVersion(String gameVersionName, String gameVersionPadded, String gameVersion,
+                                      String gameVersionReleaseDate, int gameVersionTypeId) {
 
     }
+
     public record ModDependency(long modId, int relationType) {
 
     }
-    public record Artifact(long id, long gameId, long modId, String displayName, String fileName, int releaseType, String downloadUrl, List<String> gameVersions, List<SortableGameVersion> sortableGameVersions,
-                           List<ModDependency> dependencies, long alternateFileId, boolean isServerPack, long fileFingerprint) {
+
+    public record Artifact(long id, long gameId, long modId, String displayName, String fileName, int releaseType,
+                           String downloadUrl, List<String> gameVersions,
+                           List<SortableGameVersion> sortableGameVersions,
+                           List<ModDependency> dependencies, long alternateFileId, boolean isServerPack,
+                           long fileFingerprint) {
 
     }
-    public record ArtifactIndex(String gameVersion, long fileId, String filename, int releaseType, int gameVersionTypeId, Integer modLoader) {
+
+    public record ArtifactIndex(String gameVersion, long fileId, String filename, int releaseType,
+                                int gameVersionTypeId, Integer modLoader) {
 
     }
+
     public record Mod(long id, long gameId, String name,
                       long mainFileId, List<Artifact> latestFiles, List<ArtifactIndex> latestFilesIndexes) {
         public long findFileIdByGameVersion(String version) {
-            for(var e : latestFilesIndexes) {
-                if(e.gameVersion.equals(version)) {
+            for (var e : latestFilesIndexes) {
+                if (e.gameVersion.equals(version)) {
                     return e.fileId;
                 }
             }

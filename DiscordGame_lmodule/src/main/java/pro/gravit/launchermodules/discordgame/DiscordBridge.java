@@ -91,7 +91,7 @@ public class DiscordBridge {
         try {
             core.close();
         } catch (Throwable e) {
-            if(LogHelper.isDebugEnabled()) {
+            if (LogHelper.isDebugEnabled()) {
                 LogHelper.error(e);
             }
             LogHelper.warning("DiscordGame core object not closed correctly. Discord is down?");
@@ -99,7 +99,7 @@ public class DiscordBridge {
         try {
             params.close();
         } catch (Throwable e) {
-            if(LogHelper.isDebugEnabled()) {
+            if (LogHelper.isDebugEnabled()) {
                 LogHelper.error(e);
             }
             LogHelper.warning("DiscordGame params object not closed correctly. Discord is down?");
