@@ -14,8 +14,7 @@ public class RequestEventWatcher implements RequestService.EventHandler {
 
     @Override
     public <T extends WebSocketEvent> boolean eventHandle(T event) {
-        if (event instanceof AuthRequestEvent && ((AuthRequestEvent) event).playerProfile != null) {
-            AuthRequestEvent event1 = (AuthRequestEvent) event;
+        if (event instanceof AuthRequestEvent event1 && ((AuthRequestEvent) event).playerProfile != null) {
             DiscordBridge.activityService.onLauncherAuth(event1.playerProfile);
         }
         return false;
