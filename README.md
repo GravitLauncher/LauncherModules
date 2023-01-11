@@ -67,6 +67,6 @@
 
 [DiscordGame]: https://github.com/GravitLauncher/LauncherModules/tree/master/DiscordGame_lmodule
 
-[Wiki]: https://launcher.gravit.pro
+[Wiki]: https://gravitlauncher.com
 
 [Releases]: https://github.com/GravitLauncher/Launcher/releases

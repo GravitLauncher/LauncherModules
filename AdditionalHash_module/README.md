@@ -1,6 +1,6 @@
 # AdditionalHash
 
-### Внимание! Данная документация устарела и не подходит к лаунчсерверу v5.2+ (актуальная документация указана в [wiki](https://launcher.gravit.pro/auth/#%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F-passwordverifier))
+### Внимание! Данная документация устарела и не подходит к лаунчсерверу v5.2+ (актуальная документация указана в [wiki](https://gravitlauncher.com/auth/#%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D1%8F-passwordverifier))
 ---
 
 Добавляет новый тип **AuthProvider'a**, который поддерживает стандартное шифрование паролей таких CMS как *WorldPress* и
