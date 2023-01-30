@@ -192,6 +192,9 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         String url = String.format("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", username, serverID);
         try {
             MojangProfileResponse result = mojangRequest(url, null, MojangProfileResponse.class);
+            if(result == null) {
+                return null;
+            }
             return getUserByProfileResponse(result);
         } catch (URISyntaxException | InterruptedException | IOException e) {
             logger.error(e);
