@@ -19,7 +19,7 @@ subprojects {
 
     shadowJar {
         duplicatesStrategy = 'EXCLUDE'
-        classifier = null
+        archiveClassifier = null
         configurations = [project.configurations.runtimeClasspath]
         exclude 'module-info.class'
     }
