@@ -1,13 +1,9 @@
 package pro.gravit.launchermodules.sentryl;
 
-import io.sentry.Sentry;
-import io.sentry.protocol.User;
 import pro.gravit.launcher.events.request.AuthRequestEvent;
+import pro.gravit.launcher.events.request.ExitRequestEvent;
 import pro.gravit.launcher.request.RequestService;
 import pro.gravit.launcher.request.WebSocketEvent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class SentryEventHandler implements RequestService.EventHandler {
     @Override
@@ -17,8 +13,17 @@ public class SentryEventHandler implements RequestService.EventHandler {
             if(authEvent.playerProfile == null) {
                 return false;
             }
-            Sentry.configureScope(scope -> {
+            SentryModule.currentHub.configureScope(scope -> {
                 scope.setUser(SentryModule.makeSentryUser(authEvent.playerProfile));
+            });
+        }
+        if(event instanceof ExitRequestEvent) {
+            ExitRequestEvent exitEvent = (ExitRequestEvent) event;
+            if(exitEvent.reason == ExitRequestEvent.ExitReason.NO_EXIT) {
+                return false;
+            }
+            SentryModule.currentHub.configureScope(scope -> {
+                scope.setUser(null);
             });
         }
         return false;

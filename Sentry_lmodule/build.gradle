@@ -5,10 +5,11 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 dependencies {
-    api('io.sentry:sentry:6.14.0') {
+    implementation('io.sentry:sentry:6.15.0') {
         exclude group: 'org.slf4j'
     }
-    api('io.sentry:sentry-log4j2:6.14.0')
+    implementation('io.sentry:sentry-log4j2:6.15.0')
+    compileOnly 'com.github.oshi:oshi-core:6.4.0'
 }
 
 jar {
