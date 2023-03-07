@@ -4,6 +4,7 @@ import io.sentry.IHub;
 import io.sentry.Sentry;
 import io.sentry.protocol.User;
 import pro.gravit.launcher.LauncherEngine;
+import pro.gravit.launcher.LauncherInject;
 import pro.gravit.launcher.api.AuthService;
 import pro.gravit.launcher.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.client.ClientProcessInitPhase;
@@ -27,6 +28,9 @@ public class SentryModule extends LauncherModule {
     public static Config config = new Config();
 
     public static IHub currentHub;
+
+    @LauncherInject("modules.sentry.proguarduuid")
+    public static String proguardUuid;
 
     public SentryModule() {
         super(new LauncherModuleInfo("Sentry", Version.of(2, 0, 0), new String[]{"ClientLauncherCore"}));
@@ -61,6 +65,9 @@ public class SentryModule extends LauncherModule {
             options.setDsn(config.dsn);
             options.setEnvironment(engine.clientInstance ? "CLIENT" : "LAUNCHER");
             options.setRelease(Version.getVersion().getVersionString());
+            if(proguardUuid != null) {
+                options.setProguardUuid(proguardUuid);
+            }
         }, true);
         currentHub = Sentry.getCurrentHub();
         Sentry.configureScope(scope -> {
