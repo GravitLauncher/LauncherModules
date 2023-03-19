@@ -62,6 +62,6 @@ public class OshiUtils {
     }
 
     public static String formatGHz(long hz) {
-        return String.format("%.2fGHz", hz / 1024.0 / 1024.0);
+        return String.format("%.2fGHz", hz / 1024.0 / 1024.0 / 1024.0);
     }
 }
