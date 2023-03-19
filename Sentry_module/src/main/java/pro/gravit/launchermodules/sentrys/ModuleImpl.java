@@ -12,18 +12,26 @@ import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.log4j.LogAppender;
+import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
+import pro.gravit.launchserver.modules.events.LaunchServerNettyFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.JVMHelper;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     private static final String DEFAULT_DSN = "YOUR_DSN";
     private transient final Logger logger = LogManager.getLogger();
     public Config c = null;
+
+    public SentryTransactionTracker tracker = new SentryTransactionTracker(this);
     private LaunchServer server;
     private JsonConfigurable<Config> configurable;
     private SentryAppender appender;
@@ -35,6 +43,7 @@ public class ModuleImpl extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preInit, LaunchServerInitPhase.class);
+        registerEvent(this::onPostInit, LaunchServerNettyFullInitEvent.class);
     }
 
     public void preInit(LaunchServerInitPhase phase) {
@@ -58,15 +67,15 @@ public class ModuleImpl extends LauncherModule {
                 }
             };
             configurable.loadConfig();
-            if (c.dsn == null) {
+            if (c.dsn == null || c.dsn.equals(DEFAULT_DSN)) {
                 logger.error("Please, configure Sentry_module config!!!");
                 return;
             }
-            if (c.dsn.equals(DEFAULT_DSN)) {
-                logger.info("");
-            }
             Sentry.init(options -> {
                 options.setDsn(c.dsn);
+                options.setSampleRate(c.sampleRate);
+                options.setEnableTracing(c.enableTracing);
+                options.setTracesSampleRate(c.tracingSampleRate);
                 options.setRelease(Version.getVersion().getVersionString());
                 options.setEnvironment(Version.getVersion().release.name());
             });
@@ -75,12 +84,18 @@ public class ModuleImpl extends LauncherModule {
                 scope.setContexts("modules", modulesList());
             });
             if (c.addSentryAppender) {
-                appender = SentryAppender.createAppender("Sentry", Level.getLevel(c.appenderLogLevel), null, null, null, null);
+                appender = SentryAppender.createAppender("Sentry", Level.getLevel(c.appenderLogLevel), null, null, null, null, null);
                 appender.start();
                 LogAppender.getInstance().addListener(this::append);
             }
         } catch (Throwable e) {
             logger.error("Sentry module not configured", e);
+        }
+    }
+
+    public void onPostInit(LaunchServerNettyFullInitEvent event) {
+        if(c.requestTracker) {
+            tracker.register(server.nettyServerSocketHandler);
         }
     }
 
@@ -94,19 +109,25 @@ public class ModuleImpl extends LauncherModule {
         appender.append(event);
     }
 
-    public String modulesList() {
-        StringBuilder builder = new StringBuilder();
+    public Map<String, String> modulesList() {
+        Map<String, String> map = new HashMap<>();
         for (LauncherModule module : server.modulesManager.getModules()) {
             LauncherModuleInfo info = module.getModuleInfo();
-            builder.append(String.format("%s v%s | ", info.name, info.version.getVersionString()));
+            map.put(info.name, info.version.getVersionString());
         }
-        return builder.toString();
+        return map;
     }
 
     public static class Config {
         public String dsn = DEFAULT_DSN;
+        public double sampleRate = 1.0;
+        public boolean enableTracing = false;
+        public double tracingSampleRate = 1.0;
         public boolean addSentryAppender = true;
         public boolean filterExceptions = true;
+        public boolean requestTracker = true;
+        public boolean captureRequestData = false;
+        public boolean captureRequestError = false;
         public String appenderLogLevel = "ERROR";
     }
 }
