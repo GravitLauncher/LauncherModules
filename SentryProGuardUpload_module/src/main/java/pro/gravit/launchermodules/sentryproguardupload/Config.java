@@ -8,6 +8,8 @@ public class Config {
     public String authToken = "YOUR_TOKEN";
     public String org = "YOUR_ORGANIZATION";
     public String project = "YOUR_PROJECT";
-    public String mappingPath = "proguard/mapping.pro";
+    public String url = "https://sentry.io/";
+    public String mappingPath = "proguard/mappings.pro";
     public List<String> customArgs = new ArrayList<>();
+    public List<String> customArgsBefore = new ArrayList<>();
 }

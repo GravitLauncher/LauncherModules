@@ -90,6 +90,11 @@ public class SentryProguardUploadModule extends LauncherModule {
         public Path process(Path inputFile) throws IOException {
             List<String> args = new ArrayList<>();
             args.add(config.sentryCliPath);
+            if(config.url != null) {
+                args.add("--url");
+                args.add(config.url);
+            }
+            args.addAll(config.customArgsBefore);
             args.add("upload-proguard");
             if(config.authToken != null) {
                 args.add("--auth-token");
