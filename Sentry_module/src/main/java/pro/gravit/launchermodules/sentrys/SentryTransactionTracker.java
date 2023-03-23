@@ -48,7 +48,9 @@ public class SentryTransactionTracker {
         Sentry.configureScope(scope -> {
             scope.setUser(makeSentryUser(context.client, context.ip));
             Map<String, String> security = new HashMap<>();
+            security.put("type", context.client.type.name());
             security.put("isAuth", String.valueOf(context.client.isAuth));
+            security.put("isLauncherCheck", String.valueOf(context.client.checkSign));
             security.put("trustLevel", makeTrustLevel(context.client.trustLevel));
             scope.setContexts("security", security);
             if(module.c.captureRequestData) {
