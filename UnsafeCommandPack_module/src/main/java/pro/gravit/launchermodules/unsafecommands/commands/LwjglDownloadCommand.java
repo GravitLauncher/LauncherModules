@@ -8,10 +8,7 @@ import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -125,6 +122,8 @@ public class LwjglDownloadCommand extends Command {
                         }
                         entry = input.getNextEntry();
                     }
+                } catch (FileNotFoundException e) {
+                    logger.warn("Skip {}", nativesUrl);
                 }
             }
             logger.info("Complete");

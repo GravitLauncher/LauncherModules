@@ -8,7 +8,9 @@ dependencies {
     implementation('io.sentry:sentry:6.16.0') {
         exclude group: 'org.slf4j'
     }
-    implementation('io.sentry:sentry-log4j2:6.16.0')
+    implementation('io.sentry:sentry-log4j2:6.16.0') {
+        exclude group: 'org.apache.logging.log4j'
+    }
     compileOnly 'com.github.oshi:oshi-core:6.4.0'
 }
 

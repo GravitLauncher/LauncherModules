@@ -3,6 +3,8 @@ package pro.gravit.launchermodules.sentryl;
 import io.sentry.IHub;
 import io.sentry.Sentry;
 import io.sentry.protocol.User;
+import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.LauncherConfig;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.LauncherInject;
 import pro.gravit.launcher.api.AuthService;
@@ -64,7 +66,7 @@ public class SentryModule extends LauncherModule {
             options.addEventProcessor(new SentryEventProcessor());
             options.setDsn(config.dsn);
             options.setEnvironment(engine.clientInstance ? "CLIENT" : "LAUNCHER");
-            options.setRelease(Version.getVersion().getVersionString());
+            options.setRelease(Version.getVersion().getVersionString().concat(".").concat(String.valueOf(Launcher.getConfig().buildNumber)));
             if(proguardUuid != null) {
                 options.setProguardUuid(proguardUuid);
             }
