@@ -28,7 +28,7 @@ public class RemoteControlWebSeverlet implements NettyWebAPIHandler.SimpleSeverl
     }
 
     @Override
-    public void handle(ChannelHandlerContext ctx, FullHttpRequest msg, NettyConnectContext context) throws Exception {
+    public void handle(ChannelHandlerContext ctx, FullHttpRequest msg, NettyConnectContext context) {
         if (!module.config.enabled) {
             sendHttpResponse(ctx, simpleJsonResponse(HttpResponseStatus.FORBIDDEN, new RemoteControlResponse<Void>("RemoteControl disabled")));
             return;

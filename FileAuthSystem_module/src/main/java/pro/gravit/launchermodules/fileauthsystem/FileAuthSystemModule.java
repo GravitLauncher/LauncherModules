@@ -15,7 +15,6 @@ import java.nio.file.Path;
 public class FileAuthSystemModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public JsonConfigurable<FileAuthSystemConfig> jsonConfigurable;
-    private Path dbPath;
 
     public FileAuthSystemModule() {
         super(new LauncherModuleInfo("FileAuthSystem", version, new String[]{"LaunchServerCore"}));
@@ -33,7 +32,7 @@ public class FileAuthSystemModule extends LauncherModule {
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preConfig, PreConfigPhase.class);
         registerEvent(this::finish, LaunchServerFullInitEvent.class);
-        dbPath = modulesConfigManager.getModuleConfigDir(moduleInfo.name);
+        Path dbPath = modulesConfigManager.getModuleConfigDir(moduleInfo.name);
         jsonConfigurable = modulesConfigManager.getConfigurable(FileAuthSystemConfig.class, moduleInfo.name);
     }
 

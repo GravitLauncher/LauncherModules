@@ -57,7 +57,7 @@ public class S3Service {
         return String.format("%02dm%02ds", (seconds % 3600) / 60, (seconds % 60));
     }
 
-    public void uploadDir(Path directory, String bucket, String prefix, final boolean forceUpload, UpdatesManager updatesManager) throws IOException {
+    public void uploadDir(Path directory, String bucket, String prefix, final boolean forceUpload, UpdatesManager updatesManager) {
         logger.info("[S3Updates] Starting to upload updates directory contents to bucket {} with prefix {}", bucket, prefix);
         List<CompletableFuture<?>> awsRequestFutures = new ArrayList<>();
         final var startTime = System.currentTimeMillis();

@@ -4,7 +4,6 @@ import io.sentry.IHub;
 import io.sentry.Sentry;
 import io.sentry.protocol.User;
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.LauncherConfig;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.LauncherInject;
 import pro.gravit.launcher.api.AuthService;

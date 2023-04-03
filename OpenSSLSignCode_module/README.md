@@ -7,7 +7,7 @@
 1. Скопировать модуль **OpenSSLSignCode_module.jar** в папку **/LaunchServer/modules/**.
 2. Обязательно создать самоподписанный сертификат или же купить его (более подробное описание есть на [Wiki]).
   - В конфигурации **LaunchServer.json** `"sign": { "enabled": true }`.
-3. Установленная программа **osslsigncode**.
+1. Установленная программа **osslsigncode**.
   - Debian-подобные системы: `sudo apt install osslsigncode`.
   - Для CentOS 7:
 ```sh
@@ -23,7 +23,7 @@ dnf -y install osslsigncode
 ```
 
 
-4. Выполнить **build** в консоли *LaunchServer*, если всё сделали правильно, **exe** будет подписан сертификатом.
+1. Выполнить **build** в консоли *LaunchServer*, если всё сделали правильно, **exe** будет подписан сертификатом.
 
 #### Конфигурация
 

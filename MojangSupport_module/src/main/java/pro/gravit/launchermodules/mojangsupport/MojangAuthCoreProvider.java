@@ -168,14 +168,14 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    protected boolean updateServerID(User user, String serverID) throws IOException {
+    protected boolean updateServerID(User user, String serverID) {
         MojangUser mojangUser = (MojangUser) user;
         mojangUser.serverId = serverID;
         return false;
     }
 
     @Override
-    public boolean joinServer(Client client, String username, String accessToken, String serverID) throws IOException {
+    public boolean joinServer(Client client, String username, String accessToken, String serverID) {
         MojangUser user = (MojangUser) client.getUser();
         if (user == null) return false;
         MojangJoinServerRequest request = new MojangJoinServerRequest(accessToken, user.uuid, serverID);
@@ -188,7 +188,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    public User checkServer(Client client, String username, String serverID) throws IOException {
+    public User checkServer(Client client, String username, String serverID) {
         String url = String.format("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", username, serverID);
         try {
             MojangProfileResponse result = mojangRequest(url, null, MojangProfileResponse.class);
@@ -231,7 +231,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 

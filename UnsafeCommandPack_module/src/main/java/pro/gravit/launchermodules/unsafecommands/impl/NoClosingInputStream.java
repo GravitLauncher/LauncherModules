@@ -78,7 +78,7 @@ public class NoClosingInputStream extends InputStream {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         // None
     }
 }

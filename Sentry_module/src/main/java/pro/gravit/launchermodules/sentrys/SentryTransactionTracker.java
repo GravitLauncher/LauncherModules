@@ -1,14 +1,12 @@
 package pro.gravit.launchermodules.sentrys;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import io.sentry.ITransaction;
 import io.sentry.Sentry;
 import io.sentry.SpanStatus;
 import io.sentry.protocol.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.events.request.ErrorRequestEvent;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.WebSocketService;
@@ -20,9 +18,9 @@ import java.util.Map;
 public class SentryTransactionTracker {
     private final Logger logger = LogManager.getLogger(SentryTransactionTracker.class);
     private final ModuleImpl module;
-    private ThreadLocal<WebSocketService.WebSocketRequestContext> contextThreadLocal = new ThreadLocal<>();
-    private ThreadLocal<Object> latestSendEvent = new ThreadLocal<>();
-    private ThreadLocal<ITransaction> sentryTransaction = new ThreadLocal<>();
+    private final ThreadLocal<WebSocketService.WebSocketRequestContext> contextThreadLocal = new ThreadLocal<>();
+    private final ThreadLocal<Object> latestSendEvent = new ThreadLocal<>();
+    private final ThreadLocal<ITransaction> sentryTransaction = new ThreadLocal<>();
 
     public SentryTransactionTracker(ModuleImpl module) {
         this.module = module;

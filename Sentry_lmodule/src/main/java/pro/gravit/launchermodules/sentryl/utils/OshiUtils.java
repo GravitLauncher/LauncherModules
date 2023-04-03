@@ -3,7 +3,6 @@ package pro.gravit.launchermodules.sentryl.utils;
 import io.sentry.Scope;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
-import oshi.hardware.ComputerSystem;
 import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.software.os.OSProcess;

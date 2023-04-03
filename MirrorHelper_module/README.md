@@ -19,11 +19,11 @@
 - LauncherAuthlib3.jar
 - LauncherAuthlib3-1.19.jar
 - LauncherAuthlib3-1.19.1.jar
-2. В папке installers должны находится установщики forge и fabric:
+1. В папке installers должны находится установщики forge и fabric:
 - fabric-installer.jar
 - forge-{ВЕРСИЯ}-installer.jar (например `forge-1.16.5-installer.jar`)
 **Для установки Forge необходим GUI**
-3. В папке workdir должны хранится файлы, которые будут скопированы в клиент в указанном порядке
+1. В папке workdir должны хранится файлы, которые будут скопированы в клиент в указанном порядке
 - ALL/
 - {FABRIC/FORGE/VANILLA}/
 - lwjgl{2/3}/
@@ -43,6 +43,6 @@
 - java17/
 - 1.18.2/ALL/
 - 1.18.2/FABRIC/
-6. Устанавливает моды с curseforge если это было указано
-7. Выполняет `deduplibraries`
-8. Создает профиль
+1. Устанавливает моды с curseforge если это было указано
+2. Выполняет `deduplibraries`
+3. Создает профиль

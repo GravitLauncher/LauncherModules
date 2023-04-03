@@ -11,7 +11,6 @@ import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -64,11 +63,7 @@ public class TelegramBotModule extends LauncherModule {
             logger.error(e);
             config = configurable.getDefaultConfig();
         }
-        try {
-            TelegramBot.initialize(config, server);
-        } catch (LoginException e) {
-            logger.error("TelegramBotModule disabled. Please set 'token'", e);
-        }
+        TelegramBot.initialize(config, server);
         if (config.events.login) {
             server.authHookManager.postHook.registerHook((context, client) -> {
                 TelegramBotListener.getInstance()

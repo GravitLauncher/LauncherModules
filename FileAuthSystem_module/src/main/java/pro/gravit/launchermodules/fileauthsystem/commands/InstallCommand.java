@@ -9,12 +9,10 @@ import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.command.Command;
 
 public class InstallCommand extends Command {
-    private final FileAuthSystemModule module;
     private final Logger logger = LogManager.getLogger();
 
     public InstallCommand(LaunchServer server, FileAuthSystemModule module) {
         super(server);
-        this.module = module;
     }
 
     @Override

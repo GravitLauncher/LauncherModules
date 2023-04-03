@@ -72,7 +72,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         });
         commands.put("xconvertpassword", new SubCommand("[]", "Convert 5.2.2 and lower base64 sha256 passwords") {
             @Override
-            public void invoke(String... args) throws Exception {
+            public void invoke(String... args) {
                 for (var e : users.entrySet()) {
                     byte[] rawPassword = Base64.getUrlDecoder().decode(e.getValue().password);
                     e.getValue().setPassword(SecurityHelper.toHex(rawPassword));
@@ -81,13 +81,13 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         });
         commands.put("reload", new SubCommand("[]", "Reload database") {
             @Override
-            public void invoke(String... args) throws Exception {
+            public void invoke(String... args) {
                 load();
             }
         });
         commands.put("save", new SubCommand("[]", "Save database") {
             @Override
-            public void invoke(String... args) throws Exception {
+            public void invoke(String... args) {
                 save();
             }
         });
@@ -278,7 +278,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    protected boolean updateServerID(User user, String serverID) throws IOException {
+    protected boolean updateServerID(User user, String serverID) {
         UserEntity entity = (UserEntity) user;
         if (entity == null) return false;
         entity.serverId = serverID;
@@ -286,7 +286,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (autoSave) {
             save();
         }
@@ -305,13 +305,13 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    public boolean deleteSession(UserSession session) {
-        return deleteSession((UserSessionEntity) session);
+    public void deleteSession(UserSession session) {
+        deleteSession((UserSessionEntity) session);
     }
 
     @Override
-    public boolean exitUser(User user) {
-        return exitUser((UserEntity) user);
+    public void exitUser(User user) {
+        exitUser((UserEntity) user);
     }
 
 

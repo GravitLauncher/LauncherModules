@@ -12,17 +12,14 @@ import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.log4j.LogAppender;
-import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
 import pro.gravit.launchserver.modules.events.LaunchServerNettyFullInitEvent;
-import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.JVMHelper;
 
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ModuleImpl extends LauncherModule {
@@ -33,7 +30,6 @@ public class ModuleImpl extends LauncherModule {
 
     public SentryTransactionTracker tracker = new SentryTransactionTracker(this);
     private LaunchServer server;
-    private JsonConfigurable<Config> configurable;
     private SentryAppender appender;
 
     public ModuleImpl() {
@@ -50,7 +46,7 @@ public class ModuleImpl extends LauncherModule {
         server = phase.server;
         try {
             Path p = modulesConfigManager.getModuleConfig(this.moduleInfo.name);
-            configurable = new JsonConfigurable<>(Config.class, p) {
+            JsonConfigurable<Config> configurable = new JsonConfigurable<>(Config.class, p) {
                 @Override
                 public Config getConfig() {
                     return c;

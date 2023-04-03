@@ -17,7 +17,7 @@ import java.util.List;
 
 public class InstallModCommand extends Command {
 
-    private static final transient Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private final MirrorHelperModule module;
 
     public InstallModCommand(LaunchServer server, MirrorHelperModule module) {
@@ -44,7 +44,6 @@ public class InstallModCommand extends Command {
         }
         ClientProfile.Version version = ClientProfile.Version.byName(args[1]);
         List<Long> mods = Arrays.stream(args[2].split(",")).map(Long::parseLong).toList();
-        ;
         if (!mods.isEmpty()) {
             CurseforgeAPI api = new CurseforgeAPI(module.config.curseforgeApiKey);
             Path modsDir = dir.resolve("mods");

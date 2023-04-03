@@ -102,8 +102,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         // XSTS
         var xsts = sendMicrosoftXSTSRequest(xboxLive.Token);
         // Minecraft auth
-        var response = sendMinecraftLoginWithXBoxRequest(xsts.getUHS(), xsts.Token);
-        return response;
+        return sendMinecraftLoginWithXBoxRequest(xsts.getUHS(), xsts.Token);
     }
 
     private URI makeOAuthTokenRequestURI(String code) throws IOException {
@@ -193,11 +192,6 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-    }
-
-    @Override
-    public void close() throws IOException {
-
     }
 
     public record XSTSError(String Identity, long XErr, String Message, String Redirect) {

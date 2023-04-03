@@ -1,16 +1,16 @@
-task bundleZip(type: Zip) {
+tasks.register('bundleZip', Zip) {
     subprojects.stream().map(e -> e.tasks.build).forEach(e -> dependsOn(e))
     archiveFileName = 'modules.zip'
     destinationDirectory = file("$buildDir")
 }
 
 if (!project.tasks.findByName('assemble')) {
-    task assemble {
+    tasks.register('assemble') {
     }
 }
 
 if (!project.tasks.findByName('build')) {
-    task build {
+    tasks.register('build') {
     }
 }
 

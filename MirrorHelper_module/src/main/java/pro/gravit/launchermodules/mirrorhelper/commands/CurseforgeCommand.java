@@ -11,12 +11,10 @@ import pro.gravit.utils.command.SubCommand;
 
 public class CurseforgeCommand extends Command {
     private transient final Logger logger = LogManager.getLogger();
-    private final Config config;
     private final CurseforgeAPI api;
 
     public CurseforgeCommand(LaunchServer server, Config config) {
         super(server);
-        this.config = config;
         this.api = new CurseforgeAPI(config.curseforgeApiKey);
         this.childCommands.put("getMod", new SubCommand("[modId]", "Get mod info by id") {
             @Override

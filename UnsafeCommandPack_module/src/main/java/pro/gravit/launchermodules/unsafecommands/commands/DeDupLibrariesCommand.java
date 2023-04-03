@@ -48,7 +48,7 @@ public class DeDupLibrariesCommand extends Command {
         Map<String, List<Path>> map = new HashMap<>(16);
         IOHelper.walk(dir, new FileVisitor<>() {
             @Override
-            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
+            public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes basicFileAttributes) {
                 if (Files.isDirectory(path) && Character.isDigit(path.getFileName().toString().charAt(0))) {
                     String basePath = path.getParent().toString();
                     List<Path> value = map.computeIfAbsent(basePath, k -> new ArrayList<>(1));
@@ -58,17 +58,17 @@ public class DeDupLibrariesCommand extends Command {
             }
 
             @Override
-            public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) throws IOException {
+            public FileVisitResult visitFile(Path path, BasicFileAttributes basicFileAttributes) {
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFileFailed(Path path, IOException e) throws IOException {
+            public FileVisitResult visitFileFailed(Path path, IOException e) {
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult postVisitDirectory(Path path, IOException e) throws IOException {
+            public FileVisitResult postVisitDirectory(Path path, IOException e) {
                 return FileVisitResult.CONTINUE;
             }
         }, false);

@@ -47,9 +47,7 @@ public class NewDownloadAssetCommand extends Command {
 
         LogHelper.subInfo("Getting asset index, it may take some time");
         List<AsyncDownloader.SizedFile> applies = AssetDownloader.listAssets(assetDir, version);
-        applies.removeIf((f) -> {
-            return Files.exists(assetDir.resolve(f.filePath));
-        });
+        applies.removeIf((f) -> Files.exists(assetDir.resolve(f.filePath)));
         // Download required asset
         LogHelper.subInfo("Downloading asset, it may take some time");
         long total = 0;

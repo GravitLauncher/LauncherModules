@@ -33,7 +33,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class InstallClient {
-    private static final transient Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
     private final LaunchServer launchServer;
     private final Config config;
     private final Path workdir;
@@ -41,7 +41,7 @@ public class InstallClient {
     private final ClientProfile.Version version;
 
     private final List<Long> mods;
-    private VersionType versionType;
+    private final VersionType versionType;
 
     public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<Long> mods, VersionType versionType) {
         this.launchServer = launchServer;
@@ -53,7 +53,7 @@ public class InstallClient {
         this.versionType = versionType;
     }
 
-    public static Path installMod(CurseforgeAPI api, Path modsDir, long modId, ClientProfile.Version version) throws Exception {
+    public static void installMod(CurseforgeAPI api, Path modsDir, long modId, ClientProfile.Version version) throws Exception {
         var modInfo = api.fetchModById(modId);
         long fileId = modInfo.findFileIdByGameVersion(version.name);
         var fileInfo = api.fetchModFileById(modId, fileId);
@@ -64,7 +64,6 @@ public class InstallClient {
             IOHelper.transfer(input, path);
         }
         logger.info("{} downloaded", fileInfo.fileName());
-        return path;
     }
 
     private void downloadVanillaTo(Path clientDir) throws Exception {
@@ -95,8 +94,6 @@ public class InstallClient {
             IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
         }
         LogHelper.subInfo("Downloaded client jar!");
-        //fetchNatives(clientDir.resolve("natives"), info.natives);
-        //LogHelper.subInfo("Natives downloaded!");
         f.get();
         e.shutdownNow();
         // Finished

@@ -21,7 +21,7 @@ import java.util.zip.ZipInputStream;
 
 public class ForgeInstallerCommand extends Command {
     private transient final Logger logger = LogManager.getLogger();
-    private boolean forgeNoConfirm = Boolean.parseBoolean(System.getProperty("modules.unsafecommandspack.forgeinstaller.noconfirm", "false"));
+    private final boolean forgeNoConfirm = Boolean.parseBoolean(System.getProperty("modules.unsafecommandspack.forgeinstaller.noconfirm", "false"));
 
     public ForgeInstallerCommand(LaunchServer server) {
         super(server);

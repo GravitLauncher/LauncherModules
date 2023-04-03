@@ -24,7 +24,7 @@ public class S3UpdatesCleanupCommand extends Command {
     }
 
     @Override
-    public void invoke(String... args) throws Exception {
+    public void invoke(String... args) {
         if (args.length == 0) {
             s3Service.cleanupBucket(config.s3Bucket, config.behavior.prefix);
         } else {

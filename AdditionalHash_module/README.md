@@ -23,7 +23,7 @@ wget https://repo1.maven.org/maven2/org/mindrot/jbcrypt/0.4/jbcrypt-0.4.jar
 mv jbcrypt-0.4.jar /LaunchServer/libraries/
 ```
 
-3. Выполнить настройку `auth provider`
+1. Выполнить настройку `auth provider`
 
 Укажите нужный вам `"type": "mysql-bcrypt"` или `"mysql-phphash"`
 Так же требуется заполнить подключение к вашей БД MySQL \| MariaDB.

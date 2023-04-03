@@ -23,7 +23,7 @@ public class CipherListCommand extends Command {
     }
 
     @Override
-    public void invoke(String... args) throws Exception {
+    public void invoke(String... args) {
         for (Provider provider : Security.getProviders()) {
             LogHelper.info("Provider %s | %s", provider.getName(), provider.getClass().getName());
             for (Provider.Service service : provider.getServices()) {

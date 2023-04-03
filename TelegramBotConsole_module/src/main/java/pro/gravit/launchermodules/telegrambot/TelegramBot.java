@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import pro.gravit.launchserver.LaunchServer;
 
-import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class TelegramBot {
         return config;
     }
 
-    public static void initialize(Config config, LaunchServer server) throws LoginException {
+    public static void initialize(Config config, LaunchServer server) {
         TelegramBot.config = config;
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);

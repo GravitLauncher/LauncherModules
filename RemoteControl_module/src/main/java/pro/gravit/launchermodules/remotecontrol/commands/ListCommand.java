@@ -22,7 +22,7 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public void invoke(String... args) throws Exception {
+    public void invoke(String... args) {
         RemoteControlModule module = server.modulesManager.getModule(RemoteControlModule.class);
         for (RemoteControlConfig.RemoteControlToken token : module.config.list) {
             LogHelper.info("Token %s... allow %s commands %s", token.token.substring(0, 5), token.allowAll ? "all" : String.valueOf(token.commands.size()), token.commands.isEmpty() ? "" : String.join(", ", token.commands));
