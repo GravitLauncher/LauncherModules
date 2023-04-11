@@ -39,6 +39,7 @@ public class BasicProperties {
         systemProperties.put("sun.jnu.encoding", System.getProperties().getProperty("sun.jnu.encoding"));
         systemProperties.put("user.language", System.getProperties().getProperty("user.language"));
         systemProperties.put("user.timezone", System.getProperties().getProperty("user.timezone"));
+        systemProperties.put("javafx.runtime.version", System.getProperties().getProperty("javafx.runtime.version"));
         scope.setContexts("System Properties", systemProperties);
 
         DateFormat df = new SimpleDateFormat("'Date:' " + "yyyy.dd.MM" + " 'Time:' " + "HH:mm:ss" + " 'Timezone:' X");

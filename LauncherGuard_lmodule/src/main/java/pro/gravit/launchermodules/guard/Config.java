@@ -1,0 +1,37 @@
+package pro.gravit.launchermodules.guard;
+
+import pro.gravit.launcher.LauncherInject;
+import pro.gravit.launcher.client.DirBridge;
+import pro.gravit.utils.helper.JVMHelper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Config {
+    @LauncherInject(value = "modules.launcherguard.files")
+    public Map<String, List<String>> files;
+    @LauncherInject(value = "modules.launcherguard.exefile")
+    public Map<String, String> exeFile;
+    @LauncherInject(value = "modules.launcherguard.renameexefile")
+    public boolean renameExeFile;
+    @LauncherInject(value = "modules.launcherguard.useclasspathproperty")
+    public boolean useClasspathProperty;
+
+    public static Object getDefault() {
+        Config config = new Config();
+        config.files = new HashMap<>();
+        config.exeFile = new HashMap<>();
+        List<String> windowsFiles = new ArrayList<>();
+        windowsFiles.add("wrapper.exe");
+        windowsFiles.add("AntiInject.dll");
+        config.files.put(DirBridge.makeSpecialGuardDirName(JVMHelper.ARCH.X86_64, JVMHelper.OS.MUSTDIE), windowsFiles);
+        config.files.put(DirBridge.makeSpecialGuardDirName(JVMHelper.ARCH.X86, JVMHelper.OS.MUSTDIE), windowsFiles);
+        config.exeFile.put(DirBridge.makeSpecialGuardDirName(JVMHelper.ARCH.X86_64, JVMHelper.OS.MUSTDIE), "wrapper.exe");
+        config.exeFile.put(DirBridge.makeSpecialGuardDirName(JVMHelper.ARCH.X86, JVMHelper.OS.MUSTDIE), "wrapper.exe");
+        config.renameExeFile = true;
+        config.useClasspathProperty = true;
+        return config;
+    }
+}

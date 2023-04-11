@@ -21,32 +21,33 @@ public class DiscordBridge {
     private static Activity activity;
 
     private static void initCore() throws IOException {
+        Path baseDir = DirBridge.getGuardDir(JVMHelper.ARCH_TYPE, JVMHelper.OS_TYPE);
         Path pathToLib;
         String arch = System.getProperty("os.arch");
         if (JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
-            pathToLib = DirBridge.getGuardDir().resolve("discord_game_sdk_jni.dll");
+            pathToLib = baseDir.resolve("discord_game_sdk_jni.dll");
             String libraryJarPath = "native/windows/" + arch + "/discord_game_sdk_jni.dll";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
         } else if (JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
-            pathToLib = DirBridge.getGuardDir().resolve("libdiscord_game_sdk_jni.so");
+            pathToLib = baseDir.resolve("libdiscord_game_sdk_jni.so");
             String libraryJarPath = "native/linux/" + arch + "/libdiscord_game_sdk_jni.so";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
         } else {
-            pathToLib = DirBridge.getGuardDir().resolve("libdiscord_game_sdk_jni.dylib");
+            pathToLib = baseDir.resolve("libdiscord_game_sdk_jni.dylib");
             String libraryJarPath = "native/macos/" + arch + "/libdiscord_game_sdk_jni.dylib";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
         }
         Path pathToDiscordSdkLib;
         if (JVMHelper.OS_TYPE == JVMHelper.OS.MUSTDIE) {
-            pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.dll");
+            pathToDiscordSdkLib = baseDir.resolve("discord_game_sdk.dll");
             String libraryJarPath = "native/windows/" + arch + "/discord_game_sdk.dll";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
         } else if (JVMHelper.OS_TYPE == JVMHelper.OS.LINUX) {
-            pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.so");
+            pathToDiscordSdkLib = baseDir.resolve("discord_game_sdk.so");
             String libraryJarPath = "native/linux/" + arch + "/discord_game_sdk.so";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
         } else {
-            pathToDiscordSdkLib = DirBridge.getGuardDir().resolve("discord_game_sdk.dylib");
+            pathToDiscordSdkLib = baseDir.resolve("discord_game_sdk.dylib");
             String libraryJarPath = "native/macos/" + arch + "/discord_game_sdk.dylib";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
         }
