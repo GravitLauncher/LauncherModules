@@ -41,7 +41,7 @@ public class ModuleImpl extends LauncherModule {
 
     public void preProcess(ClientProcessBuilderCreateEvent event) {
         JavaHelper.JavaVersion javaVersion = event.processBuilder.javaVersion;
-        String key = DirBridge.makeSpecialGuardDirName(javaVersion.arch, JVMHelper.OS_TYPE);
+        String key = Launcher.makeSpecialGuardDirName(javaVersion.arch, JVMHelper.OS_TYPE);
         if(config.files.get(key) == null || config.exeFile.get(key) == null) {
             LogHelper.warning("LauncherGuard disabled: OS or ARCH not supported");
             return;
