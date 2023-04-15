@@ -1,6 +1,8 @@
 package pro.gravit.launchermodules.guard;
 
+import pro.gravit.launcher.ClientLauncherWrapper;
 import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.client.ClientWrapperModule;
 import pro.gravit.launcher.client.DirBridge;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
@@ -16,9 +18,10 @@ import pro.gravit.utils.helper.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-public class ModuleImpl extends LauncherModule {
+public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public static final Config config = new Config();
 
@@ -41,17 +44,25 @@ public class ModuleImpl extends LauncherModule {
 
     public void preProcess(ClientProcessBuilderCreateEvent event) {
         JavaHelper.JavaVersion javaVersion = event.processBuilder.javaVersion;
+        Path executeFile = unpackIfPossible(javaVersion);
+        if(executeFile != null) {
+            event.processBuilder.executeFile = executeFile;
+            event.processBuilder.useLegacyJavaClassPathProperty = config.useClasspathProperty;
+            event.processBuilder.systemEnv.put("JAVA_HOME", javaVersion.jvmDir.toAbsolutePath().toString());
+        }
+    }
+
+    public Path unpackIfPossible(JavaHelper.JavaVersion javaVersion) {
         String key = Launcher.makeSpecialGuardDirName(javaVersion.arch, JVMHelper.OS_TYPE);
         if(config.files.get(key) == null || config.exeFile.get(key) == null) {
             LogHelper.warning("LauncherGuard disabled: OS or ARCH not supported");
-            return;
+            return null;
         }
         Path executeFile = unpack(key);
-        if(Files.notExists(executeFile)) {
+        if(executeFile == null || Files.notExists(executeFile)) {
             throw new SecurityException("Wrong configuration: exe not found");
         }
-        event.processBuilder.executeFile = executeFile;
-        event.processBuilder.useLegacyJavaClassPathProperty = config.useClasspathProperty;
+        return executeFile;
     }
 
     public void preMainClass(ClientProcessPreInvokeMainClassEvent event) {
@@ -88,5 +99,19 @@ public class ModuleImpl extends LauncherModule {
             throw new SecurityException(e);
         }
         return exePath;
+    }
+
+    @Override
+    public void wrapperPhase(ClientLauncherWrapper.ClientLauncherWrapperContext context) {
+        if(!config.protectLauncher) {
+            return;
+        }
+        Path executeFile = unpackIfPossible(context.javaVersion);
+        if(executeFile != null) {
+            context.executePath = executeFile.toAbsolutePath();
+            context.useLegacyClasspathProperty = config.useClasspathProperty;
+            Map<String, String> env = context.processBuilder.environment();
+            env.put("JAVA_HOME", context.javaVersion.jvmDir.toAbsolutePath().toString());
+        }
     }
 }

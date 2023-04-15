@@ -18,6 +18,8 @@ public class Config {
     public boolean renameExeFile;
     @LauncherInject(value = "modules.launcherguard.useclasspathproperty")
     public boolean useClasspathProperty;
+    @LauncherInject(value = "modules.launcherguard.protectlauncher")
+    public boolean protectLauncher;
 
     public static Object getDefault() {
         Config config = new Config();
@@ -32,6 +34,7 @@ public class Config {
         config.exeFile.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86, JVMHelper.OS.MUSTDIE), "wrapper.exe");
         config.renameExeFile = true;
         config.useClasspathProperty = true;
+        config.protectLauncher = false;
         return config;
     }
 }
