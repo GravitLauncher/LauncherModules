@@ -9,6 +9,9 @@ import pro.gravit.utils.helper.JVMHelper;
 public class SentryEventProcessor implements EventProcessor {
     @Override
     public SentryEvent process(SentryEvent event, Hint hint) {
+        if(event.getThrowable() != null && SentryModule.config.ignoreErrors != null && SentryModule.config.ignoreErrors.contains(event.getThrowable().getMessage())) {
+            return null;
+        }
         if(SentryModule.config.collectMemoryInfo) {
             event.getContexts().put("Memory info", OshiUtils.makeMemoryProperties());
         }
