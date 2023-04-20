@@ -40,10 +40,10 @@ public class InstallClient {
     private final String name;
     private final ClientProfile.Version version;
 
-    private final List<Long> mods;
+    private final List<String> mods;
     private final VersionType versionType;
 
-    public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<Long> mods, VersionType versionType) {
+    public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<String> mods, VersionType versionType) {
         this.launchServer = launchServer;
         this.config = config;
         this.workdir = workdir;
@@ -64,6 +64,31 @@ public class InstallClient {
             IOHelper.transfer(input, path);
         }
         logger.info("{} downloaded", fileInfo.fileName());
+    }
+
+    public static void installMod(ModrinthAPI api, Path modsDir, String slug, String loader, ClientProfile.Version version) throws Exception {
+        var list = api.getMod(slug);
+        var mod = api.getModByGameVersion(list, version.name, loader);
+        if(mod == null) {
+            throw new RuntimeException(String.format("Mod '%s' not supported game version '%s'", slug, version.name));
+        }
+        ModrinthAPI.ModVersionFileData file = null;
+        for(var e : mod.files()) {
+            file = e;
+            if(e.primary()) {
+                break;
+            }
+        }
+        if(file == null) {
+            throw new RuntimeException(String.format("Mod '%s' not found suitable file", slug));
+        }
+        URL url = new URL(file.url());
+        Path path = modsDir.resolve(file.filename().replace("+", "-"));
+        logger.info("Download {} {} into {}", file.filename(), url, path);
+        try (InputStream input = IOHelper.newInput(url)) {
+            IOHelper.transfer(input, path);
+        }
+        logger.info("{} downloaded", file.filename());
     }
 
     private void downloadVanillaTo(Path clientDir) throws Exception {
@@ -222,11 +247,29 @@ public class InstallClient {
             logger.info("Files copied");
         }
         if (mods != null && !mods.isEmpty()) {
-            CurseforgeAPI api = new CurseforgeAPI(config.curseforgeApiKey);
+            ModrinthAPI modrinthAPI = null;
+            CurseforgeAPI curseforgeApi = null;
             Path modsDir = clientPath.resolve("mods");
+            String loaderName = switch (versionType) {
+                case VANILLA -> "";
+                case FABRIC -> "fabric";
+                case FORGE -> "forge";
+            };
             for (var modId : mods) {
                 try {
-                    installMod(api, modsDir, modId, version);
+                    try {
+                        long id = Long.parseLong(modId);
+                        if(curseforgeApi == null) {
+                            curseforgeApi = new CurseforgeAPI(config.curseforgeApiKey);
+                        }
+                        installMod(curseforgeApi, modsDir, id, version);
+                        continue;
+                    } catch (NumberFormatException ignored) {
+                    }
+                    if(modrinthAPI == null) {
+                        modrinthAPI = new ModrinthAPI();
+                    }
+                    installMod(modrinthAPI, modsDir, modId, loaderName, version);
                 } catch (Throwable e) {
                     logger.warn("Mod {} not installed! Exception {}", modId, e);
                 }

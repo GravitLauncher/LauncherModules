@@ -6,6 +6,7 @@ import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchermodules.mirrorhelper.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
+import pro.gravit.launchermodules.mirrorhelper.ModrinthAPI;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 
@@ -27,7 +28,7 @@ public class InstallModCommand extends Command {
 
     @Override
     public String getArgsDescription() {
-        return "[dir] [version] [mod1,mod2,mod3]";
+        return "[dir] [version] [forge/fabric] [mod1,mod2,mod3]";
     }
 
     @Override
@@ -37,18 +38,36 @@ public class InstallModCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        verifyArgs(args, 3);
+        verifyArgs(args, 4);
         Path dir = server.updatesDir.resolve(args[0]);
         if (Files.notExists(dir)) {
             throw new FileNotFoundException(dir.toString());
         }
         ClientProfile.Version version = ClientProfile.Version.byName(args[1]);
-        List<Long> mods = Arrays.stream(args[2].split(",")).map(Long::parseLong).toList();
+        ModrinthAPI modrinthAPI = null;
+        CurseforgeAPI curseforgeApi = null;
+        Path modsDir = dir.resolve("mods");
+        String loaderName = args[2];
+        List<String> mods = Arrays.stream(args[3].split(",")).toList();
         if (!mods.isEmpty()) {
-            CurseforgeAPI api = new CurseforgeAPI(module.config.curseforgeApiKey);
-            Path modsDir = dir.resolve("mods");
             for (var modId : mods) {
-                InstallClient.installMod(api, modsDir, modId, version);
+                try {
+                    try {
+                        long id = Long.parseLong(modId);
+                        if (curseforgeApi == null) {
+                            curseforgeApi = new CurseforgeAPI(module.config.curseforgeApiKey);
+                        }
+                        InstallClient.installMod(curseforgeApi, modsDir, id, version);
+                        continue;
+                    } catch (NumberFormatException ignored) {
+                    }
+                    if (modrinthAPI == null) {
+                        modrinthAPI = new ModrinthAPI();
+                    }
+                    InstallClient.installMod(modrinthAPI, modsDir, modId, loaderName, version);
+                } catch (Throwable e) {
+                    logger.warn("Mod {} not installed! Exception {}", modId, e);
+                }
             }
             logger.info("Mods installed");
         }

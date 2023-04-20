@@ -34,9 +34,9 @@ public class InstallClientCommand extends Command {
         String name = args[0];
         ClientProfile.Version version = ClientProfile.Version.byName(args[1]);
         InstallClient.VersionType versionType = InstallClient.VersionType.valueOf(args[2]);
-        List<Long> mods = new ArrayList<>();
+        List<String> mods = new ArrayList<>();
         if (args.length > 3) {
-            mods = Arrays.stream(args[3].split(",")).map(Long::parseLong).toList();
+            mods = Arrays.stream(args[3].split(",")).toList();
         }
         InstallClient run = new InstallClient(server, module.config, module.getWorkspaceDir(), name, version, mods, versionType);
         run.run();
