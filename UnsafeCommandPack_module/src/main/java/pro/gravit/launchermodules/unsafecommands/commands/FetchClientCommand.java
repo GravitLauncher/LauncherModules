@@ -45,7 +45,8 @@ public class FetchClientCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
-        String version = args[0];
+        ClientProfile.Version version = parseClientVersion(args[0]);
+        String versionStr = version.toString();
         String dirName = IOHelper.verifyFileName(args[1]);
         Path clientDir = server.updatesDir.resolve(dirName);
 
@@ -55,13 +56,13 @@ public class FetchClientCommand extends Command {
 
         LogHelper.subInfo("Getting client info, it may take some time");
         JsonObject obj;
-        if (Files.exists(Paths.get(version))) {
+        if (Files.exists(Paths.get(versionStr))) {
             LogHelper.subInfo("Using file %s", version);
-            try (Reader reader = IOHelper.newReader(Paths.get(version))) {
+            try (Reader reader = IOHelper.newReader(Paths.get(versionStr))) {
                 obj = ClientDownloader.GSON.fromJson(reader, JsonObject.class);
             }
         } else {
-            obj = ClientDownloader.gainClient(version);
+            obj = ClientDownloader.gainClient(versionStr);
         }
         ClientDownloader.ClientInfo info = ClientDownloader.getClient(obj);
         // Download required files
@@ -82,9 +83,8 @@ public class FetchClientCommand extends Command {
         LogHelper.subInfo("Client downloaded!");
         server.syncUpdatesDir(Collections.singleton(dirName));
         try {
-            ClientProfile.Version clientVersion = ClientProfile.Version.byName(version);
-            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientDir, clientVersion, Files.exists(server.updatesDir.resolve("assets")));
-            ClientProfile profile = MakeProfileHelper.makeProfile(clientVersion, dirName, options);
+            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientDir, version, Files.exists(server.updatesDir.resolve("assets")));
+            ClientProfile profile = MakeProfileHelper.makeProfile(version, dirName, options);
             try (Writer w = IOHelper.newWriter(server.profilesDir.resolve(dirName + ".json"))) {
                 Launcher.gsonManager.configGson.toJson(profile, w);
             }

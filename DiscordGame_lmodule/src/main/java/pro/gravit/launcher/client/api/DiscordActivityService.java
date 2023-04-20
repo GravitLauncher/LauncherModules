@@ -187,7 +187,7 @@ public class DiscordActivityService {
     }
 
     public void onClientStart(ClientLauncherProcess.ClientParams params) {
-        setParam("profileVersion", params.profile.getVersion().name);
+        setParam("profileVersion", params.profile.getVersion().toString());
         setParam("profileName", params.profile.getTitle());
         setParam("profileUUID", params.profile.getUUID().toString());
         setParam("profileHash", params.profile.getUUID().toString().replaceAll("-", ""));

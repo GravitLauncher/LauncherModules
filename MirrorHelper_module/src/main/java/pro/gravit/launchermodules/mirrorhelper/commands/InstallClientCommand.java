@@ -32,7 +32,7 @@ public class InstallClientCommand extends Command {
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 3);
         String name = args[0];
-        ClientProfile.Version version = ClientProfile.Version.byName(args[1]);
+        ClientProfile.Version version = parseClientVersion(args[1]);
         InstallClient.VersionType versionType = InstallClient.VersionType.valueOf(args[2]);
         List<String> mods = new ArrayList<>();
         if (args.length > 3) {

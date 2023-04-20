@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.profiles.ClientProfile;
+import pro.gravit.launcher.profiles.ClientProfileVersions;
 import pro.gravit.launchermodules.unsafecommands.commands.DeDupLibrariesCommand;
 import pro.gravit.launchermodules.unsafecommands.commands.installers.FabricInstallerCommand;
 import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
@@ -55,7 +56,7 @@ public class InstallClient {
 
     public static void installMod(CurseforgeAPI api, Path modsDir, long modId, ClientProfile.Version version) throws Exception {
         var modInfo = api.fetchModById(modId);
-        long fileId = modInfo.findFileIdByGameVersion(version.name);
+        long fileId = modInfo.findFileIdByGameVersion(version.toString());
         var fileInfo = api.fetchModFileById(modId, fileId);
         URL url = new URL(fileInfo.downloadUrl());
         Path path = modsDir.resolve(fileInfo.fileName().replace("+", "-"));
@@ -68,9 +69,9 @@ public class InstallClient {
 
     public static void installMod(ModrinthAPI api, Path modsDir, String slug, String loader, ClientProfile.Version version) throws Exception {
         var list = api.getMod(slug);
-        var mod = api.getModByGameVersion(list, version.name, loader);
+        var mod = api.getModByGameVersion(list, version.toString(), loader);
         if(mod == null) {
-            throw new RuntimeException(String.format("Mod '%s' not supported game version '%s'", slug, version.name));
+            throw new RuntimeException(String.format("Mod '%s' not supported game version '%s'", slug, version.toString()));
         }
         ModrinthAPI.ModVersionFileData file = null;
         for(var e : mod.files()) {
@@ -93,7 +94,7 @@ public class InstallClient {
 
     private void downloadVanillaTo(Path clientDir) throws Exception {
         JsonObject obj;
-        Path vanillaProfileJson = workdir.resolve("profiles").resolve("vanilla").resolve(version.name.concat(".json"));
+        Path vanillaProfileJson = workdir.resolve("profiles").resolve("vanilla").resolve(version.toString().concat(".json"));
         if (Files.exists(vanillaProfileJson)) {
             LogHelper.subInfo("Using file %s", vanillaProfileJson);
             try (Reader reader = IOHelper.newReader(vanillaProfileJson)) {
@@ -101,7 +102,7 @@ public class InstallClient {
             }
         } else {
             IOHelper.createParentDirs(vanillaProfileJson);
-            obj = ClientDownloader.gainClient(version.name);
+            obj = ClientDownloader.gainClient(version.toString());
             try (Writer writer = IOHelper.newWriter(vanillaProfileJson)) {
                 Launcher.gsonManager.configGson.toJson(obj, writer);
             }
@@ -142,9 +143,10 @@ public class InstallClient {
     }
 
     public void run() throws Exception {
+        logger.info("Install client {} {}", version.toString(), versionType);
         Path clientPath = launchServer.updatesDir.resolve(name);
         {
-            Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.name);
+            Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.toString());
             if (Files.notExists(fetchDir)) {
                 downloadVanillaTo(fetchDir);
             }
@@ -153,13 +155,13 @@ public class InstallClient {
         Path tmpFile = workdir.resolve("file.tmp");
         {
             Path pathToLauncherAuthlib;
-            if (version.compareTo(ClientProfile.Version.MC1165) < 0) {
+            if (version.compareTo(ClientProfileVersions.MINECRAFT_1_16_5) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib1.jar");
-            } else if (version.compareTo(ClientProfile.Version.MC118) < 0) {
+            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_18) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib2.jar");
-            } else if (version.compareTo(ClientProfile.Version.MC119) < 0) {
+            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3.jar");
-            } else if (version.compareTo(ClientProfile.Version.MC119) == 0) {
+            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) == 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.jar");
             } else {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.1.jar");
@@ -175,11 +177,11 @@ public class InstallClient {
         {
             if (versionType == VersionType.FABRIC) {
                 FabricInstallerCommand fabricInstallerCommand = new FabricInstallerCommand(launchServer);
-                fabricInstallerCommand.invoke(version.name, name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
+                fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Fabric installed");
             } else if (versionType == VersionType.FORGE) {
-                Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version.name + "-installer.jar");
+                Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer.jar");
                 Path tmpDir = workdir.resolve("tmp");
                 IOHelper.transfer("{}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
                 int counter = 5;
@@ -232,18 +234,18 @@ public class InstallClient {
         {
             copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
-            if (version.compareTo(ClientProfile.Version.MC113) >= 0) {
+            if (version.compareTo(ClientProfileVersions.MINECRAFT_1_13) >= 0) {
                 copyDir(workdir.resolve("workdir").resolve("lwjgl3"), clientPath);
             } else {
                 copyDir(workdir.resolve("workdir").resolve("lwjgl2"), clientPath);
             }
-            if (version.compareTo(ClientProfile.Version.MC118) >= 0) {
+            if (version.compareTo(ClientProfileVersions.MINECRAFT_1_18) >= 0) {
                 copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
             } else {
                 copyDir(workdir.resolve("workdir").resolve("java8"), clientPath);
             }
-            copyDir(workdir.resolve("workdir").resolve(version.name).resolve("ALL"), clientPath);
-            copyDir(workdir.resolve("workdir").resolve(version.name).resolve(versionType.name()), clientPath);
+            copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve("ALL"), clientPath);
+            copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve(versionType.name()), clientPath);
             logger.info("Files copied");
         }
         if (mods != null && !mods.isEmpty()) {
@@ -283,7 +285,7 @@ public class InstallClient {
         }
         {
             MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
-            makeProfileCommand.invoke(name, version.name, name);
+            makeProfileCommand.invoke(name, version.toString(), name);
             logger.info("makeprofile completed");
         }
         logger.info("Completed");

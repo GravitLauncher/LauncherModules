@@ -43,7 +43,7 @@ public class InstallModCommand extends Command {
         if (Files.notExists(dir)) {
             throw new FileNotFoundException(dir.toString());
         }
-        ClientProfile.Version version = ClientProfile.Version.byName(args[1]);
+        ClientProfile.Version version = parseClientVersion(args[1]);
         ModrinthAPI modrinthAPI = null;
         CurseforgeAPI curseforgeApi = null;
         Path modsDir = dir.resolve("mods");

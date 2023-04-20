@@ -86,9 +86,9 @@ public class SentryModule extends LauncherModule {
         Sentry.configureScope(scope -> {
             scope.setUser(makeSentryUser(LauncherEngine.clientParams.playerProfile));
             ClientProfile profile = AuthService.profile;
-            scope.setTag("minecraftVersion", profile.getVersion().name);
+            scope.setTag("minecraftVersion", profile.getVersion().toString());
             Map<String, String> profileParams = new HashMap<>();
-            profileParams.put("MinecraftVersion", profile.getVersion().name);
+            profileParams.put("MinecraftVersion", profile.getVersion().toString());
             profileParams.put("Name", profile.getTitle());
             profileParams.put("UUID", profile.getUUID().toString());
             scope.setContexts("Profile", profileParams);
