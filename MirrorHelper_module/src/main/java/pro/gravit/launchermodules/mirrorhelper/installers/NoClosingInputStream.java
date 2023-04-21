@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands.impl;
+package pro.gravit.launchermodules.mirrorhelper.installers;
 
 import org.jetbrains.annotations.NotNull;
 

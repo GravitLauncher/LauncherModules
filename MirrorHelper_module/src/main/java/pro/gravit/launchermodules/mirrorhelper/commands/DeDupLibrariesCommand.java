@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands.commands;
+package pro.gravit.launchermodules.mirrorhelper.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

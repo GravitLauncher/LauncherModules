@@ -1,8 +1,9 @@
-package pro.gravit.launchermodules.mirrorhelper;
+package pro.gravit.launchermodules.mirrorhelper.modapi;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import pro.gravit.launcher.Launcher;
+import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
 import pro.gravit.launchserver.helper.HttpHelper;
 import pro.gravit.utils.Version;
 

@@ -8,5 +8,4 @@ jar {
 }
 
 dependencies {
-    compileOnly project(":modules:UnsafeCommandPack_module")
 }

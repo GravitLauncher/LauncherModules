@@ -1,4 +1,4 @@
-package pro.gravit.launchermodules.unsafecommands.impl;
+package pro.gravit.launchermodules.mirrorhelper;
 
 import com.google.gson.*;
 import pro.gravit.utils.helper.IOHelper;

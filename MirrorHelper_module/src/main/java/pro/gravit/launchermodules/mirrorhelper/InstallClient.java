@@ -7,9 +7,11 @@ import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launcher.profiles.ClientProfileVersions;
-import pro.gravit.launchermodules.unsafecommands.commands.DeDupLibrariesCommand;
-import pro.gravit.launchermodules.unsafecommands.commands.installers.FabricInstallerCommand;
-import pro.gravit.launchermodules.unsafecommands.impl.ClientDownloader;
+import pro.gravit.launchermodules.mirrorhelper.commands.DeDupLibrariesCommand;
+import pro.gravit.launchermodules.mirrorhelper.installers.FabricInstallerCommand;
+import pro.gravit.launchermodules.mirrorhelper.installers.QuiltInstallerCommand;
+import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
+import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.hash.MakeProfileCommand;
 import pro.gravit.utils.helper.IOHelper;
@@ -180,6 +182,11 @@ public class InstallClient {
                 fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Fabric installed");
+            } else if(versionType == VersionType.QUILT) {
+                QuiltInstallerCommand quiltInstallerCommand = new QuiltInstallerCommand(launchServer);
+                quiltInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
+                Files.createDirectories(clientPath.resolve("mods"));
+                logger.info("Quilt installed");
             } else if (versionType == VersionType.FORGE) {
                 Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer.jar");
                 Path tmpDir = workdir.resolve("tmp");
@@ -256,6 +263,7 @@ public class InstallClient {
                 case VANILLA -> "";
                 case FABRIC -> "fabric";
                 case FORGE -> "forge";
+                case QUILT -> "quilt";
             };
             for (var modId : mods) {
                 try {
@@ -354,6 +362,6 @@ public class InstallClient {
     }
 
     public enum VersionType {
-        VANILLA, FABRIC, FORGE
+        VANILLA, FABRIC, FORGE, QUILT
     }
 }

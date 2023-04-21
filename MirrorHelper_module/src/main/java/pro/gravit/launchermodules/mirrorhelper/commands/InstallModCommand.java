@@ -3,10 +3,10 @@ package pro.gravit.launchermodules.mirrorhelper.commands;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.profiles.ClientProfile;
-import pro.gravit.launchermodules.mirrorhelper.CurseforgeAPI;
+import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
-import pro.gravit.launchermodules.mirrorhelper.ModrinthAPI;
+import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 

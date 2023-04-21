@@ -6,9 +6,7 @@ import pro.gravit.launcher.config.JsonConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
-import pro.gravit.launchermodules.mirrorhelper.commands.CurseforgeCommand;
-import pro.gravit.launchermodules.mirrorhelper.commands.InstallClientCommand;
-import pro.gravit.launchermodules.mirrorhelper.commands.InstallModCommand;
+import pro.gravit.launchermodules.mirrorhelper.commands.*;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -27,7 +25,7 @@ public class MirrorHelperModule extends LauncherModule {
     public JsonConfigurable<Config> configurable;
 
     public MirrorHelperModule() {
-        super(new LauncherModuleInfo("MirrorHelper", version, new String[]{"LaunchServerCore", "UnsafeCommands"}));
+        super(new LauncherModuleInfo("MirrorHelper", version, new String[]{"LaunchServerCore"}));
     }
 
     public Path getWorkspaceDir() {
@@ -67,6 +65,10 @@ public class MirrorHelperModule extends LauncherModule {
         commands.registerCommand("curseforge", new CurseforgeCommand(server, config));
         commands.registerCommand("installClient", new InstallClientCommand(server, this));
         commands.registerCommand("installMods", new InstallModCommand(server, this));
+        commands.registerCommand("deduplibraries", new DeDupLibrariesCommand(server));
+        commands.registerCommand("launchInstaller", new LaunchInstallerCommand(server));
+        commands.registerCommand("lwjgldownload", new LwjglDownloadCommand(server));
+        commands.registerCommand("patchauthlib", new PatchAuthlibCommand(server));
         CommandHandler.Category category = new CommandHandler.Category(commands, "mirror");
         server.commandHandler.registerCategory(category);
     }
