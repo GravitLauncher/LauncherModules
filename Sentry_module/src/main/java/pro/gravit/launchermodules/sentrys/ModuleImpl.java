@@ -19,8 +19,7 @@ import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.JVMHelper;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ModuleImpl extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
@@ -74,6 +73,15 @@ public class ModuleImpl extends LauncherModule {
                 options.setTracesSampleRate(c.tracingSampleRate);
                 options.setRelease(Version.getVersion().getVersionString());
                 options.setEnvironment(Version.getVersion().release.name());
+                options.setBeforeSend((event, hint) -> {
+                    if (event.getThrowable() != null && c.ignoreErrors != null && c.ignoreErrors.contains(event.getThrowable().getMessage())) {
+                        return null;
+                    }
+                    if (event.getThrowable() instanceof SentryTransactionTracker.RequestError) {
+                        event.setFingerprints(List.of(event.getThrowable().toString()));
+                    }
+                    return event;
+                });
             });
             Sentry.configureScope(scope -> {
                 scope.setTag("java_version", String.valueOf(JVMHelper.RUNTIME_MXBEAN.getVmVersion()));
@@ -90,7 +98,7 @@ public class ModuleImpl extends LauncherModule {
     }
 
     public void onPostInit(LaunchServerNettyFullInitEvent event) {
-        if(c.requestTracker) {
+        if (c.requestTracker) {
             tracker.register(server.nettyServerSocketHandler);
         }
     }
@@ -125,5 +133,8 @@ public class ModuleImpl extends LauncherModule {
         public boolean captureRequestData = false;
         public boolean captureRequestError = false;
         public String appenderLogLevel = "ERROR";
+
+        public List<String> ignoreErrors = new ArrayList<>(List.of("auth.wrongpassword"));
+
     }
 }
