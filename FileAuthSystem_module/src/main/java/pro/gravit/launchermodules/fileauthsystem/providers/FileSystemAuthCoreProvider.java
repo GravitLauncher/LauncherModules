@@ -121,6 +121,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 if (entity == null)
                     throw new IllegalArgumentException(String.format("User %s not found", args[0]));
                 boolean isSlim = Boolean.parseBoolean(args[1]);
+                Map<String, String> metadata = isSlim ? Map.of("model", "slim") : null;
                 Texture texture;
                 if (args.length >= 3) {
                     String textureUrl = args[2];
@@ -134,13 +135,13 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                             Files.copy(pathToSkin, target);
                         }
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
-                        texture = new Texture(url, digest, isSlim ? Map.of("model", "slim") : null);
+                        texture = new Texture(url, digest, metadata);
                     } else {
-                        texture = new Texture(textureUrl, false);
+                        texture = new Texture(textureUrl, false, metadata);
                     }
                 } else if (skinUrl != null) {
                     String textureUrl = RequestTextureProvider.getTextureURL(skinUrl, entity.uuid, entity.username, "");
-                    texture = new Texture(textureUrl, false);
+                    texture = new Texture(textureUrl, false, metadata);
                 } else {
                     throw new IllegalArgumentException("Please provide url or path");
                 }
@@ -169,11 +170,11 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
                         texture = new Texture(url, digest, null);
                     } else {
-                        texture = new Texture(textureUrl, true);
+                        texture = new Texture(textureUrl, true, null);
                     }
                 } else if (cloakUrl != null) {
                     String textureUrl = RequestTextureProvider.getTextureURL(cloakUrl, entity.uuid, entity.username, "");
-                    texture = new Texture(textureUrl, true);
+                    texture = new Texture(textureUrl, true, null);
                 } else {
                     throw new IllegalArgumentException("Please provide url or path");
                 }
