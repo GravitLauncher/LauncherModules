@@ -134,7 +134,7 @@ public class ModuleImpl extends LauncherModule {
         public boolean captureRequestError = false;
         public String appenderLogLevel = "ERROR";
 
-        public List<String> ignoreErrors = new ArrayList<>(List.of("auth.wrongpassword"));
+        public List<String> ignoreErrors = new ArrayList<>(List.of("auth.wrongpassword", "auth.require2fa", "auth.usernotfound", "auth.require.factor."));
 
     }
 }
