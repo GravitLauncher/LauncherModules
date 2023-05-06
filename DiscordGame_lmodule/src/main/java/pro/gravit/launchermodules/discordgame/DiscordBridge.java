@@ -2,6 +2,7 @@ package pro.gravit.launchermodules.discordgame;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
+import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.client.DirBridge;
@@ -57,19 +58,30 @@ public class DiscordBridge {
     }
 
     public static void init(long appId) throws IOException {
+        if (JVMHelper.OS_TYPE == JVMHelper.OS.MACOSX && (JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM32 || JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM64)) {
+            LogHelper.info("Cannot initialize Discord Game SDK because of launcher started at unsupported system && arch");
+            return;
+        }
         initCore();
         params = new CreateParams();
         params.setClientID(appId);
         //params.setClientID(698611073133051974L);
         params.setFlags(CreateParams.getDefaultFlags() | 1);
         // Create the Core
-        core = new Core(params);
-        {
-            // Create the Activity
-            activity = new Activity();
-            activityService.applyToActivity(activity);
-            activityService.resetStartTime();
-            core.activityManager().updateActivity(DiscordBridge.getActivity());
+        // here we would like to deal with
+        try {
+            core = new Core(params);
+            {
+                // Create the Activity
+                activity = new Activity();
+                activityService.applyToActivity(activity);
+                activityService.resetStartTime();
+                core.activityManager().updateActivity(DiscordBridge.getActivity());
+            }
+        } catch (GameSDKException e) {
+            LogHelper.info("Failed to start Discord Game SDK. Most surely because local discord app is down");
+            close();
+            return;
         }
         //params.close();
         LauncherEngine.modulesManager.invokeEvent(new DiscordInitEvent(core));
@@ -87,7 +99,7 @@ public class DiscordBridge {
     }
 
     public static void close() {
-        if (core == null) return;
+        if (core == null || thread == null) return;
         thread.interrupt();
         try {
             core.close();
