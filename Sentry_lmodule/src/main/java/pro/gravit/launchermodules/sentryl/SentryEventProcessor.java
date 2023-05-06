@@ -18,7 +18,7 @@ public class SentryEventProcessor implements EventProcessor {
             return null;
         }
         if (event.getThrowable() instanceof RequestException) {
-            event.setFingerprints(Collections.singletonList(event.getThrowable().toString()));
+            event.setFingerprints(Collections.singletonList(event.getThrowable().getMessage()));
         }
         if(SentryModule.config.collectMemoryInfo) {
             event.getContexts().put("Memory info", OshiUtils.makeMemoryProperties());
