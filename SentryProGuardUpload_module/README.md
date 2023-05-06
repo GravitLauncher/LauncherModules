@@ -47,15 +47,15 @@
 
 - **/LaunchServer/config/SentryProGuardUpload/Config.json**
 
-```json
-{
-  "sentryCliPath": "sentry-cli",
-  "authToken": "<ВАШ_ТОКЕН>",
-  "org": "<ИМЯ_ОРГАНИЗАЦИИ>",
-  "project": "<ИМЯ_ПРОЕКТА_ДЛЯ_ЛАУНЧЕРА>",
-  "url": "",
-  "mappingPath": "proguard/mappings.pro",
-  "customArgs": [],
-  "customArgsBefore": []
-}
-```
+  ```json
+  {
+    "sentryCliPath": "sentry-cli",
+    "authToken": "<ВАШ_ТОКЕН>",
+    "org": "<ИМЯ_ОРГАНИЗАЦИИ>",
+    "project": "<ИМЯ_ПРОЕКТА_ДЛЯ_ЛАУНЧЕРА>",
+    "url": "",
+    "mappingPath": "proguard/mappings.pro",
+    "customArgs": [],
+    "customArgsBefore": []
+  }
+  ```
