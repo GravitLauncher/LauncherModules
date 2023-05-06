@@ -28,16 +28,16 @@
 
 - **/LaunchServer/config/Sentry/Config.json**
 
-```json
-{
-   "dsn": "YOUR_DSN",
-   "collectSystemInfo": true,
-   "collectMemoryInfo": true,
-   "ignoreErrors": [
-      "auth.wrongpassword"
-   ]
-}
-```
+  ```json
+  {
+     "dsn": "YOUR_DSN",
+     "collectSystemInfo": true,
+     "collectMemoryInfo": true,
+     "ignoreErrors": [
+        "auth.wrongpassword"
+     ]
+  }
+  ```
 
 #### Для расшифровки стактрейсов с ProGuard, смотрите следующий модуль:
 [\[SentryProGuardUpload_module\]](https://github.com/GravitLauncher/LauncherModules/tree/master/SentryProGuardUpload_module)
