@@ -4,10 +4,10 @@ sourceCompatibility = '17'
 targetCompatibility = '17'
 
 dependencies {
-    implementation('io.sentry:sentry:6.16.0') {
+    implementation('io.sentry:sentry:6.18.1') {
         exclude group: 'org.slf4j'
     }
-    implementation('io.sentry:sentry-log4j2:6.16.0') {
+    implementation('io.sentry:sentry-log4j2:6.18.1') {
         exclude group: 'org.apache.logging.log4j'
     }
 }
