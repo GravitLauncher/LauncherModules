@@ -12,10 +12,10 @@
 
 1. Скопировать модуль **Sentry_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
    - Либо установкой symlink:
-   ```
-   cd launcher-modules
-   ln -s ../src/modules/Sentry_lmodule/build/libs/Sentry_lmodule.jar
-   ```
+     ```
+     cd launcher-modules
+     ln -s ../src/modules/Sentry_lmodule/build/libs/Sentry_lmodule.jar
+     ```
 2. Запустить и остановить **LaunchServer.jar** для создания файла конфигурации.
 3. Зарегистрироваться на сайте **Sentry.io** и создайте там Java проект.
 4. После создания проекта потребуется скопировать **DSN** ключ:
@@ -41,3 +41,8 @@
 
 #### Для расшифровки стактрейсов с ProGuard, смотрите следующий модуль:
 [\[SentryProGuardUpload_module\]](https://github.com/GravitLauncher/LauncherModules/tree/master/SentryProGuardUpload_module)
+
+
+#### P.S.
+
+- Настройка в вашей учётной записи: языка, часового пояса и темы по ссылке [\[Account Details\]](https://sentry.io/settings/account/details/)
