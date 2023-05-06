@@ -78,7 +78,7 @@ public class ModuleImpl extends LauncherModule {
                         return null;
                     }
                     if (event.getThrowable() instanceof SentryTransactionTracker.RequestError) {
-                        event.setFingerprints(List.of(event.getThrowable().getMessage()));
+                        event.setFingerprints(Arrays.asList("RequestError", event.getThrowable().getMessage()));
                     }
                     return event;
                 });
