@@ -58,7 +58,7 @@ public class DiscordBridge {
     }
 
     public static void init(long appId) throws IOException {
-        if (JVMHelper.OS_TYPE == JVMHelper.OS.MACOSX && (JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM32 || JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM64)) {
+        if (JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM32 || JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM64) {
             LogHelper.info("Cannot initialize Discord Game SDK because of launcher started at unsupported system && arch");
             return;
         }
@@ -99,23 +99,31 @@ public class DiscordBridge {
     }
 
     public static void close() {
-        if (core == null || thread == null) return;
-        thread.interrupt();
-        try {
-            core.close();
-        } catch (Throwable e) {
-            if (LogHelper.isDebugEnabled()) {
-                LogHelper.error(e);
-            }
-            LogHelper.warning("DiscordGame core object not closed correctly. Discord is down?");
+        if (thread != null) {
+            thread.interrupt();
         }
-        try {
-            params.close();
-        } catch (Throwable e) {
-            if (LogHelper.isDebugEnabled()) {
-                LogHelper.error(e);
+
+        if (core != null) {
+            try {
+                core.close();
+            } catch (Throwable e) {
+                if (LogHelper.isDebugEnabled()) {
+                    LogHelper.error(e);
+                }
+                LogHelper.warning("DiscordGame core object not closed correctly. Discord is down?");
             }
-            LogHelper.warning("DiscordGame params object not closed correctly. Discord is down?");
         }
+
+        if (params != null) {
+            try {
+                params.close();
+            } catch (Throwable e) {
+                if (LogHelper.isDebugEnabled()) {
+                    LogHelper.error(e);
+                }
+                LogHelper.warning("DiscordGame params object not closed correctly. Discord is down?");
+            }
+        }
+
     }
 }
