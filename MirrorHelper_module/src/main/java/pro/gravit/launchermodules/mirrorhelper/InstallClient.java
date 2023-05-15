@@ -165,8 +165,10 @@ public class InstallClient {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3.jar");
             } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) == 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.jar");
-            } else {
+            } else if(version.compareTo(ClientProfileVersions.MINECRAFT_1_20) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.1.jar");
+            } else {
+                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib4.jar");
             }
             logger.info("Found launcher authlib in {}", pathToLauncherAuthlib);
             Path pathToOriginalAuthlib = findClientAuthlib(clientPath);
