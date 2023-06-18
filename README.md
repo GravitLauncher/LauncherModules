@@ -40,7 +40,7 @@
 | [GenerateCertificate] | Создает сертификаты для подписи бинарных файлов лаунчера (.jar/.exe) |
 | [MirrorHelper] | Сборка клиентов с патчем authlib для [GravitLauncher] |
 | [MojangSupport] | Добавляет поддержку лицензионных аккаунтов **Mojang/Microsoft** |
-| [OpenSSLSignCode] | Позволяет подписывать бинарные файлы своим сертификатом |
+| [OpenSSLSignCode] | Позволяет подписывать `.exe` файлы своим сертификатом |
 | [RemoteControl] | Позволяет выполнять консольные команды [LaunchServer] при помощи HTTP протокола |
 | [S3Updates] | Синхронизация папки `updates` с Хранилищем объектов S3 |
 | [SentryProGuardUpload] | Снятие ProGuard маппингов с приходящих стактрейсов со стороны лаунчера |
