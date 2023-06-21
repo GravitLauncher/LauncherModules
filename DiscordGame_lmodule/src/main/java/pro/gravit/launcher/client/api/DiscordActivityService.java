@@ -6,8 +6,8 @@ import pro.gravit.launcher.client.ClientLauncherProcess;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchermodules.discordgame.ClientModule;
-import pro.gravit.launchermodules.discordgame.Config;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
+import pro.gravit.launchermodules.discordgame.ScopeConfig;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -177,13 +177,12 @@ public class DiscordActivityService {
     }
 
     public void onLauncherStart() {
-        Config config = ClientModule.config;
-        setDetails(config.launcherDetails);
-        setState(config.launcherState);
-        setLargeKey(config.largeKey);
-        setLargeText(config.largeText);
-        setSmallKey(config.smallKey);
-        setSmallText(config.smallText);
+        setScope(ClientModule.loginScopeConfig);
+    }
+
+    public void onLauncherAuth(PlayerProfile playerProfile) {
+        onPlayerProfile(playerProfile);
+        setScope(ClientModule.authorizedScopeConfig);
     }
 
     public void onClientStart(ClientLauncherProcess.ClientParams params) {
@@ -192,33 +191,23 @@ public class DiscordActivityService {
         setParam("profileUUID", params.profile.getUUID().toString());
         setParam("profileHash", params.profile.getUUID().toString().replaceAll("-", ""));
         onPlayerProfile(params.playerProfile);
-        Config config = ClientModule.config;
-        setDetails(config.clientDetails);
-        setState(config.clientState);
-        setLargeKey(config.clientLargeKey);
-        setLargeText(config.clientLargeText);
-        setSmallKey(config.clientSmallKey);
-        setSmallText(config.clientSmallText);
+        setScope(ClientModule.clientScopeConfig);
     }
 
     public void onPlayerProfile(PlayerProfile playerProfile) {
         setParam("username", playerProfile.username);
         setParam("uuid", playerProfile.uuid.toString());
-        Texture skin = playerProfile.assets.get("SKIN");
-        if (skin != null) {
-            setParam("skinurl", skin.url);
-        }
-        Texture cape = playerProfile.assets.get("CAPE");
-        if (cape != null) {
-            setParam("cloakurl", cape.url);
-        }
     }
 
-    public void onLauncherAuth(PlayerProfile playerProfile) {
-        onPlayerProfile(playerProfile);
-        Config config = ClientModule.config;
-        setDetails(config.authorizedDetails);
-        setState(config.authorizedState);
+
+    private void setScope(ScopeConfig scopeConfig) {
+        LogHelper.dev(scopeConfig.toString());
+        setDetails(scopeConfig.getDetails());
+        setState(scopeConfig.getState());
+        setLargeKey(scopeConfig.getLargeImageKey());
+        setLargeText(scopeConfig.getLargeImageText());
+        setSmallKey(scopeConfig.getSmallImageKey());
+        setSmallText(scopeConfig.getSmallImageText());
     }
 
     public void resetStartTime() {

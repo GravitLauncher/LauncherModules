@@ -17,6 +17,9 @@ public class ClientModule extends LauncherModule {
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
     private static final Object lock = new Object();
     public static Config config;
+    public static ScopeConfig loginScopeConfig;
+    public static ScopeConfig authorizedScopeConfig;
+    public static ScopeConfig clientScopeConfig;
     private static volatile boolean isClosed = false;
 
     public ClientModule() {
@@ -41,6 +44,9 @@ public class ClientModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         config = new Config();
+        loginScopeConfig = new ScopeConfig(config.scopes.get("login"));
+        authorizedScopeConfig = new ScopeConfig(config.scopes.get("authorized"));
+        clientScopeConfig = new ScopeConfig(config.scopes.get("client"));
         registerEvent(this::clientInit, ClientProcessLaunchEvent.class);
         registerEvent(this::launcherInit, ClientEngineInitPhase.class);
         registerEvent(this::exitHandler, ClientExitPhase.class);
