@@ -17,7 +17,7 @@ public class Config {
         config.enable = true;
         config.appId = 810913859371532298L;
 
-        config.scopes = new HashMap<>();
+        config.scopes = new LinkedHashMap<>();
 
         config.scopes.put("login",
                 new ScopeConfig("Лучший проект Minecraft", "Авторизуется",

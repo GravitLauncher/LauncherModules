@@ -4,7 +4,6 @@ import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.client.ClientLauncherProcess;
 import pro.gravit.launcher.profiles.PlayerProfile;
-import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchermodules.discordgame.ClientModule;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
 import pro.gravit.launchermodules.discordgame.ScopeConfig;
@@ -176,11 +175,13 @@ public class DiscordActivityService {
         return result;
     }
 
-    public void onLauncherStart() {
+    public void updateLoginStage() {
+        setParam("username", null);
+        setParam("uuid", null);
         setScope(ClientModule.loginScopeConfig);
     }
 
-    public void onLauncherAuth(PlayerProfile playerProfile) {
+    public void updateAuthorizedStage(PlayerProfile playerProfile) {
         onPlayerProfile(playerProfile);
         setScope(ClientModule.authorizedScopeConfig);
     }

@@ -1,6 +1,6 @@
 package pro.gravit.launchermodules.discordgame;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ScopeConfig {
@@ -55,7 +55,7 @@ public class ScopeConfig {
     }
 
     public Map<String, String> toMap() {
-        Map<String, String> scopeConfig = new HashMap<>();
+        Map<String, String> scopeConfig = new LinkedHashMap<>();
         scopeConfig.put("details", this.details);
         scopeConfig.put("state", this.state);
         scopeConfig.put("largeImageKey", this.largeImageKey);
