@@ -4,10 +4,9 @@ import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.client.ClientLauncherProcess;
 import pro.gravit.launcher.profiles.PlayerProfile;
-import pro.gravit.launcher.profiles.Texture;
 import pro.gravit.launchermodules.discordgame.ClientModule;
-import pro.gravit.launchermodules.discordgame.Config;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
+import pro.gravit.launchermodules.discordgame.ScopeConfig;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -73,7 +72,6 @@ public class DiscordActivityService {
 
     public void setDetails(String details) {
         this.details = replaceParams(details);
-        updateActivity();
     }
 
     public String getState() {
@@ -82,7 +80,6 @@ public class DiscordActivityService {
 
     public void setState(String state) {
         this.state = replaceParams(state);
-        updateActivity();
     }
 
     public String getLargeKey() {
@@ -91,7 +88,6 @@ public class DiscordActivityService {
 
     public void setLargeKey(String largeKey) {
         this.largeKey = replaceParams(largeKey);
-        updateActivity();
     }
 
     public String getSmallKey() {
@@ -100,7 +96,6 @@ public class DiscordActivityService {
 
     public void setSmallKey(String smallKey) {
         this.smallKey = replaceParams(smallKey);
-        updateActivity();
     }
 
     public String getLargeText() {
@@ -109,7 +104,6 @@ public class DiscordActivityService {
 
     public void setLargeText(String largeText) {
         this.largeText = replaceParams(largeText);
-        updateActivity();
     }
 
     public String getSmallText() {
@@ -118,7 +112,6 @@ public class DiscordActivityService {
 
     public void setSmallText(String smallText) {
         this.smallText = replaceParams(smallText);
-        updateActivity();
     }
 
     public String getPartyId() {
@@ -176,49 +169,40 @@ public class DiscordActivityService {
         return result;
     }
 
-    public void onLauncherStart() {
-        Config config = ClientModule.config;
-        setDetails(config.launcherDetails);
-        setState(config.launcherState);
-        setLargeKey(config.largeKey);
-        setLargeText(config.largeText);
-        setSmallKey(config.smallKey);
-        setSmallText(config.smallText);
+    public void updateLoginStage() {
+        setParam("username", null);
+        setParam("uuid", null);
+        setScope(ClientModule.loginScopeConfig);
     }
 
-    public void onClientStart(ClientLauncherProcess.ClientParams params) {
+    public void updateAuthorizedStage(PlayerProfile playerProfile) {
+        onPlayerProfile(playerProfile);
+        setScope(ClientModule.authorizedScopeConfig);
+    }
+
+    public void updateClientStage(ClientLauncherProcess.ClientParams params) {
         setParam("profileVersion", params.profile.getVersion().toString());
         setParam("profileName", params.profile.getTitle());
         setParam("profileUUID", params.profile.getUUID().toString());
         setParam("profileHash", params.profile.getUUID().toString().replaceAll("-", ""));
         onPlayerProfile(params.playerProfile);
-        Config config = ClientModule.config;
-        setDetails(config.clientDetails);
-        setState(config.clientState);
-        setLargeKey(config.clientLargeKey);
-        setLargeText(config.clientLargeText);
-        setSmallKey(config.clientSmallKey);
-        setSmallText(config.clientSmallText);
+        setScope(ClientModule.clientScopeConfig);
     }
 
     public void onPlayerProfile(PlayerProfile playerProfile) {
         setParam("username", playerProfile.username);
         setParam("uuid", playerProfile.uuid.toString());
-        Texture skin = playerProfile.assets.get("SKIN");
-        if (skin != null) {
-            setParam("skinurl", skin.url);
-        }
-        Texture cape = playerProfile.assets.get("CAPE");
-        if (cape != null) {
-            setParam("cloakurl", cape.url);
-        }
     }
 
-    public void onLauncherAuth(PlayerProfile playerProfile) {
-        onPlayerProfile(playerProfile);
-        Config config = ClientModule.config;
-        setDetails(config.authorizedDetails);
-        setState(config.authorizedState);
+    private void setScope(ScopeConfig scopeConfig) {
+        LogHelper.dev(scopeConfig.toString());
+        setDetails(scopeConfig.getDetails());
+        setState(scopeConfig.getState());
+        setLargeKey(scopeConfig.getLargeImageKey());
+        setLargeText(scopeConfig.getLargeImageText());
+        setSmallKey(scopeConfig.getSmallImageKey());
+        setSmallText(scopeConfig.getSmallImageText());
+        updateActivity();
     }
 
     public void resetStartTime() {
