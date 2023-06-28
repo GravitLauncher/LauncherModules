@@ -54,7 +54,7 @@ public class ClientModule extends LauncherModule {
     }
 
     private void clientInit(ClientProcessLaunchEvent phase) {
-        DiscordBridge.activityService.onClientStart(phase.params);
+        DiscordBridge.activityService.updateClientStage(phase.params);
         try {
             DiscordBridge.init(config.appId);
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);

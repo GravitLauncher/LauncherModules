@@ -72,7 +72,6 @@ public class DiscordActivityService {
 
     public void setDetails(String details) {
         this.details = replaceParams(details);
-        updateActivity();
     }
 
     public String getState() {
@@ -81,7 +80,6 @@ public class DiscordActivityService {
 
     public void setState(String state) {
         this.state = replaceParams(state);
-        updateActivity();
     }
 
     public String getLargeKey() {
@@ -90,7 +88,6 @@ public class DiscordActivityService {
 
     public void setLargeKey(String largeKey) {
         this.largeKey = replaceParams(largeKey);
-        updateActivity();
     }
 
     public String getSmallKey() {
@@ -99,7 +96,6 @@ public class DiscordActivityService {
 
     public void setSmallKey(String smallKey) {
         this.smallKey = replaceParams(smallKey);
-        updateActivity();
     }
 
     public String getLargeText() {
@@ -108,7 +104,6 @@ public class DiscordActivityService {
 
     public void setLargeText(String largeText) {
         this.largeText = replaceParams(largeText);
-        updateActivity();
     }
 
     public String getSmallText() {
@@ -117,7 +112,6 @@ public class DiscordActivityService {
 
     public void setSmallText(String smallText) {
         this.smallText = replaceParams(smallText);
-        updateActivity();
     }
 
     public String getPartyId() {
@@ -186,7 +180,7 @@ public class DiscordActivityService {
         setScope(ClientModule.authorizedScopeConfig);
     }
 
-    public void onClientStart(ClientLauncherProcess.ClientParams params) {
+    public void updateClientStage(ClientLauncherProcess.ClientParams params) {
         setParam("profileVersion", params.profile.getVersion().toString());
         setParam("profileName", params.profile.getTitle());
         setParam("profileUUID", params.profile.getUUID().toString());
@@ -200,7 +194,6 @@ public class DiscordActivityService {
         setParam("uuid", playerProfile.uuid.toString());
     }
 
-
     private void setScope(ScopeConfig scopeConfig) {
         LogHelper.dev(scopeConfig.toString());
         setDetails(scopeConfig.getDetails());
@@ -209,6 +202,7 @@ public class DiscordActivityService {
         setLargeText(scopeConfig.getLargeImageText());
         setSmallKey(scopeConfig.getSmallImageKey());
         setSmallText(scopeConfig.getSmallImageText());
+        updateActivity();
     }
 
     public void resetStartTime() {
