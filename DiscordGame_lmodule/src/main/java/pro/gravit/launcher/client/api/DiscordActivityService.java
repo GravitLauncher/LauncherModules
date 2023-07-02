@@ -170,8 +170,8 @@ public class DiscordActivityService {
     }
 
     public void updateLoginStage() {
-        setParam("username", null);
-        setParam("uuid", null);
+        setParam("username", "");
+        setParam("uuid", "");
         setScope(ClientModule.loginScopeConfig);
     }
 
