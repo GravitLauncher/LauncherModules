@@ -36,8 +36,12 @@ public class DiscordActivityService {
     }
 
     public void applyToActivity(Activity activity) {
-        activity.setDetails(details);
-        activity.setState(state);
+        if (details != null) {
+            activity.setDetails(details);
+        }
+        if (state != null) {
+            activity.setState(state);
+        }
         if (largeKey != null) {
             activity.assets().setLargeImage(largeKey);
         }
