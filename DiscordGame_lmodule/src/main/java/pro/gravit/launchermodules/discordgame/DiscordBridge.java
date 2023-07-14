@@ -35,7 +35,7 @@ public class DiscordBridge {
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
         } else {
             pathToLib = baseDir.resolve("libdiscord_game_sdk_jni.dylib");
-            String libraryJarPath = "native/macos/" + arch + "/libdiscord_game_sdk_jni.dylib";
+            String libraryJarPath = "native/macos/" + (arch.equals("x86_64") ? "amd64" : arch) + "/libdiscord_game_sdk_jni.dylib";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToLib);
         }
         Path pathToDiscordSdkLib;
@@ -49,7 +49,7 @@ public class DiscordBridge {
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
         } else {
             pathToDiscordSdkLib = baseDir.resolve("discord_game_sdk.dylib");
-            String libraryJarPath = "native/macos/" + arch + "/discord_game_sdk.dylib";
+            String libraryJarPath = "native/macos/" + (arch.equals("x86_64") ? "amd64" : arch) + "/discord_game_sdk.dylib";
             UnpackHelper.unpack(IOHelper.getResourceURL(libraryJarPath), pathToDiscordSdkLib);
         }
         System.load(pathToDiscordSdkLib.toAbsolutePath().toString());
