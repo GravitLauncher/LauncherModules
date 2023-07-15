@@ -76,8 +76,8 @@ public class MirrorHelperModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::finish, LaunchServerFullInitEvent.class);
-        if (initContext instanceof LaunchServerInitContext) {
-            initialize(((LaunchServerInitContext) initContext).server);
+        if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
+            initialize(launchServerInitContext.server);
         }
     }
 }
