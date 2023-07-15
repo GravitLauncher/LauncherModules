@@ -43,7 +43,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     @Override
     public User getUserByUsername(String username) {
         try {
-            MojangUUIDResponse response1 = mojangRequest(String.format("https://api.mojang.com/users/profiles/minecraft/%s", username), null, MojangUUIDResponse.class);
+            MojangUUIDResponse response1 = mojangRequest("https://api.mojang.com/users/profiles/minecraft/%s".formatted(username), null, MojangUUIDResponse.class);
             if (response1 == null) {
                 return null;
             }
@@ -80,7 +80,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
 
     private MojangUser getUserByHash(String hash) {
         try {
-            MojangProfileResponse response1 = mojangRequest(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s", hash), null, MojangProfileResponse.class);
+            MojangProfileResponse response1 = mojangRequest("https://sessionserver.mojang.com/session/minecraft/profile/%s".formatted(hash), null, MojangProfileResponse.class);
             if (response1 == null) {
                 return null;
             }
@@ -189,7 +189,7 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
 
     @Override
     public User checkServer(Client client, String username, String serverID) {
-        String url = String.format("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s", username, serverID);
+        String url = "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s".formatted(username, serverID);
         try {
             MojangProfileResponse result = mojangRequest(url, null, MojangProfileResponse.class);
             if(result == null) {

@@ -51,7 +51,7 @@ public class OSSLSignTask implements LauncherBuildTask {
                 outputLength = output.length();
                 signSize = outputLength - inputLength;
                 if (lastSignSize != signSize) {
-                    throw new IllegalStateException(String.format("Sign check size failed. Saved: %d Real: %d", lastSignSize, signSize));
+                    throw new IllegalStateException("Sign check size failed. Saved: %d Real: %d".formatted(lastSignSize, signSize));
                 }
             }
             if (config.checkCorrectJar) {
@@ -103,7 +103,7 @@ public class OSSLSignTask implements LauncherBuildTask {
 
         }
         if (process.exitValue() != 0) {
-            throw new RuntimeException(String.format("OSSLSignCode process return %d", process.exitValue()));
+            throw new RuntimeException("OSSLSignCode process return %d".formatted(process.exitValue()));
         }
     }
 

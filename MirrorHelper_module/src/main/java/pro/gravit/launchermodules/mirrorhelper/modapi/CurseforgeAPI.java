@@ -111,7 +111,7 @@ public class CurseforgeAPI {
                     return e.fileId;
                 }
             }
-            throw new RuntimeException(String.format("Mod '%s' not supported game version '%s'", name, version));
+            throw new RuntimeException("Mod '%s' not supported game version '%s'".formatted(name, version));
         }
     }
 }

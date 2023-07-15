@@ -88,12 +88,12 @@ public class LwjglDownloadCommand extends Command {
                     .concat(version)
                     .concat("/");
             URL jarUrl = new URL(prepareUrl
-                    .concat(String.format("%s-%s.jar", component, version)));
+                    .concat("%s-%s.jar".formatted(component, version)));
             logger.info("Download {} to {}", jarUrl, jarPath);
             download(jarUrl, jarPath);
             for (String arch : archs) {
                 URL nativesUrl = new URL(prepareUrl
-                        .concat(String.format("%s-%s-natives-%s.jar", component, version, arch)));
+                        .concat("%s-%s-natives-%s.jar".formatted(component, version, arch)));
                 var pair = getFromLwjglNativeName(arch);
                 Path nativesPath = natives.resolve(pair.os.name.toLowerCase()).resolve(pair.arch.name.toLowerCase());
                 IOHelper.createParentDirs(nativesPath);

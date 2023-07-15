@@ -54,7 +54,7 @@ public class S3Service {
     }
 
     private static String readableTime(long seconds) {
-        return String.format("%02dm%02ds", (seconds % 3600) / 60, (seconds % 60));
+        return "%02dm%02ds".formatted((seconds % 3600) / 60, (seconds % 60));
     }
 
     public void uploadDir(Path directory, String bucket, String prefix, final boolean forceUpload, UpdatesManager updatesManager) {

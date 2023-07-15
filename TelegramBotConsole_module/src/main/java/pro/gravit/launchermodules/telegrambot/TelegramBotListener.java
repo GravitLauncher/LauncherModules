@@ -96,12 +96,12 @@ public class TelegramBotListener extends TelegramLongPollingBot {
                 String[] cmd = CommonHelper.parseCommand(content.substring(config.prefix.length()));
                 Command command = server.commandHandler.findCommand(cmd[0]);
                 if (command == null) {
-                    throw new CommandException(String.format("Command '%s' not found", cmd[0]));
+                    throw new CommandException("Command '%s' not found".formatted(cmd[0]));
                 }
                 String[] args = new String[cmd.length - 1];
                 System.arraycopy(cmd, 1, args, 0, cmd.length - 1);
                 command.invoke(args);
-                String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception == null ? "" : x.exception)).collect(Collectors.joining("\n"));
+                String fullLog = container.lines.stream().map((x) -> "[%s] %s %s".formatted(x.level, x.message, x.exception == null ? "" : x.exception)).collect(Collectors.joining("\n"));
 
                 message.setText("Команда выполнена успешно. Лог:\n```" + fullLog + "```");
                 send(message);
@@ -109,7 +109,7 @@ public class TelegramBotListener extends TelegramLongPollingBot {
                 message.setText("Произошла ошибка при парсинге команды: ".concat(e.getMessage()));
                 send(message);
             } catch (Exception e) {
-                String fullLog = container.lines.stream().map((x) -> String.format("[%s] %s %s", x.level, x.message, x.exception)).collect(Collectors.joining("\n"));
+                String fullLog = container.lines.stream().map((x) -> "[%s] %s %s".formatted(x.level, x.message, x.exception)).collect(Collectors.joining("\n"));
                 message.setText("Произошла ошибка при выполнении команды: \n```" + e + "```\n" +
                         "```" + fullLog + "```");
                 send(message);
@@ -179,7 +179,7 @@ public class TelegramBotListener extends TelegramLongPollingBot {
             message = event.getMessage().getFormattedMessage().replaceAll("\u001B\\[[;\\d]*m", "");
             Throwable throwable = event.getMessage().getThrowable();
             if (throwable != null) {
-                exception = String.format("%s: %s", throwable.getClass().getName(), throwable.getMessage());
+                exception = "%s: %s".formatted(throwable.getClass().getName(), throwable.getMessage());
             } else {
                 exception = null;
             }
