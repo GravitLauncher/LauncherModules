@@ -23,7 +23,7 @@ public class FindRemotePatcher extends ClassTransformerPatcher {
 
                     @Override
                     public void visitLdcInsn(Object value) {
-                        if (value instanceof String && isHttpString((String) value)) {
+                        if (value instanceof String string && isHttpString(string)) {
                             LogHelper.info("Class %s method %s LDC %s", reader.getClassName(), methodName, value);
                         }
                         super.visitLdcInsn(value);

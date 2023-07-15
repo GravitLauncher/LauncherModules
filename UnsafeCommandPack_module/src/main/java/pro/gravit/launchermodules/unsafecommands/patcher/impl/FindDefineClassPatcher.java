@@ -23,7 +23,7 @@ public class FindDefineClassPatcher extends ClassTransformerPatcher {
 
                     @Override
                     public void visitLdcInsn(Object value) {
-                        if (value instanceof String && ((String) value).contains("defineClass")) {
+                        if (value instanceof String string && string.contains("defineClass")) {
                             // may be it is reflected call!
                             LogHelper.info("Class %s method %s LDC %s", reader.getClassName(), methodName, value);
                         }

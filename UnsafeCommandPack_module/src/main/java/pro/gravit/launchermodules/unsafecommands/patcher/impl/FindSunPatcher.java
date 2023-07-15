@@ -15,7 +15,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
         return new ClassVisitor(Opcodes.ASM7) {
             @Override
             public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
-                if (value instanceof String && isUnsafe((String) value)) {
+                if (value instanceof String string && isUnsafe(string)) {
                     LogHelper.info("Class %s field %s: %s", reader.getClassName(), name, value);
                 }
                 return super.visitField(access, name, descriptor, signature, value);
@@ -34,7 +34,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
 
                     @Override
                     public void visitLdcInsn(Object value) {
-                        if (value instanceof String && isUnsafe((String) value)) {
+                        if (value instanceof String string && isUnsafe(string)) {
                             LogHelper.info("Class %s method %s LDC %s", reader.getClassName(), methodName, value);
                         }
                         super.visitLdcInsn(value);

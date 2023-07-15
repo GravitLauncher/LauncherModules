@@ -33,8 +33,8 @@ public class TelegramBotModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::finish, LaunchServerFullInitEvent.class);
-        if (initContext instanceof LaunchServerInitContext) {
-            init(((LaunchServerInitContext) initContext).server);
+        if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
+            init(launchServerInitContext.server);
         }
     }
 

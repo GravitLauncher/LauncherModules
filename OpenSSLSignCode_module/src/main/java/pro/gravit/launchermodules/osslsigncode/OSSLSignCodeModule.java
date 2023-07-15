@@ -23,8 +23,8 @@ public class OSSLSignCodeModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        if (initContext instanceof LaunchServerInitContext) {
-            initOSSLSignCode(((LaunchServerInitContext) initContext).server);
+        if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
+            initOSSLSignCode(launchServerInitContext.server);
         } else {
             registerEvent(this::registerTask, LaunchServerFullInitEvent.class);
         }

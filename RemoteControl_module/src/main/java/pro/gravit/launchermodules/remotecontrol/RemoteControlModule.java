@@ -69,8 +69,8 @@ public class RemoteControlModule extends LauncherModule {
                 return config1;
             }
         };
-        if (initContext instanceof LaunchServerInitContext) {
-            initRemoteControl(((LaunchServerInitContext) initContext).server);
+        if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
+            initRemoteControl(launchServerInitContext.server);
             return;
         }
         registerEvent(this::finish, LaunchServerFullInitEvent.class);

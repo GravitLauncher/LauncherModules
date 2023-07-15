@@ -15,8 +15,8 @@ public class GenerateCertificateModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        if (initContext instanceof LaunchServerInitContext) {
-            initGenerateCertificate(((LaunchServerInitContext) initContext).server);
+        if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
+            initGenerateCertificate(launchServerInitContext.server);
         } else {
             registerEvent(this::registerCommand, LaunchServerFullInitEvent.class);
         }
