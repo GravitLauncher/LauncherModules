@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     private static final String AUTH_CODE_URL = "https://login.live.com/oauth20_authorize.srf?client_id=%s&response_type=code&redirect_uri=%s&scope=XboxLive.signin offline_access";
     private transient final HttpClient client = HttpClient.newBuilder().build();
@@ -61,7 +63,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 return null;
             }
             var response = getMinecraftTokenByMicrosoftToken(result.access_token);
-            return AuthManager.AuthReport.ofOAuth(response.access_token, result.refresh_token, response.expires_in * 1000, null);
+            return AuthManager.AuthReport.ofOAuth(response.access_token, result.refresh_token, SECONDS.toMillis(response.expires_in), null);
         } catch (IOException e) {
             logger.error("Microsoft refresh failed", e);
             return null;
@@ -84,9 +86,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 var response = getMinecraftTokenByMicrosoftToken(token.access_token);
                 var session = getUserSessionByOAuthAccessToken(response.access_token);
                 if (minecraftAccess) {
-                    return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, response.expires_in * 1000, session);
+                    return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, SECONDS.toMillis(response.expires_in), session);
                 } else {
-                    return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, response.expires_in * 1000, session);
+                    return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, SECONDS.toMillis(response.expires_in), session);
                 }
             } catch (OAuthAccessTokenExpired e) {
                 throw new AuthException("Internal Auth Error: Token invalid");
