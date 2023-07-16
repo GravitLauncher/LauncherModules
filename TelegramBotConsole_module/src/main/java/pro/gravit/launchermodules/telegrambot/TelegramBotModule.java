@@ -86,7 +86,7 @@ public class TelegramBotModule extends LauncherModule {
                                         Пользователь %s входит на сервер %s
                                         *UUID:* %s"""
                                 .formatted(report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(),
-                                        serverName, "%s".formatted(report.uuid)));
+                                        serverName, report.uuid.toString()));
                 return false;
             });
         }
