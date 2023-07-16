@@ -74,10 +74,10 @@ public class DiscordBotModule extends LauncherModule {
         if (config.events.login) {
             server.authHookManager.postHook.registerHook((context, client) -> {
                 DiscordBot.sendEvent(new MessageBuilder()
-                        .append(String.format("Пользователь %s авторизовался в лаунчере", client.username))
+                        .append("Пользователь %s авторизовался в лаунчере".formatted(client.username))
                         .setEmbeds(new EmbedBuilder()
-                                .addField("UUID", String.format("%s", client.uuid), false)
-                                .addField("AuthId", String.format("%s", client.auth.displayName), false)
+                                .addField("UUID", client.uuid.toString(), false)
+                                .addField("AuthId", client.auth.displayName, false)
                                 .build())
                         .build());
                 return false;
@@ -90,9 +90,9 @@ public class DiscordBotModule extends LauncherModule {
                     serverName = "Unknown";
                 }
                 DiscordBot.sendEvent(new MessageBuilder()
-                        .append(String.format("Пользователь %s входит на сервер %s", report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(), serverName))
+                        .append("Пользователь %s входит на сервер %s".formatted(report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(), serverName))
                         .setEmbeds(new EmbedBuilder()
-                                .addField("UUID", String.format("%s", report.uuid), false)
+                                .addField("UUID", report.uuid.toString(), false)
                                 .build())
                         .build());
                 return false;

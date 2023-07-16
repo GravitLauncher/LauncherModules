@@ -40,11 +40,11 @@ public class InstallCommand extends Command {
         if (!(pair.core instanceof FileSystemAuthCoreProvider)) {
             if (pair.core != null) {
                 pair.core.close();
-                server.unregisterObject(String.format("auth.%s.core", pair.name), pair.core);
+                server.unregisterObject("auth.%s.core".formatted(pair.name), pair.core);
             }
             pair.core = new FileSystemAuthCoreProvider();
             pair.core.init(server);
-            server.registerObject(String.format("auth.%s.core", pair.name), pair.core);
+            server.registerObject("auth.%s.core".formatted(pair.name), pair.core);
             logger.info("FileSystemAuthCoreProvider installed");
             changed = true;
         }

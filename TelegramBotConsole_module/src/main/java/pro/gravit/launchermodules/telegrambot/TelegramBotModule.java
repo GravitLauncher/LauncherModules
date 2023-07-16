@@ -67,12 +67,11 @@ public class TelegramBotModule extends LauncherModule {
         if (config.events.login) {
             server.authHookManager.postHook.registerHook((context, client) -> {
                 TelegramBotListener.getInstance()
-                        .sendNotify(String.format("""
+                        .sendNotify("""
                                         Пользователь %s авторизовался в лаунчере.
                                         *UUID:* %s
-                                        *AuthId:* %s""",
-                                client.username, String.format("%s", client.uuid),
-                                String.format("%s", client.auth.displayName)));
+                                        *AuthId:* %s"""
+                                .formatted(client.username, client.uuid.toString(), client.auth.displayName));
                 return false;
             });
         }
@@ -83,10 +82,11 @@ public class TelegramBotModule extends LauncherModule {
                     serverName = "Unknown";
                 }
                 TelegramBotListener.getInstance()
-                        .sendNotify(String.format("Пользователь %s входит на сервер %s\n" +
-                                        "*UUID:* %s", report.playerProfile != null ?
-                                        report.playerProfile.username : report.user.getUsername(), serverName,
-                                String.format("%s", report.uuid)));
+                        .sendNotify("""
+                                        Пользователь %s входит на сервер %s
+                                        *UUID:* %s"""
+                                .formatted(report.playerProfile != null ? report.playerProfile.username : report.user.getUsername(),
+                                        serverName, "%s".formatted(report.uuid)));
                 return false;
             });
         }

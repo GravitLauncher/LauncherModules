@@ -65,7 +65,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 verifyArgs(args, 1);
                 UserEntity entity = getUser(args[0]);
                 if (entity == null)
-                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                    throw new IllegalArgumentException("User %s not found".formatted(args[0]));
                 entity.setPassword(passwordVerifier.encrypt(args[1]));
                 logger.info("Password changed");
             }
@@ -97,7 +97,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 verifyArgs(args, 2);
                 UserEntity entity = getUser(args[0]);
                 if (entity == null)
-                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                    throw new IllegalArgumentException("User %s not found".formatted(args[0]));
                 entity.getPermissions().addPerm(args[1]);
                 logger.info("Permission added");
             }
@@ -108,7 +108,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 verifyArgs(args, 2);
                 UserEntity entity = getUser(args[0]);
                 if (entity == null)
-                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                    throw new IllegalArgumentException("User %s not found".formatted(args[0]));
                 entity.getPermissions().removePerm(args[1]);
                 logger.info("Permission added");
             }
@@ -119,7 +119,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 verifyArgs(args, 2);
                 UserEntity entity = getUser(args[0]);
                 if (entity == null)
-                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                    throw new IllegalArgumentException("User %s not found".formatted(args[0]));
                 boolean isSlim = Boolean.parseBoolean(args[1]);
                 Map<String, String> metadata = isSlim ? Map.of("model", "slim") : null;
                 Texture texture;
@@ -154,7 +154,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 verifyArgs(args, 1);
                 UserEntity entity = getUser(args[0]);
                 if (entity == null)
-                    throw new IllegalArgumentException(String.format("User %s not found", args[0]));
+                    throw new IllegalArgumentException("User %s not found".formatted(args[0]));
                 Texture texture;
                 if (args.length >= 2) {
                     String textureUrl = args[1];

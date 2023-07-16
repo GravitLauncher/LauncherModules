@@ -38,7 +38,7 @@ public class QuiltInstallerCommand extends Command {
         String path = baseUri.getPath();
         //
         String[] mavenIdSplit = mavenId.split(":");
-        String artifact = String.format("%s/%s/%s/%s-%s.jar", mavenIdSplit[0].replaceAll("\\.", "/"),
+        String artifact = "%s/%s/%s/%s-%s.jar".formatted(mavenIdSplit[0].replaceAll("\\.", "/"),
                 mavenIdSplit[1], mavenIdSplit[2], mavenIdSplit[1], mavenIdSplit[2]);
         //
         URL url = new URI(scheme, host, path + artifact, "", "").toURL();

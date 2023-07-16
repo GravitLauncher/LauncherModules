@@ -73,7 +73,7 @@ public class InstallClient {
         var list = api.getMod(slug);
         var mod = api.getModByGameVersion(list, version.toString(), loader);
         if(mod == null) {
-            throw new RuntimeException(String.format("Mod '%s' not supported game version '%s'", slug, version.toString()));
+            throw new RuntimeException("Mod '%s' not supported game version '%s'".formatted(slug, version.toString()));
         }
         ModrinthAPI.ModVersionFileData file = null;
         for(var e : mod.files()) {
@@ -83,7 +83,7 @@ public class InstallClient {
             }
         }
         if(file == null) {
-            throw new RuntimeException(String.format("Mod '%s' not found suitable file", slug));
+            throw new RuntimeException("Mod '%s' not found suitable file".formatted(slug));
         }
         URL url = new URL(file.url());
         Path path = modsDir.resolve(file.filename().replace("+", "-"));

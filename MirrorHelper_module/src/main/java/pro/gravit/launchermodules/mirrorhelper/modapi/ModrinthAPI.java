@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class ModrinthAPI {
     private static final String BASE_URL = "https://api.modrinth.com/v2/";
-    private static final String userAgent = String.format("GravitLauncher/%s MirrorHelper/%s", Version.getVersion().getVersionString(), MirrorHelperModule.version.getVersionString());
+    private static final String userAgent = "GravitLauncher/%s MirrorHelper/%s".formatted(Version.getVersion().getVersionString(), MirrorHelperModule.version.getVersionString());
 
     private String apiKey;
     public final HttpClient client = HttpClient.newBuilder().build();
@@ -38,7 +38,7 @@ public class ModrinthAPI {
         TypeToken<List<ModVersionData>> typeToken = new TypeToken<>(){};
         return (List<ModVersionData>) HttpHelper.send(client, HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(BASE_URL.concat(String.format("project/%s/version", slug))))
+                .uri(URI.create(BASE_URL.concat("project/%s/version".formatted(slug))))
                 .header("User-Agent", userAgent)
                 .build(), new ModrinthErrorHandler<>(typeToken.getType())).getOrThrow();
     }

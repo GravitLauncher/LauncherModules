@@ -129,7 +129,7 @@ public class RemoteControlWebSeverlet implements NettyWebAPIHandler.SimpleSeverl
             message = event.getMessage().getFormattedMessage();
             Throwable throwable = event.getMessage().getThrowable();
             if (throwable != null) {
-                exception = String.format("%s: %s", throwable.getClass().getName(), throwable.getMessage());
+                exception = "%s: %s".formatted(throwable.getClass().getName(), throwable.getMessage());
             } else {
                 exception = null;
             }

@@ -43,8 +43,8 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         String uuid = UUID.randomUUID().toString();
         client.setStaticProperty("microsoftCode", uuid);
         return List.of(new AuthWebViewDetails(
-                String.format(AUTH_CODE_URL, clientId, String.format(redirectUrl, uuid)),
-                String.format(redirectUrl, uuid)
+                AUTH_CODE_URL.formatted(clientId, redirectUrl.formatted(uuid)),
+                redirectUrl.formatted(uuid)
         ));
     }
 
@@ -109,9 +109,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         URI uri;
         try {
             if (clientSecret != null) {
-                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s", clientId, clientSecret, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
+                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s".formatted(clientId, clientSecret, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
             } else {
-                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&code=%s&grant_type=authorization_code&redirect_uri=%s", clientId, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
+                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&code=%s&grant_type=authorization_code&redirect_uri=%s".formatted(clientId, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
             }
         } catch (URISyntaxException e) {
             throw new IOException(e);
@@ -123,9 +123,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
         URI uri;
         try {
             if (clientSecret != null) {
-                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token", clientId, clientSecret, refreshToken));
+                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token".formatted(clientId, clientSecret, refreshToken));
             } else {
-                uri = new URI(String.format("https://login.live.com/oauth20_token.srf?client_id=%s&refresh_token=%s&grant_type=refresh_token", clientId, refreshToken));
+                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&refresh_token=%s&grant_type=refresh_token".formatted(clientId, refreshToken));
             }
         } catch (URISyntaxException e) {
             throw new IOException(e);
@@ -209,7 +209,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
             if (XErr == 2148916238L) {
                 return "The account is a child (under 18) and cannot proceed unless the account is added to a Family by an adult";
             }
-            return String.format("XSTS error: %d", XErr);
+            return "XSTS error: %d".formatted(XErr);
         }
     }
 
@@ -293,7 +293,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
 
     public record MinecraftLoginWithXBoxRequest(String identityToken) {
         public MinecraftLoginWithXBoxRequest(String uhs, String xstsToken) {
-            this(String.format("XBL3.0 x=%s;%s", uhs, xstsToken));
+            this("XBL3.0 x=%s;%s".formatted(uhs, xstsToken));
         }
     }
 

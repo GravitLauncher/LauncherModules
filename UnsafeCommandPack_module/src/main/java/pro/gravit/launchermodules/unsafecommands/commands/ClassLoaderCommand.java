@@ -39,7 +39,7 @@ public class ClassLoaderCommand extends Command {
             case "addURL": {
                 UnsafeURLClassLoader cl = UnsafeURLClassLoader.classLoaderMap.get(name);
                 if (cl == null)
-                    throw new NullPointerException(String.format("UnsafeURLClassLoader %s not found", name));
+                    throw new NullPointerException("UnsafeURLClassLoader %s not found".formatted(name));
                 for (URL u : getURL(args[2])) {
                     cl.addURL(u);
                 }
@@ -47,7 +47,7 @@ public class ClassLoaderCommand extends Command {
             case "manualDefine": {
                 UnsafeURLClassLoader cl = UnsafeURLClassLoader.classLoaderMap.get(name);
                 if (cl == null)
-                    throw new NullPointerException(String.format("UnsafeURLClassLoader %s not found", name));
+                    throw new NullPointerException("UnsafeURLClassLoader %s not found".formatted(name));
                 byte[] clazzBytes = IOHelper.read(Paths.get(args[2]));
                 cl.rawDefineClass(args.length > 3 ? args[3] : null, clazzBytes, args.length > 4 ? Integer.parseInt(args[4]) : 0, args.length > 5 ? Integer.parseInt(args[5]) : clazzBytes.length);
             }

@@ -43,7 +43,7 @@ public class PatchAuthlibCommand extends Command {
         if (Files.isDirectory(dir)) {
             Optional<Path> authlibDir = Files.list(dir.resolve("libraries/com/mojang/authlib")).findFirst();
             if (authlibDir.isEmpty()) {
-                throw new FileNotFoundException(String.format("Directory %s empty or not found", dir.resolve("com/mojang/authlib")));
+                throw new FileNotFoundException("Directory %s empty or not found".formatted(dir.resolve("com/mojang/authlib")));
             }
             originalAuthlib = Files.list(authlibDir.get()).findFirst().orElseThrow();
         } else {
