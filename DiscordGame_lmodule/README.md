@@ -13,8 +13,8 @@
 4. Добавить в папку **/LaunchServer/launcher-pack** следующие файлы из архива **[Discord Game SDK 2.5.6 ZIP]**:
 - Файл `lib/x86/discord_game_sdk.dll` в `native/windows/x86/discord_game_sdk.dll`
 - Файл `lib/x86_64/discord_game_sdk.dll` в `native/windows/amd64/discord_game_sdk.dll`
-- Файл `lib/x86_64/discord_game_sdk.so` в `native/linux/amd64/discord_game_sdk.so`
-- Файл `lib/x86_64/discord_game_sdk.dylib` в `native/macos/amd64/discord_game_sdk.dylib`
+- Файл `lib/x86_64/discord_game_sdk.so` в `native/linux/amd64/libdiscord_game_sdk.so`
+- Файл `lib/x86_64/discord_game_sdk.dylib` в `native/macos/amd64/libdiscord_game_sdk.dylib`
 
 ---
 
