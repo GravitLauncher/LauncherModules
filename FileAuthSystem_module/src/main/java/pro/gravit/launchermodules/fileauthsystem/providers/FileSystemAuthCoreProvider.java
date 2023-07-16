@@ -41,12 +41,14 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.concurrent.TimeUnit.HOURS;
+
 public class FileSystemAuthCoreProvider extends AuthCoreProvider implements AuthSupportRegistration, AuthSupportExit {
     private final transient Logger logger = LogManager.getLogger();
     public String databaseDir;
     public boolean autoSave = true;
     public boolean autoReg = false;
-    public long oauthTokenExpire = 60 * 60 * 1000;
+    public long oauthTokenExpire = HOURS.toMillis(1);
     public PasswordVerifier passwordVerifier;
     public String skinUrl;
     public String cloakUrl;
