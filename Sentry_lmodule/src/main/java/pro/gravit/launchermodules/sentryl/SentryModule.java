@@ -53,7 +53,7 @@ public class SentryModule extends LauncherModule {
     }
 
     public void onClientInit(ClientProcessInitPhase event) {
-        initSentry(event.clientInstance);
+        initSentry(null);
     }
 
     public void initSentry(LauncherEngine engine) {
@@ -64,7 +64,7 @@ public class SentryModule extends LauncherModule {
         Sentry.init(options -> {
             options.addEventProcessor(new SentryEventProcessor());
             options.setDsn(config.dsn);
-            options.setEnvironment(engine.clientInstance ? "CLIENT" : "LAUNCHER");
+            options.setEnvironment(engine == null ? "CLIENT" : "LAUNCHER");
             options.setRelease(Version.getVersion().getVersionString().concat(".").concat(String.valueOf(Launcher.getConfig().buildNumber)));
             if(proguardUuid != null) {
                 options.setProguardUuid(proguardUuid);

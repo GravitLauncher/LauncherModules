@@ -2,7 +2,7 @@ package pro.gravit.launcher.client.api;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
-import pro.gravit.launcher.client.ClientLauncherProcess;
+import pro.gravit.launcher.client.ClientParams;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchermodules.discordgame.ClientModule;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;
@@ -184,7 +184,7 @@ public class DiscordActivityService {
         setScope(ClientModule.authorizedScopeConfig);
     }
 
-    public void updateClientStage(ClientLauncherProcess.ClientParams params) {
+    public void updateClientStage(ClientParams params) {
         setParam("profileVersion", params.profile.getVersion().toString());
         setParam("profileName", params.profile.getTitle());
         setParam("profileUUID", params.profile.getUUID().toString());

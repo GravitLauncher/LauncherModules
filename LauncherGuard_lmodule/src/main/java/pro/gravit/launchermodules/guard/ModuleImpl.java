@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.guard;
 
 import pro.gravit.launcher.ClientLauncherWrapper;
 import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.client.ClientWrapperModule;
+import pro.gravit.launcher.ClientWrapperModule;
 import pro.gravit.launcher.client.DirBridge;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
