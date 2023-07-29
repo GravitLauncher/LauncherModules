@@ -1,8 +1,8 @@
 def mainClassName = "pro.gravit.launchermodules.discordgame.ClientModule"
 def configClassName = "pro.gravit.launchermodules.discordgame.Config"
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 repositories {
     maven { url 'https://jitpack.io' }
@@ -16,5 +16,6 @@ dependencies {
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
             "Module-Config-Class": configClassName,
-            "Module-Config-Name": "DiscordGame")
+            "Module-Config-Name": "DiscordGame",
+            "Required-Modern-Java": "true")
 }
