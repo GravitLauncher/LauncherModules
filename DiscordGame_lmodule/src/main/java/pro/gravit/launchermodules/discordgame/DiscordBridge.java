@@ -4,6 +4,7 @@ import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
 import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.activity.Activity;
+import de.jcm.discordgamesdk.impl.channel.DiscordChannel;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.client.DirBridge;
 import pro.gravit.launcher.client.api.DiscordActivityService;
@@ -23,30 +24,6 @@ public class DiscordBridge {
     private static Activity activity;
 
     private static void initCore() throws IOException {
-        Path baseDir = DirBridge.getGuardDir(JVMHelper.ARCH_TYPE, JVMHelper.OS_TYPE);
-
-        String osFolder = "";
-        switch (JVMHelper.OS_TYPE) {
-            case MUSTDIE:
-                osFolder = "windows";
-                break;
-            case LINUX:
-                osFolder = "linux";
-                break;
-            case MACOSX:
-                osFolder = "macos";
-                break;
-        }
-
-        String arch;
-        if (JVMHelper.ARCH_TYPE == JVMHelper.ARCH.X86_64) {
-            arch = "amd64";
-        } else {
-            arch = JVMHelper.ARCH_TYPE.name;
-        }
-        DiscordBridge.loadNative(baseDir, "discord_game_sdk", osFolder, arch);
-        Core.initDiscordNative(DiscordBridge.loadNative(baseDir, "discord_game_sdk_jni", osFolder, arch));
-
     }
 
     public static void init(long appId) throws IOException {
