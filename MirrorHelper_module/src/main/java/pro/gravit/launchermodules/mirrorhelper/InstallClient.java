@@ -14,6 +14,7 @@ import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.hash.MakeProfileCommand;
+import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -45,8 +46,9 @@ public class InstallClient {
 
     private final List<String> mods;
     private final VersionType versionType;
+    private final MirrorWorkspace mirrorWorkspace;
 
-    public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<String> mods, VersionType versionType) {
+    public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<String> mods, VersionType versionType, MirrorWorkspace mirrorWorkspace) {
         this.launchServer = launchServer;
         this.config = config;
         this.workdir = workdir;
@@ -54,6 +56,7 @@ public class InstallClient {
         this.version = version;
         this.mods = mods;
         this.versionType = versionType;
+        this.mirrorWorkspace = mirrorWorkspace;
     }
 
     public static void installMod(CurseforgeAPI api, Path modsDir, long modId, ClientProfile.Version version) throws Exception {
@@ -165,7 +168,7 @@ public class InstallClient {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3.jar");
             } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) == 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.jar");
-            } else if(version.compareTo(ClientProfileVersions.MINECRAFT_1_20) < 0) {
+            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20) < 0) {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.1.jar");
             } else {
                 pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib4.jar");
@@ -181,10 +184,14 @@ public class InstallClient {
         {
             if (versionType == VersionType.FABRIC) {
                 FabricInstallerCommand fabricInstallerCommand = new FabricInstallerCommand(launchServer);
-                fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
+                if(mirrorWorkspace == null || mirrorWorkspace.fabricLoaderVersion() == null) {
+                    fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
+                } else {
+                    fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString(), mirrorWorkspace.fabricLoaderVersion());
+                }
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Fabric installed");
-            } else if(versionType == VersionType.QUILT) {
+            } else if (versionType == VersionType.QUILT) {
                 QuiltInstallerCommand quiltInstallerCommand = new QuiltInstallerCommand(launchServer);
                 quiltInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
@@ -271,14 +278,14 @@ public class InstallClient {
                 try {
                     try {
                         long id = Long.parseLong(modId);
-                        if(curseforgeApi == null) {
+                        if (curseforgeApi == null) {
                             curseforgeApi = new CurseforgeAPI(config.curseforgeApiKey);
                         }
                         installMod(curseforgeApi, modsDir, id, version);
                         continue;
                     } catch (NumberFormatException ignored) {
                     }
-                    if(modrinthAPI == null) {
+                    if (modrinthAPI == null) {
                         modrinthAPI = new ModrinthAPI();
                     }
                     installMod(modrinthAPI, modsDir, modId, loaderName, version);
@@ -288,17 +295,45 @@ public class InstallClient {
             }
             logger.info("Mods installed");
         }
-        {
-            DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);
-            deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
-            logger.info("deduplibraries completed");
+        if (mirrorWorkspace != null) {
+            logger.info("Install multiMods");
+            for (var m : mirrorWorkspace.multiMods().entrySet()) {
+                var k = m.getKey();
+                var v = m.getValue();
+                if (v.minVersion() != null) {
+                    ClientProfile.Version min = ClientProfile.Version.of(v.minVersion());
+                    if (version.compareTo(min) < 0) {
+                        continue;
+                    }
+                }
+                if (v.maxVersion() != null) {
+                    ClientProfile.Version max = ClientProfile.Version.of(v.maxVersion());
+                    if (version.compareTo(max) > 0) {
+                        continue;
+                    }
+                    Path file = workdir.resolve("multimods").resolve(k.concat(".jar"));
+                    if (Files.notExists(file)) {
+                        logger.warn("File {} not exist", file);
+                        continue;
+                    }
+                    Path targetMod = clientPath.resolve("mods").resolve(file.getFileName());
+                    logger.info("Copy {} to {}", file, targetMod);
+                    IOHelper.copy(file, targetMod);
+                }
+                logger.info("MultiMods installed");
+            }
+            {
+                DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);
+                deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
+                logger.info("deduplibraries completed");
+            }
+            {
+                MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
+                makeProfileCommand.invoke(name, version.toString(), name);
+                logger.info("makeprofile completed");
+            }
+            logger.info("Completed");
         }
-        {
-            MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
-            makeProfileCommand.invoke(name, version.toString(), name);
-            logger.info("makeprofile completed");
-        }
-        logger.info("Completed");
     }
 
     private void copyDir(Path source, Path target) throws IOException {

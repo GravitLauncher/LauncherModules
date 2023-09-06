@@ -47,7 +47,7 @@ public class FabricInstallerCommand extends Command {
 
     @Override
     public String getArgsDescription() {
-        return "[minecraft version] [vanilla dir] [fabric installer file]";
+        return "[minecraft version] [vanilla dir] [fabric installer file] (loader version)";
     }
 
     @Override
@@ -73,6 +73,10 @@ public class FabricInstallerCommand extends Command {
         processArgs.add(vanillaDir.toString());
         processArgs.add("-mcversion");
         processArgs.add(version);
+        if(args.length > 3) {
+            processArgs.add("-loader");
+            processArgs.add(args[3]);
+        }
         logger.debug("Launch {}", String.join(" ", processArgs));
         Process process = new ProcessBuilder(processArgs).inheritIO().start();
         process.waitFor();

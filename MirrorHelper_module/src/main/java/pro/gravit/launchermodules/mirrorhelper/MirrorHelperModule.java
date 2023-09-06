@@ -2,6 +2,7 @@ package pro.gravit.launchermodules.mirrorhelper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.config.JsonConfigurable;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
@@ -14,9 +15,12 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.command.BaseCommandCategory;
 import pro.gravit.utils.command.CommandCategory;
 import pro.gravit.utils.command.CommandHandler;
+import pro.gravit.utils.helper.IOHelper;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MirrorHelperModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
@@ -30,6 +34,20 @@ public class MirrorHelperModule extends LauncherModule {
 
     public Path getWorkspaceDir() {
         return modulesConfigManager.getModuleConfigDir(moduleInfo.name).resolve("workspace");
+    }
+
+    public MirrorWorkspace getWorkspace() {
+        if(config.workspace == null) {
+            if(config.workspaceFile == null) {
+                return null;
+            }
+            try(Reader reader = IOHelper.newReader(Paths.get(config.workspaceFile))) {
+                config.workspace = Launcher.gsonManager.gson.fromJson(reader, MirrorWorkspace.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return config.workspace;
     }
 
 
@@ -69,6 +87,7 @@ public class MirrorHelperModule extends LauncherModule {
         commands.registerCommand("launchInstaller", new LaunchInstallerCommand(server));
         commands.registerCommand("lwjgldownload", new LwjglDownloadCommand(server));
         commands.registerCommand("patchauthlib", new PatchAuthlibCommand(server));
+        commands.registerCommand("applyworkspace", new ApplyWorkspaceCommand(server, this));
         CommandHandler.Category category = new CommandHandler.Category(commands, "mirror");
         server.commandHandler.registerCategory(category);
     }

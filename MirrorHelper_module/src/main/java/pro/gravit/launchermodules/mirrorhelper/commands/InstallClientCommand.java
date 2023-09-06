@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.mirrorhelper.commands;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
+import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 
@@ -35,10 +36,26 @@ public class InstallClientCommand extends Command {
         ClientProfile.Version version = parseClientVersion(args[1]);
         InstallClient.VersionType versionType = InstallClient.VersionType.valueOf(args[2]);
         List<String> mods = new ArrayList<>();
+        MirrorWorkspace mirrorWorkspace = module.getWorkspace();
+        if(mirrorWorkspace != null) {
+            switch (versionType) {
+                case VANILLA -> {
+                }
+                case FABRIC -> {
+                    mods.addAll(module.getWorkspace().fabricMods());
+                }
+                case FORGE -> {
+                    mods.addAll(module.getWorkspace().forgeMods());
+                }
+                case QUILT -> {
+                    mods.addAll(module.getWorkspace().quiltMods());
+                }
+            }
+        }
         if (args.length > 3) {
             mods = Arrays.stream(args[3].split(",")).toList();
         }
-        InstallClient run = new InstallClient(server, module.config, module.getWorkspaceDir(), name, version, mods, versionType);
+        InstallClient run = new InstallClient(server, module.config, module.getWorkspaceDir(), name, version, mods, versionType, mirrorWorkspace);
         run.run();
     }
 }
