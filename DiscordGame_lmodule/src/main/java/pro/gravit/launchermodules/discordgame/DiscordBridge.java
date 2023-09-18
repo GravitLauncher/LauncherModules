@@ -45,7 +45,7 @@ public class DiscordBridge {
             arch = JVMHelper.ARCH_TYPE.name;
         }
         String pathToSdkLib = DiscordBridge.loadNative(baseDir, "discord_game_sdk", osFolder, arch);
-        DiscordBridge.loadNative(baseDir, "discord_game_sdk_jni", osFolder, arch)
+        DiscordBridge.loadNative(baseDir, "discord_game_sdk_jni", osFolder, arch);
         Core.initDiscordNative(pathToSdkLib);
 
     }
