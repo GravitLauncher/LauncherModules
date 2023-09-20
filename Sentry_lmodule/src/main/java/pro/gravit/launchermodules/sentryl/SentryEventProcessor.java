@@ -22,7 +22,7 @@ public class SentryEventProcessor implements EventProcessor {
             event.getContexts().put("Memory info", OshiUtils.makeMemoryProperties());
         }
         long uptime = JVMHelper.RUNTIME_MXBEAN.getUptime();
-        event.getContexts().put("Uptime", "%ds %dms".formatted(uptime / 1000, uptime % 1000));
+        event.getContexts().put("Uptime", String.format("%ds %dms", uptime / 1000, uptime % 1000));
         return event;
     }
 }
