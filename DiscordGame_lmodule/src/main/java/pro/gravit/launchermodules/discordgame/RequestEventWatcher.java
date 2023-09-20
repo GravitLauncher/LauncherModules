@@ -15,12 +15,10 @@ public class RequestEventWatcher implements RequestService.EventHandler {
 
     @Override
     public <T extends WebSocketEvent> boolean eventHandle(T event) {
-        if (event instanceof AuthRequestEvent && ((AuthRequestEvent) event).playerProfile != null) {
-            AuthRequestEvent authrequestevent = (AuthRequestEvent) event;
+        if (event instanceof AuthRequestEvent authrequestevent && ((AuthRequestEvent) event).playerProfile != null) {
             DiscordBridge.activityService.updateAuthorizedStage(authrequestevent.playerProfile);
         }
-        if (event instanceof ExitRequestEvent) {
-            ExitRequestEvent exitEvent = (ExitRequestEvent) event;
+        if (event instanceof ExitRequestEvent exitEvent) {
             if (exitEvent.reason == ExitRequestEvent.ExitReason.NO_EXIT) {
                 return false;
             }

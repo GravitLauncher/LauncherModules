@@ -1,7 +1,7 @@
 def mainClassName = "pro.gravit.launchermodules.discordbot.DiscordBotModule"
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 dependencies {
     implementation("net.dv8tion:JDA:5.0.0-alpha.9")
