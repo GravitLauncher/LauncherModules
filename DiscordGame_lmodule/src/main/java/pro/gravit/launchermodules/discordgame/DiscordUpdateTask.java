@@ -10,6 +10,7 @@ public class DiscordUpdateTask implements Runnable {
         this.core = core;
     }
 
+    @SuppressWarnings("BusyWait")
     @Override
     public void run() {
         while (!Thread.interrupted()) {

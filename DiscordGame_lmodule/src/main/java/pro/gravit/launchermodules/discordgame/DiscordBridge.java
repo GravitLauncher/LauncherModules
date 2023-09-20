@@ -4,16 +4,13 @@ import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
 import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.activity.Activity;
-import de.jcm.discordgamesdk.impl.channel.DiscordChannel;
 import pro.gravit.launcher.LauncherEngine;
-import pro.gravit.launcher.client.DirBridge;
 import pro.gravit.launcher.client.api.DiscordActivityService;
 import pro.gravit.launchermodules.discordgame.event.DiscordInitEvent;
 import pro.gravit.utils.helper.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
 
 public class DiscordBridge {
     public static final DiscordActivityService activityService = new DiscordActivityService();
@@ -80,17 +77,6 @@ public class DiscordBridge {
                     LogHelper.error(e);
                 }
                 LogHelper.warning("DiscordGame core object not closed correctly. Discord is down?");
-            }
-        }
-
-        if (params != null) {
-            try {
-                params.close();
-            } catch (Throwable e) {
-                if (LogHelper.isDebugEnabled()) {
-                    LogHelper.error(e);
-                }
-                LogHelper.warning("DiscordGame params object not closed correctly. Discord is down?");
             }
         }
 

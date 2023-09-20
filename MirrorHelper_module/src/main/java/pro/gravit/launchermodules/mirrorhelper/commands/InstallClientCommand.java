@@ -41,15 +41,9 @@ public class InstallClientCommand extends Command {
             switch (versionType) {
                 case VANILLA -> {
                 }
-                case FABRIC -> {
-                    mods.addAll(module.getWorkspace().fabricMods());
-                }
-                case FORGE -> {
-                    mods.addAll(module.getWorkspace().forgeMods());
-                }
-                case QUILT -> {
-                    mods.addAll(module.getWorkspace().quiltMods());
-                }
+                case FABRIC -> mods.addAll(module.getWorkspace().fabricMods());
+                case FORGE -> mods.addAll(module.getWorkspace().forgeMods());
+                case QUILT -> mods.addAll(module.getWorkspace().quiltMods());
             }
         }
         if (args.length > 3) {

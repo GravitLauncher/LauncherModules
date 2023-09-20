@@ -13,18 +13,14 @@ public class SentryEventHandler implements RequestService.EventHandler {
             if(authEvent.playerProfile == null) {
                 return false;
             }
-            SentryModule.currentHub.configureScope(scope -> {
-                scope.setUser(SentryModule.makeSentryUser(authEvent.playerProfile));
-            });
+            SentryModule.currentHub.configureScope(scope -> scope.setUser(SentryModule.makeSentryUser(authEvent.playerProfile)));
         }
         if(event instanceof ExitRequestEvent) {
             ExitRequestEvent exitEvent = (ExitRequestEvent) event;
             if(exitEvent.reason == ExitRequestEvent.ExitReason.NO_EXIT) {
                 return false;
             }
-            SentryModule.currentHub.configureScope(scope -> {
-                scope.setUser(null);
-            });
+            SentryModule.currentHub.configureScope(scope -> scope.setUser(null));
         }
         return false;
     }
