@@ -116,7 +116,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
                     .findFirst()
                     .map(MojangProfileByTokenResponse.MojangProfileByTokenTextureResponse::toTexture)
                     .orElse(null);
-            user.accessToken = accessToken;
             return new MojangUserSession(user, accessToken);
         } catch (IOException | URISyntaxException | InterruptedException e) {
 
@@ -147,7 +146,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
             MojangUser mojangUser = new MojangUser();
             mojangUser.username = result.selectedProfile.username;
             mojangUser.uuid = getUUIDFromMojangHash(result.selectedProfile.id);
-            mojangUser.accessToken = result.accessToken;
             MojangUser userWithProfile = getUserByHash(result.selectedProfile.id);
             if (userWithProfile != null) {
                 mojangUser.username = userWithProfile.username;
@@ -168,17 +166,15 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     }
 
     @Override
-    protected boolean updateServerID(User user, String serverID) {
-        MojangUser mojangUser = (MojangUser) user;
-        mojangUser.serverId = serverID;
-        return false;
-    }
-
-    @Override
-    public boolean joinServer(Client client, String username, String accessToken, String serverID) {
+    public boolean joinServer(Client client, String username, UUID uuid, String accessToken, String serverID) {
         MojangUser user = (MojangUser) client.getUser();
         if (user == null) return false;
-        MojangJoinServerRequest request = new MojangJoinServerRequest(accessToken, user.uuid, serverID);
+        MojangJoinServerRequest request;
+        if(uuid == null) { // Before 1.20.2
+            request = new MojangJoinServerRequest(accessToken, user.uuid, serverID);
+        } else {
+            request = new MojangJoinServerRequest(accessToken, uuid, serverID);
+        }
         try {
             mojangRequest("POST", "https://sessionserver.mojang.com/session/minecraft/join", null, request, Void.class);
             return true;
@@ -386,6 +382,11 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         }
 
         @Override
+        public String getMinecraftAccessToken() {
+            return accessToken;
+        }
+
+        @Override
         public long getExpireIn() {
             return 0;
         }
@@ -407,19 +408,15 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
     public static class MojangUser implements User, UserSupportTextures {
         private String username;
         private UUID uuid;
-        private String accessToken;
-        private String serverId;
         private Texture skin;
         private Texture cloak;
 
         public MojangUser() {
         }
 
-        public MojangUser(String username, UUID uuid, String accessToken, String serverId, Texture skin, Texture cloak) {
+        public MojangUser(String username, UUID uuid, Texture skin, Texture cloak) {
             this.username = username;
             this.uuid = uuid;
-            this.accessToken = accessToken;
-            this.serverId = serverId;
             this.skin = skin;
             this.cloak = cloak;
         }
@@ -432,16 +429,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
         @Override
         public UUID getUUID() {
             return uuid;
-        }
-
-        @Override
-        public String getServerId() {
-            return serverId;
-        }
-
-        @Override
-        public String getAccessToken() {
-            return accessToken;
         }
 
         @Override
@@ -464,8 +451,6 @@ public class MojangAuthCoreProvider extends AuthCoreProvider {
             return "MojangUser{" +
                     "username='" + username + '\'' +
                     ", uuid=" + uuid +
-                    ", accessToken='" + (accessToken == null ? "null" : "XXXXXX") + '\'' +
-                    ", serverId='" + serverId + '\'' +
                     ", skin=" + skin +
                     ", cloak=" + cloak +
                     '}';

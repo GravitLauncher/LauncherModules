@@ -23,6 +23,7 @@ import pro.gravit.launchserver.auth.password.DigestPasswordVerifier;
 import pro.gravit.launchserver.auth.password.PasswordVerifier;
 import pro.gravit.launchserver.auth.texture.RequestTextureProvider;
 import pro.gravit.launchserver.manangers.AuthManager;
+import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;
 import pro.gravit.utils.command.Command;
 import pro.gravit.utils.command.SubCommand;
@@ -187,6 +188,38 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
+    public User checkServer(Client client, String username, String serverID) throws IOException {
+        UserSessionEntity session = getSessionByServerId(serverID);
+        if(session == null) {
+            return null;
+        }
+        if(session.entity.username.equals(username)) {
+            return session.entity;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean joinServer(Client client, String username, UUID uuid, String accessToken, String serverID) throws IOException {
+        UserSessionEntity session = getSessionByAccessToken(accessToken);
+        if(session == null) {
+            return false;
+        }
+        if(uuid != null) {
+            if(session.uuid.equals(uuid)) {
+                session.serverId = serverID;
+                return true;
+            }
+        } else {
+            if(session.entity.username.equals(username)) {
+                session.serverId = serverID;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public User getUserByUsername(String username) {
         return getUser(username);
     }
@@ -251,9 +284,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             session.update(oauthTokenExpire);
         }
         if (minecraftAccess) {
-            String minecraftAccessToken = SecurityHelper.randomStringToken();
-            user.accessToken = minecraftAccessToken;
-            return AuthManager.AuthReport.ofOAuthWithMinecraft(minecraftAccessToken, session.accessToken, session.refreshToken, oauthTokenExpire, session);
+            return AuthManager.AuthReport.ofOAuthWithMinecraft(session.minecraftAccessToken, session.accessToken, session.refreshToken, oauthTokenExpire, session);
         }
         return AuthManager.AuthReport.ofOAuth(session.accessToken, session.refreshToken, oauthTokenExpire, session);
     }
@@ -278,14 +309,6 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             }
         }
         load();
-    }
-
-    @Override
-    protected boolean updateServerID(User user, String serverID) {
-        UserEntity entity = (UserEntity) user;
-        if (entity == null) return false;
-        entity.serverId = serverID;
-        return true;
     }
 
     @Override
@@ -323,6 +346,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     public void load(Path path) {
+        boolean saveRequired = false;
         {
             Path databasePath = path.resolve("Database.json");
             if (!Files.exists(databasePath)) return;
@@ -348,7 +372,14 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 if (sessionEntity.userEntityUUID != null) {
                     sessionEntity.entity = getUser(sessionEntity.userEntityUUID);
                 }
+                if(sessionEntity.minecraftAccessToken == null) {
+                    sessionEntity.minecraftAccessToken = SecurityHelper.randomStringToken();
+                    saveRequired = true;
+                }
             }
+        }
+        if(saveRequired) {
+            logger.warn("FileAuthSystem: converted old database {}", path.toAbsolutePath().toString());
         }
     }
 
@@ -391,6 +422,10 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
     private UserSessionEntity getSessionByAccessToken(String accessToken) {
         return sessions.stream().filter(e -> e.accessToken != null && e.accessToken.equals(accessToken)).findFirst().orElse(null);
+    }
+
+    private UserSessionEntity getSessionByServerId(String serverId) {
+        return sessions.stream().filter(e -> e.serverId != null && e.serverId.equals(serverId)).findFirst().orElse(null);
     }
 
     private UserSessionEntity getSessionByRefreshToken(String refreshToken) {
@@ -436,8 +471,6 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         public String username;
         public UUID uuid;
         public ClientPermissions permissions;
-        public String serverId;
-        public String accessToken;
         public Texture skin;
         public Texture cloak;
         private String password;
@@ -474,16 +507,6 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         }
 
         @Override
-        public String getServerId() {
-            return serverId;
-        }
-
-        @Override
-        public String getAccessToken() {
-            return accessToken;
-        }
-
-        @Override
         public ClientPermissions getPermissions() {
             return permissions;
         }
@@ -514,6 +537,8 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         public UUID userEntityUUID;
         public String accessToken;
         public String refreshToken;
+        public String serverId;
+        public String minecraftAccessToken;
         public long expireMillis;
 
         public UserSessionEntity(UserEntity entity) {
@@ -521,6 +546,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             this.entity = entity;
             this.accessToken = SecurityHelper.randomStringToken();
             this.refreshToken = SecurityHelper.randomStringToken();
+            this.minecraftAccessToken = SecurityHelper.randomStringToken();
             this.expireMillis = 0;
             this.userEntityUUID = entity.uuid;
         }
@@ -550,6 +576,11 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         @Override
         public User getUser() {
             return entity;
+        }
+
+        @Override
+        public String getMinecraftAccessToken() {
+            return minecraftAccessToken;
         }
 
         @Override
