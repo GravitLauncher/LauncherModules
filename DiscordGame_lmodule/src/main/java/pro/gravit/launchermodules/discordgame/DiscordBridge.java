@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.discordgame;
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
 import de.jcm.discordgamesdk.GameSDKException;
+import de.jcm.discordgamesdk.LogLevel;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.LauncherEngine;
 import pro.gravit.launcher.client.api.DiscordActivityService;
@@ -37,6 +38,25 @@ public class DiscordBridge {
         // here we would like to deal with
         try {
             core = new Core(params);
+            core.setLogHook(getLogLevel(), (level, s) -> {
+                switch (level) {
+                    case ERROR -> {
+                        LogHelper.error(s);
+                    }
+                    case WARN -> {
+                        LogHelper.warning(s);
+                    }
+                    case INFO -> {
+                        LogHelper.info(s);
+                    }
+                    case DEBUG -> {
+                        LogHelper.debug(s);
+                    }
+                    case VERBOSE -> {
+                        LogHelper.dev(s);
+                    }
+                }
+            });
             {
                 // Create the Activity
                 activity = new Activity();
@@ -54,6 +74,16 @@ public class DiscordBridge {
         LogHelper.debug("Initialized Discord Game. Application ID %d", appId);
         thread = CommonHelper.newThread("DiscordGameBridge callbacks", true, new DiscordUpdateTask(core));
         thread.start();
+    }
+
+    private static LogLevel getLogLevel() {
+        if(LogHelper.isDevEnabled()) {
+            return LogLevel.VERBOSE;
+        }
+        if(LogHelper.isDebugEnabled()) {
+            return LogLevel.INFO;
+        }
+        return LogLevel.ERROR;
     }
 
     public static Core getCore() {

@@ -21,13 +21,13 @@ public class Config {
 
         config.scopes.put("login",
                 new ScopeConfig("Лучший проект Minecraft", "Авторизуется",
-                        "large", "small", "Everything", "Everything").toMap());
+                        "large", "small", "Everything", "Everything", false, "Site", "https://example.com", false, "Forum", "https://example.com").toMap());
         config.scopes.put("authorized",
                 new ScopeConfig("Лучший проект Minecraft", "Выбирает сервер",
-                        "large", "small", "Everything", "Everything").toMap());
+                        "large", "small", "Everything", "Everything", false, "Site", "https://example.com", false, "Forum", "https://example.com").toMap());
         config.scopes.put("client",
                 new ScopeConfig("Лучший проект Minecraft", "Играет на %profileName%",
-                        "large", "small", "Everything", "Everything").toMap());
+                        "large", "small", "Everything", "Everything", false, "Site", "https://example.com", false, "Forum", "https://example.com").toMap());
 
         return config;
     }

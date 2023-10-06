@@ -2,6 +2,8 @@ package pro.gravit.launcher.client.api;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
+import de.jcm.discordgamesdk.activity.ActivityButton;
+import de.jcm.discordgamesdk.activity.ActivityButtonsMode;
 import pro.gravit.launcher.client.ClientParams;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchermodules.discordgame.ClientModule;
@@ -12,7 +14,9 @@ import pro.gravit.utils.helper.JVMHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +31,7 @@ public class DiscordActivityService {
     private String partyId;
     private int partySize;
     private int partyMaxSize;
+    private final List<ActivityButton> buttons = new ArrayList<>(2);
 
     public DiscordActivityService() {
         setParam("launcherVersion", Version.getVersion().getVersionString());
@@ -60,6 +65,16 @@ public class DiscordActivityService {
         if (partyMaxSize != 0) {
             activity.party().size().setCurrentSize(partySize);
             activity.party().size().setMaxSize(partyMaxSize);
+        }
+        if(!buttons.isEmpty()) {
+            activity.setActivityButtonsMode(ActivityButtonsMode.BUTTONS);
+            List<ActivityButton> oldButtons = new ArrayList<>(activity.getButtons());
+            for(var e : oldButtons) {
+                activity.removeButton(e);
+            }
+            for(var e : buttons) {
+                activity.addButton(e);
+            }
         }
     }
 
@@ -152,6 +167,14 @@ public class DiscordActivityService {
         }
     }
 
+    public void addButton(ActivityButton button) {
+        buttons.add(button);
+    }
+
+    public void clearButtons() {
+        buttons.clear();
+    }
+
     public String getParam(String key) {
         return params.get(key);
     }
@@ -206,6 +229,13 @@ public class DiscordActivityService {
         setLargeText(scopeConfig.getLargeImageText());
         setSmallKey(scopeConfig.getSmallImageKey());
         setSmallText(scopeConfig.getSmallImageText());
+        clearButtons();
+        if(scopeConfig.isFirstButtonEnable()) {
+            addButton(new ActivityButton(scopeConfig.getFirstButtonName(), scopeConfig.getFirstButtonUrl()));
+        }
+        if(scopeConfig.isSecondButtonEnable()) {
+            addButton(new ActivityButton(scopeConfig.getSecondButtonName(), scopeConfig.getSecondButtonUrl()));
+        }
         updateActivity();
     }
 
