@@ -14,7 +14,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
 
     }
 
-    public record BuildCommand(String workdir, List<String> cmd) {
+    public record BuildCommand(String workdir, List<String> cmd, boolean ignoreErrorCode, Map<String, String> env) {
 
     }
 }

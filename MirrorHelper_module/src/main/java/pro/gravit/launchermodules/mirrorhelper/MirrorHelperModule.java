@@ -33,7 +33,11 @@ public class MirrorHelperModule extends LauncherModule {
     }
 
     public Path getWorkspaceDir() {
-        return modulesConfigManager.getModuleConfigDir(moduleInfo.name).resolve("workspace");
+        return getConfigDir().resolve("workspace");
+    }
+
+    public Path getConfigDir() {
+        return modulesConfigManager.getModuleConfigDir(moduleInfo.name);
     }
 
     public MirrorWorkspace getWorkspace() {

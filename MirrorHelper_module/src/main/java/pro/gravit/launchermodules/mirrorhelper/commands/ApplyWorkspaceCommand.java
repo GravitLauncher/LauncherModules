@@ -11,13 +11,18 @@ import pro.gravit.utils.HttpDownloader;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -26,6 +31,10 @@ import java.util.zip.ZipOutputStream;
 public class ApplyWorkspaceCommand extends Command {
     private final MirrorHelperModule module;
     private final Logger logger = LogManager.getLogger(ApplyWorkspaceCommand.class);
+    private static final Map<String, BuildInCommand> buildInCommands = new HashMap<>();
+    static {
+        buildInCommands.put("%download", new DownloadCommand());
+    }
 
     public ApplyWorkspaceCommand(LaunchServer server, MirrorHelperModule module) {
         super(server);
@@ -44,8 +53,20 @@ public class ApplyWorkspaceCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        verifyArgs(args, 1);
-        Path workspaceFilePath = Paths.get(args[0]);
+        URL url = null;
+        Path workspaceFilePath = null;
+        if(args.length == 0) {
+            url = server.mirrorManager.getDefaultMirror().getURL("workspace.json");
+        } else if(args[0].startsWith("http://") || args[0].startsWith("https://")) {
+            url = new URL(args[0]);
+        } else {
+            workspaceFilePath = Paths.get(args[0]);
+        }
+        if(url != null) {
+            workspaceFilePath = module.getConfigDir().resolve("workspace.json");
+            logger.info("Download {} to {}", url, workspaceFilePath);
+            HttpDownloader.downloadFile(url, workspaceFilePath, (p) -> {});
+        }
         MirrorWorkspace workspace;
         try(Reader reader = IOHelper.newReader(workspaceFilePath)) {
             workspace = Launcher.gsonManager.gson.fromJson(reader, MirrorWorkspace.class);
@@ -119,6 +140,11 @@ public class ApplyWorkspaceCommand extends Command {
                     }
                 }
             }
+            logger.info("Build from sources");
+            BuildContext context = new BuildContext();
+            for(var e : workspace.build().entrySet()) {
+                build(context, e.getKey(), e.getValue());
+            }
             logger.info("Download multiMods");
             for(var e : workspace.multiMods().entrySet()) {
                 Path target = workspacePath.resolve("multimods").resolve(e.getKey().concat(".jar"));
@@ -135,6 +161,78 @@ public class ApplyWorkspaceCommand extends Command {
             logger.info("Complete");
         } finally {
             IOHelper.deleteDir(tmp, true);
+        }
+    }
+
+    private void build(BuildContext context, String scriptName, MirrorWorkspace.BuildScript buildScript) throws IOException {
+        context.scriptBuildDir = context.createNewBuildDir(scriptName);
+        logger.info("Script build dir {}", context.scriptBuildDir);
+        try {
+            for(var inst : buildScript.script()) {
+                var cmd = inst.cmd().stream().map(context::replace).toList();
+                logger.info("Execute {}", String.join(" ", cmd));
+                var workdirString = context.replace(inst.workdir());
+                Path workdir = workdirString != null ? Path.of(workdirString) : context.scriptBuildDir;
+                if(!cmd.isEmpty() && cmd.get(0).startsWith("%")) {
+                    BuildInCommand buildInCommand = buildInCommands.get(cmd.get(0));
+                    if(buildInCommand == null) {
+                        throw new IllegalArgumentException(String.format("Build-in command %s not found", cmd.get(0)));
+                    }
+                    List<String> cmdArgs = cmd.subList(1, cmd.size());
+                    buildInCommand.run(cmdArgs, context, module, server, workdir);
+                } else {
+                    ProcessBuilder builder = new ProcessBuilder(cmd);
+                    builder.inheritIO();
+                    builder.directory(workdir.toFile());
+                    Process process = builder.start();
+                    int code = process.waitFor();
+                    if(!inst.ignoreErrorCode() && code != 0) {
+                        throw new RuntimeException(String.format("Process exited with code %d", code));
+                    }
+                }
+            }
+            if(buildScript.result() != null && buildScript.path() != null) {
+                var from = Path.of(context.replace(buildScript.result()));
+                var to = module.getConfigDir().resolve(buildScript.path());
+                logger.info("Copy {} to {}", from, to);
+                IOHelper.createParentDirs(to);
+                IOHelper.copy(from, to);
+            }
+            logger.info("Deleting temp dir {}", context.scriptBuildDir);
+        } catch (Throwable e){
+            logger.error("Build {} failed: {}", scriptName, e);
+        }
+    }
+
+    private class BuildContext {
+        public final Logger logger = LogManager.getLogger(BuildContext.class);
+        public Path scriptBuildDir;
+        public String replace(String str) {
+            if(str == null) {
+                return null;
+            }
+            return str
+                    .replace("%scripttmpdir%", scriptBuildDir.toString())
+                    .replace("%projectname%", server.config.projectName);
+        }
+
+        public Path createNewBuildDir(String scriptName) throws IOException {
+            return Files.createTempDirectory(scriptName);
+        }
+    }
+
+    private interface BuildInCommand {
+        void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception;
+    }
+
+    private static final class DownloadCommand implements BuildInCommand {
+
+        @Override
+        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
+            URL url = new URL(args.get(0));
+            Path target = Path.of(args.get(1));
+            context.logger.info("Download {} to {}", url, target);
+            HttpDownloader.downloadFile(url, target, (p) -> {});
         }
     }
 }
