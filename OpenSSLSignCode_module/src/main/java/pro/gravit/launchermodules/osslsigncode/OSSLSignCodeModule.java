@@ -5,6 +5,7 @@ import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.tasks.exe.BuildExeMainTask;
 import pro.gravit.launchserver.binary.tasks.exe.Launch4JTask;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -61,6 +62,6 @@ public class OSSLSignCodeModule extends LauncherModule {
         }
         config = configurable.getConfig();
         server.commandHandler.registerCommand("osslsignexe", new OSSLSignEXECommand(server, config));
-        server.launcherEXEBinary.addAfter((t) -> t instanceof Launch4JTask, new OSSLSignTask(server, config));
+        server.launcherEXEBinary.addAfter((t) -> t instanceof BuildExeMainTask, new OSSLSignTask(server, config));
     }
 }
