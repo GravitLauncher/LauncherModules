@@ -323,18 +323,18 @@ public class InstallClient {
                 }
                 logger.info("MultiMods installed");
             }
-            {
-                DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);
-                deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
-                logger.info("deduplibraries completed");
-            }
-            {
-                MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
-                makeProfileCommand.invoke(name, version.toString(), name);
-                logger.info("makeprofile completed");
-            }
-            logger.info("Completed");
         }
+        {
+            DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);
+            deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
+            logger.info("deduplibraries completed");
+        }
+        {
+            MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
+            makeProfileCommand.invoke(name, version.toString(), name);
+            logger.info("makeprofile completed");
+        }
+        logger.info("Completed");
     }
 
     private void copyDir(Path source, Path target) throws IOException {

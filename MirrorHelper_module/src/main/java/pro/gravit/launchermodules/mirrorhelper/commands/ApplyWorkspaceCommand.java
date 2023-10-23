@@ -157,6 +157,7 @@ public class ApplyWorkspaceCommand extends Command {
             IOHelper.move(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"), lwjgl3Path);
             Files.deleteIfExists(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"));
             logger.info("Save config");
+            module.config.workspaceFile = workspaceFilePath.toString();
             module.configurable.saveConfig();
             logger.info("Complete");
         } finally {
