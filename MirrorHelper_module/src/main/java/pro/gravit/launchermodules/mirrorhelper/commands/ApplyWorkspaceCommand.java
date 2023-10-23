@@ -194,7 +194,7 @@ public class ApplyWorkspaceCommand extends Command {
             }
             if(buildScript.result() != null && buildScript.path() != null) {
                 var from = Path.of(context.replace(buildScript.result()));
-                var to = module.getConfigDir().resolve(buildScript.path());
+                var to = module.getWorkspaceDir().resolve(buildScript.path());
                 logger.info("Copy {} to {}", from, to);
                 IOHelper.createParentDirs(to);
                 IOHelper.copy(from, to);
