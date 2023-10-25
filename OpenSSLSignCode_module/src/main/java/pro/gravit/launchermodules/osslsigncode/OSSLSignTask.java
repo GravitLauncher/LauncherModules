@@ -119,11 +119,6 @@ public class OSSLSignTask implements LauncherBuildTask {
         return resultFile;
     }
 
-    @Override
-    public boolean allowDelete() {
-        return true;
-    }
-
     public void sign(Path source, Path dest) throws IOException {
         OSSLSignTask.sign(config, signConf, source, dest);
     }

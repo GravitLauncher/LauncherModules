@@ -124,10 +124,5 @@ public class SentryProguardUploadModule extends LauncherModule {
             }
             return inputFile;
         }
-
-        @Override
-        public boolean allowDelete() {
-            return false;
-        }
     }
 }
