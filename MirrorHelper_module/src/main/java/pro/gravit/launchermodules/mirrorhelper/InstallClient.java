@@ -3,8 +3,8 @@ package pro.gravit.launchermodules.mirrorhelper;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.AsyncDownloader;
 import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.modern.Downloader;
 import pro.gravit.launcher.profiles.ClientProfile;
 import pro.gravit.launcher.profiles.ClientProfileVersions;
 import pro.gravit.launchermodules.mirrorhelper.commands.DeDupLibrariesCommand;
@@ -115,16 +115,15 @@ public class InstallClient {
         ClientDownloader.ClientInfo info = ClientDownloader.getClient(obj);
         // Download required files
         LogHelper.subInfo("Downloading client, it may take some time");
-        AsyncDownloader d = new AsyncDownloader();
         ExecutorService e = Executors.newFixedThreadPool(4);
         //info.libraries.addAll(info.natives); // Hack
-        List<AsyncDownloader.SizedFile> applies = info.libraries.stream().map(y -> new AsyncDownloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
-        CompletableFuture<Void> f = CompletableFuture.allOf(d.runDownloadListSimple(d.sortFiles(applies, 4), "", clientDir.resolve("libraries"), e)).thenAccept((v) -> LogHelper.subInfo("Client libraries successfully downloaded!"));
+        List<Downloader.SizedFile> applies = info.libraries.stream().map(y -> new Downloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
+        var downloader = Downloader.downloadList(applies, null, clientDir.resolve("libraries"), null, e, 4);
         if (info.client != null) {
             IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
         }
         LogHelper.subInfo("Downloaded client jar!");
-        f.get();
+        downloader.getFuture().get();
         e.shutdownNow();
         // Finished
         LogHelper.subInfo("Client downloaded!");

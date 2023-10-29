@@ -3,18 +3,18 @@ package pro.gravit.launchermodules.mirrorhelper.commands;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.modern.Downloader;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
 import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.HttpDownloader;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,19 +53,19 @@ public class ApplyWorkspaceCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        URL url = null;
+        URI url = null;
         Path workspaceFilePath = null;
         if(args.length == 0) {
-            url = server.mirrorManager.getDefaultMirror().getURL("workspace.json");
+            url = server.mirrorManager.getDefaultMirror().getURL("workspace.json").toURI();
         } else if(args[0].startsWith("http://") || args[0].startsWith("https://")) {
-            url = new URL(args[0]);
+            url = new URI(args[0]);
         } else {
             workspaceFilePath = Paths.get(args[0]);
         }
         if(url != null) {
             workspaceFilePath = module.getConfigDir().resolve("workspace.json");
             logger.info("Download {} to {}", url, workspaceFilePath);
-            HttpDownloader.downloadFile(url, workspaceFilePath, (p) -> {});
+            Downloader.downloadFile(url, workspaceFilePath, null).getFuture().get();
         }
         MirrorWorkspace workspace;
         try(Reader reader = IOHelper.newReader(workspaceFilePath)) {
@@ -93,7 +93,7 @@ public class ApplyWorkspaceCommand extends Command {
                 String randomName = SecurityHelper.randomStringAESKey();
                 Path tmpPath = tmp.resolve(randomName);
                 logger.info("Download {} to {}", l.url(), tmpPath);
-                HttpDownloader.downloadFile(new URL(l.url()), tmpPath, (tr) -> {});
+                Downloader.downloadFile(new URI(l.url()), tmpPath, null).getFuture().get();
                 if(l.path() != null) {
                     Path lPath = workspacePath.resolve(l.path());
                     IOHelper.createParentDirs(lPath);
@@ -149,7 +149,7 @@ public class ApplyWorkspaceCommand extends Command {
             for(var e : workspace.multiMods().entrySet()) {
                 Path target = workspacePath.resolve("multimods").resolve(e.getKey().concat(".jar"));
                 logger.info("Download {} to {}", e.getValue().url(), target);
-                HttpDownloader.downloadFile(new URL(e.getValue().url()), target, (tr) -> {});
+                Downloader.downloadFile(new URI(e.getValue().url()), target, null).getFuture().get();
             }
             logger.info("Install lwjgl3 directory");
             server.commandHandler.findCommand("lwjgldownload").invoke(workspace.lwjgl3version(), "mirrorhelper-tmp-lwjgl3");
@@ -230,10 +230,10 @@ public class ApplyWorkspaceCommand extends Command {
 
         @Override
         public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
-            URL url = new URL(args.get(0));
+            URI uri = new URI(args.get(0));
             Path target = Path.of(args.get(1));
-            context.logger.info("Download {} to {}", url, target);
-            HttpDownloader.downloadFile(url, target, (p) -> {});
+            context.logger.info("Download {} to {}", uri, target);
+            Downloader.downloadFile(uri, target, null).getFuture().get();
         }
     }
 }
