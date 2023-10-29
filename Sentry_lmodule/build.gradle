@@ -17,6 +17,7 @@ dependencies {
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
             "Module-Config-Class": configClassName,
-            "Module-Config-Name": "Sentry")
+            "Module-Config-Name": "Sentry",
+            "Required-Modern-Java": "true")
 }
 

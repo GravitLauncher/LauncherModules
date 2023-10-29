@@ -6,5 +6,6 @@ targetCompatibility = '1.8'
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
             "Module-Config-Class": configClassName,
-            "Module-Config-Name": "StartScreen")
+            "Module-Config-Name": "StartScreen",
+            "Required-Modern-Java": "true")
 }
