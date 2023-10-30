@@ -196,7 +196,7 @@ public class InstallClient {
             } else if (versionType == VersionType.FORGE) {
                 Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer.jar");
                 Path tmpDir = workdir.resolve("tmp");
-                IOHelper.transfer("{}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
+                IOHelper.transfer("\"profiles\": {}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
                 int counter = 5;
                 do {
                     logger.info("Please install forge client into {} (require gui)", tmpDir.toAbsolutePath().toString());
