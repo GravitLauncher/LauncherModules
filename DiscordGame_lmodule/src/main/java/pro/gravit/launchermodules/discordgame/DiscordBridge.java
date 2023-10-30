@@ -6,6 +6,7 @@ import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.LogLevel;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.LauncherEngine;
+import pro.gravit.launcher.client.ClientLauncherEntryPoint;
 import pro.gravit.launcher.client.api.DiscordActivityService;
 import pro.gravit.launchermodules.discordgame.event.DiscordInitEvent;
 import pro.gravit.utils.helper.*;
@@ -24,7 +25,7 @@ public class DiscordBridge {
     private static void initCore() throws IOException {
     }
 
-    public static void init(long appId) throws IOException {
+    public static void init(long appId, boolean isClient) throws IOException {
         if (JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM32 || JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM64) {
             LogHelper.info("Cannot initialize Discord Game SDK because of launcher started at unsupported system && arch");
             return;
@@ -70,7 +71,11 @@ public class DiscordBridge {
             return;
         }
         //params.close();
-        LauncherEngine.modulesManager.invokeEvent(new DiscordInitEvent(core));
+        if(isClient) {
+            ClientLauncherEntryPoint.modulesManager.invokeEvent(new DiscordInitEvent(core));
+        } else {
+            LauncherEngine.modulesManager.invokeEvent(new DiscordInitEvent(core));
+        }
         LogHelper.debug("Initialized Discord Game. Application ID %d", appId);
         thread = CommonHelper.newThread("DiscordGameBridge callbacks", true, new DiscordUpdateTask(core));
         thread.start();

@@ -56,7 +56,7 @@ public class ClientModule extends LauncherModule {
     private void clientInit(ClientProcessLaunchEvent phase) {
         DiscordBridge.activityService.updateClientStage(phase.params);
         try {
-            DiscordBridge.init(config.appId);
+            DiscordBridge.init(config.appId, true);
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
             Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
@@ -71,7 +71,7 @@ public class ClientModule extends LauncherModule {
     private void launcherInit(ClientEngineInitPhase phase) {
         DiscordBridge.activityService.updateLoginStage();
         try {
-            DiscordBridge.init(config.appId);
+            DiscordBridge.init(config.appId, false);
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);
             Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
