@@ -22,10 +22,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -333,6 +330,7 @@ public class InstallClient {
             makeProfileCommand.invoke(name, version.toString(), name);
             logger.info("makeprofile completed");
         }
+        launchServer.syncUpdatesDir(Collections.singleton(name));
         logger.info("Completed");
     }
 
