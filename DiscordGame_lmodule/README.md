@@ -8,13 +8,8 @@
 ## Установка модуля
 
 1. Скопировать модуль **DiscordGame_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
-2. Скачать последнюю версию библиотеки **[discord-game-sdk4j-0.5.x.jar]**
+2. Скачать последнюю версию библиотеки [отсюда](http://javadoc.jitpack.io/com/github/JnCrMx/discord-game-sdk4j/java-impl-v0.1-gc775cf1-200/discord-game-sdk4j-java-impl-v0.1-gc775cf1-200.jar)
 3. Библиотеку **discord-game-sdk4j-0.5.x.jar** поместить в папку **/LaunchServer/launcher-libraries/**
-4. Добавить в папку **/LaunchServer/launcher-pack** следующие файлы из архива **[Discord Game SDK 2.5.6 ZIP]**:
-- Файл `lib/x86/discord_game_sdk.dll` в `native/windows/x86/discord_game_sdk.dll`
-- Файл `lib/x86_64/discord_game_sdk.dll` в `native/windows/amd64/discord_game_sdk.dll`
-- Файл `lib/x86_64/discord_game_sdk.so` в `native/linux/amd64/libdiscord_game_sdk.so`
-- Файл `lib/x86_64/discord_game_sdk.dylib` в `native/macos/amd64/libdiscord_game_sdk.dylib`
 
 ---
 
@@ -32,7 +27,13 @@
       "largeImageKey": "large",
       "smallImageKey": "small",
       "largeImageText": "Everything",
-      "smallImageText": "Everything"
+      "smallImageText": "Everything",
+      "firstButtonEnable": false,
+      "firstButtonName": "Site",
+      "firstButtonUrl": "https://example.com",
+      "secondButtonEnable": false,
+      "secondButtonName": "Discord",
+      "secondButtonUrl": "https://example.com"
     },
     "authorized": {
       "details": "Лучший проект Minecraft",
@@ -40,7 +41,13 @@
       "largeImageKey": "large",
       "smallImageKey": "small",
       "largeImageText": "Everything",
-      "smallImageText": "Everything"
+      "smallImageText": "Everything",
+      "firstButtonEnable": false,
+      "firstButtonName": "Site",
+      "firstButtonUrl": "https://example.com",
+      "secondButtonEnable": false,
+      "secondButtonName": "Discord",
+      "secondButtonUrl": "https://example.com"
     },
     "client": {
       "details": "Лучший проект Minecraft",
@@ -48,7 +55,13 @@
       "largeImageKey": "large",
       "smallImageKey": "small",
       "largeImageText": "Everything",
-      "smallImageText": "Everything"
+      "smallImageText": "Everything",
+      "firstButtonEnable": false,
+      "firstButtonName": "Site",
+      "firstButtonUrl": "https://example.com",
+      "secondButtonEnable": false,
+      "secondButtonName": "Discord",
+      "secondButtonUrl": "https://example.com"
     }
   }
 }
@@ -106,7 +119,3 @@
 - `%javaVersion%` - Версия используемой Java
 - `%javaBits%` - Разрядность используемой Java
 - `%os%` - Операционная система
-
-[discord-game-sdk4j-0.5.x.jar]: https://github.com/JnCrMx/discord-game-sdk4j/releases
-
-[Discord Game SDK 2.5.6 ZIP]: https://dl-game-sdk.discordapp.net/2.5.6/discord_game_sdk.zip
