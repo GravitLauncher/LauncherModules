@@ -297,6 +297,9 @@ public class InstallClient {
             for (var m : mirrorWorkspace.multiMods().entrySet()) {
                 var k = m.getKey();
                 var v = m.getValue();
+                if(v.type() != null && v.type() != versionType) {
+                    continue;
+                }
                 if (v.minVersion() != null) {
                     ClientProfile.Version min = ClientProfile.Version.of(v.minVersion());
                     if (version.compareTo(min) < 0) {
