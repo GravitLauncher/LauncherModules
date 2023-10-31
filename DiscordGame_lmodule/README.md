@@ -8,7 +8,7 @@
 ## Установка модуля
 
 1. Скопировать модуль **DiscordGame_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
-2. Скачать последнюю версию библиотеки [отсюда](http://javadoc.jitpack.io/com/github/JnCrMx/discord-game-sdk4j/java-impl-v0.1-gc775cf1-200/discord-game-sdk4j-java-impl-v0.1-gc775cf1-200.jar)
+2. Скачать последнюю версию библиотеки [отсюда](https://javadoc.jitpack.io/com/github/JnCrMx/discord-game-sdk4j/java-impl-v0.1-gc775cf1-200/discord-game-sdk4j-java-impl-v0.1-gc775cf1-200.jar)
 3. Библиотеку **discord-game-sdk4j-0.5.x.jar** поместить в папку **/LaunchServer/launcher-libraries/**
 
 ---
