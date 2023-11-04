@@ -83,6 +83,12 @@ public class DeDupLibrariesCommand extends Command {
                 }
                 logger.info("In path {} found {} libraries", key, value.size());
                 var version = value.stream()
+                        .filter((f) -> {
+                            if(key.contains("jopt-simple") && f.getFileName().toString().contains("6.0")) {
+                                return false;
+                            }
+                            return true;
+                        })
                         .map(this::convertStringToVersion)
                         .max(Comparator.naturalOrder()).orElse(null);
                 logger.info("In path {} variants [{}] selected {} version", key,
@@ -123,7 +129,7 @@ public class DeDupLibrariesCommand extends Command {
         public int compareTo(InternalLibraryVersion some) {
             int result = 0;
             for (int i = 0; i < data.length; ++i) {
-                if (i > some.data.length) break;
+                if (i >= some.data.length) break;
                 result = Long.compare(data[i], some.data[i]);
                 if (result != 0) return result;
             }

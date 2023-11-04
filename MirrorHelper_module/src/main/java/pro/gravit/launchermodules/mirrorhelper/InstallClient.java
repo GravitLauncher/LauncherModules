@@ -225,6 +225,9 @@ public class InstallClient {
                         if (library.url == null) {
                             library.url = "https://libraries.minecraft.net/";
                         }
+                        if(library.name.endsWith("@jar")) {
+                            library.name = library.name.substring(0, library.name.length()-4);
+                        }
                         FabricInstallerCommand.NamedURL url = FabricInstallerCommand.makeURL(library.url, library.name);
                         logger.info("Download {} into {}", url.url.toString(), url.name);
                         Path file = clientPath.resolve("libraries").resolve(url.name);
@@ -232,10 +235,14 @@ public class InstallClient {
                         if (Files.exists(file)) {
                             continue;
                         }
-                        try (InputStream stream = IOHelper.newInput(url.url)) {
-                            try (OutputStream output = IOHelper.newOutput(file)) {
-                                IOHelper.transfer(stream, output);
+                        try {
+                            try (InputStream stream = IOHelper.newInput(url.url)) {
+                                try (OutputStream output = IOHelper.newOutput(file)) {
+                                    IOHelper.transfer(stream, output);
+                                }
                             }
+                        } catch (FileNotFoundException e) {
+                            LogHelper.warning("Not found %s", url.url);
                         }
                     }
                 }
