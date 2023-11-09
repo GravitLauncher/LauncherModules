@@ -206,7 +206,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             return false;
         }
         if(uuid != null) {
-            if(session.uuid.equals(uuid)) {
+            if(session.entity.uuid.equals(uuid)) {
                 session.serverId = serverID;
                 return true;
             }
