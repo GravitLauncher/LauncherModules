@@ -201,7 +201,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
     @Override
     public boolean joinServer(Client client, String username, UUID uuid, String accessToken, String serverID) throws IOException {
-        UserSessionEntity session = getSessionByAccessToken(accessToken);
+        UserSessionEntity session = getSessionByMinecraftAccessToken(accessToken);
         if(session == null) {
             return false;
         }
@@ -422,6 +422,10 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
     private UserSessionEntity getSessionByAccessToken(String accessToken) {
         return sessions.stream().filter(e -> e.accessToken != null && e.accessToken.equals(accessToken)).findFirst().orElse(null);
+    }
+
+    private UserSessionEntity getSessionByMinecraftAccessToken(String minecraftAccessToken) {
+        return sessions.stream().filter(e -> e.minecraftAccessToken != null && e.minecraftAccessToken.equals(minecraftAccessToken)).findFirst().orElse(null);
     }
 
     private UserSessionEntity getSessionByServerId(String serverId) {
