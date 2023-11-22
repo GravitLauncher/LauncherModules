@@ -26,8 +26,8 @@
    Loaded: loaded (/etc/systemd/system/launcher.service; enabled; vendor preset: disabled)
    Active: active (running)
    CGroup: /system.slice/Launcher.service
-           ├─36023 /usr/bin/SCREEN -DmS LaunchServer /usr/bin/java -Xmx256M -javaagent:LaunchServer.jar -jar LaunchServer.jar
-           └─36024 /usr/bin/java -Xmx256M -javaagent:LaunchServer.jar -jar LaunchServer.jar
+           ├─36023 /usr/bin/SCREEN -DmS LaunchServer /usr/bin/java -Xmx512M -javaagent:LaunchServer.jar -jar LaunchServer.jar
+           └─36024 /usr/bin/java -Xmx512M -javaagent:LaunchServer.jar -jar LaunchServer.jar
 systemd[1]: Starting LaunchServer...
 systemd[1]: Started LaunchServer.
 ```
@@ -47,7 +47,7 @@ Group=servers
 NotifyAccess=all
 Restart=always    
 
-ExecStart=/usr/bin/screen -DmS launchserver /usr/bin/java -Xmx256M -javaagent:LaunchServer.jar -jar LaunchServer.jar
+ExecStart=/usr/bin/screen -DmS launchserver /usr/bin/java -Xmx512M -javaagent:LaunchServer.jar -jar LaunchServer.jar
 ExecStop=/usr/bin/screen -p 0 -S launchserver -X eval 'stuff "stop"\015'
 
 [Install]
