@@ -32,8 +32,9 @@ public class SystemdNotifyModule extends LauncherModule {
         processBuilder.inheritIO();
         try {
             var process = processBuilder.start();
-            logger.debug("Systemd notify successful");
-        } catch (IOException e) {
+            var exitCode = process.waitFor();
+            logger.debug("Systemd notify successful. Exit code {}", exitCode);
+        } catch (IOException | InterruptedException e) {
             logger.error("Systemd-notify error", e);
         }
     }
