@@ -114,7 +114,9 @@ public class InstallClient {
         LogHelper.subInfo("Downloading client, it may take some time");
         ExecutorService e = Executors.newFixedThreadPool(4);
         //info.libraries.addAll(info.natives); // Hack
-        List<Downloader.SizedFile> applies = info.libraries.stream().map(y -> new Downloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
+        List<Downloader.SizedFile> applies = info.libraries.stream()
+                .filter(l -> !(l.name.contains("lwjgl") || l.name.contains("natives")))
+                .map(y -> new Downloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
         var downloader = Downloader.downloadList(applies, null, clientDir.resolve("libraries"), null, e, 4);
         if (info.client != null) {
             IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
