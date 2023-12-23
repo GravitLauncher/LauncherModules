@@ -1,9 +1,9 @@
 package pro.gravit.launchermodules.osslsigncode;
 
-import pro.gravit.launcher.config.JsonConfigurable;
-import pro.gravit.launcher.modules.LauncherInitContext;
-import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.config.JsonConfigurable;
+import pro.gravit.launcher.base.modules.LauncherInitContext;
+import pro.gravit.launcher.base.modules.LauncherModule;
+import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.exe.BuildExeMainTask;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;

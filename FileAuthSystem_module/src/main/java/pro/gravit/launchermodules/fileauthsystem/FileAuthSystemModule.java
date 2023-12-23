@@ -1,10 +1,10 @@
 package pro.gravit.launchermodules.fileauthsystem;
 
-import pro.gravit.launcher.config.JsonConfigurable;
-import pro.gravit.launcher.modules.LauncherInitContext;
-import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launcher.modules.LauncherModuleInfo;
-import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launcher.base.config.JsonConfigurable;
+import pro.gravit.launcher.base.modules.LauncherInitContext;
+import pro.gravit.launcher.base.modules.LauncherModule;
+import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;

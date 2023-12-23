@@ -6,8 +6,8 @@ import de.jcm.discordgamesdk.GameSDKException;
 import de.jcm.discordgamesdk.LogLevel;
 import de.jcm.discordgamesdk.activity.Activity;
 import pro.gravit.launcher.client.api.DiscordActivityService;
-import pro.gravit.launcher.client.runtime.LauncherEngine;
-import pro.gravit.launcher.client.runtime.client.ClientLauncherEntryPoint;
+import pro.gravit.launcher.runtime.LauncherEngine;
+import pro.gravit.launcher.client.ClientLauncherEntryPoint;
 import pro.gravit.launchermodules.discordgame.event.DiscordInitEvent;
 import pro.gravit.utils.helper.*;
 

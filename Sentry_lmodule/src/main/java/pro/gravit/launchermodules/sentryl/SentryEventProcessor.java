@@ -3,7 +3,7 @@ package pro.gravit.launchermodules.sentryl;
 import io.sentry.EventProcessor;
 import io.sentry.Hint;
 import io.sentry.SentryEvent;
-import pro.gravit.launcher.request.RequestException;
+import pro.gravit.launcher.base.request.RequestException;
 import pro.gravit.launchermodules.sentryl.utils.OshiUtils;
 import pro.gravit.utils.helper.JVMHelper;
 

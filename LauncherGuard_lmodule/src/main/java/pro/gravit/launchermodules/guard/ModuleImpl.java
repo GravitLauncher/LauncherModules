@@ -1,17 +1,17 @@
 package pro.gravit.launchermodules.guard;
 
-import pro.gravit.launcher.client.runtime.client.DirBridge;
-import pro.gravit.launcher.client.runtime.client.events.ClientExitPhase;
-import pro.gravit.launcher.client.runtime.client.events.ClientGuiPhase;
-import pro.gravit.launcher.client.runtime.client.events.ClientPreGuiPhase;
-import pro.gravit.launcher.client.runtime.client.events.client.ClientProcessBuilderCreateEvent;
-import pro.gravit.launcher.client.runtime.client.events.client.ClientProcessPreInvokeMainClassEvent;
+import pro.gravit.launcher.runtime.client.DirBridge;
+import pro.gravit.launcher.client.events.ClientExitPhase;
+import pro.gravit.launcher.runtime.client.events.ClientGuiPhase;
+import pro.gravit.launcher.runtime.client.events.ClientPreGuiPhase;
+import pro.gravit.launcher.runtime.client.events.ClientProcessBuilderCreateEvent;
+import pro.gravit.launcher.client.events.ClientProcessPreInvokeMainClassEvent;
 import pro.gravit.launcher.start.ClientLauncherWrapper;
-import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.start.ClientWrapperModule;
-import pro.gravit.launcher.modules.LauncherInitContext;
-import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launcher.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherInitContext;
+import pro.gravit.launcher.base.modules.LauncherModule;
+import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.*;
 

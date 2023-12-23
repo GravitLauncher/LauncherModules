@@ -1,6 +1,6 @@
 package pro.gravit.launchermodules.guard;
 
-import pro.gravit.launcher.Launcher;
+import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.core.LauncherInject;
 import pro.gravit.utils.helper.JVMHelper;
 

@@ -1,6 +1,6 @@
 package pro.gravit.launchermodules.mirrorhelper.commands;
 
-import pro.gravit.launcher.profiles.ClientProfile;
+import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
 import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;

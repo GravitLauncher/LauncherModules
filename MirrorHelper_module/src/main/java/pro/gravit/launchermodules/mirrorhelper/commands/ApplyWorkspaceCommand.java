@@ -2,8 +2,8 @@ package pro.gravit.launchermodules.mirrorhelper.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.Launcher;
-import pro.gravit.launcher.modern.Downloader;
+import pro.gravit.launcher.base.Launcher;
+import pro.gravit.launcher.base.Downloader;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
 import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;
 import pro.gravit.launchserver.LaunchServer;

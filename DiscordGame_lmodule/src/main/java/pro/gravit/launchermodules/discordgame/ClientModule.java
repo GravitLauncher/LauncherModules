@@ -1,14 +1,14 @@
 package pro.gravit.launchermodules.discordgame;
 
-import pro.gravit.launcher.client.runtime.client.events.ClientEngineInitPhase;
-import pro.gravit.launcher.client.runtime.client.events.ClientExitPhase;
-import pro.gravit.launcher.client.runtime.client.events.ClientUnlockConsoleEvent;
-import pro.gravit.launcher.client.runtime.client.events.client.ClientProcessBuilderParamsWrittedEvent;
-import pro.gravit.launcher.client.runtime.client.events.client.ClientProcessLaunchEvent;
-import pro.gravit.launcher.modules.LauncherInitContext;
-import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launcher.modules.LauncherModuleInfo;
-import pro.gravit.launcher.request.Request;
+import pro.gravit.launcher.runtime.client.events.ClientEngineInitPhase;
+import pro.gravit.launcher.client.events.ClientExitPhase;
+import pro.gravit.launcher.client.events.ClientUnlockConsoleEvent;
+import pro.gravit.launcher.runtime.client.events.ClientProcessBuilderParamsWrittedEvent;
+import pro.gravit.launcher.client.events.ClientProcessLaunchEvent;
+import pro.gravit.launcher.base.modules.LauncherInitContext;
+import pro.gravit.launcher.base.modules.LauncherModule;
+import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.request.Request;
 import pro.gravit.launchermodules.discordgame.commands.DiscordCommand;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;

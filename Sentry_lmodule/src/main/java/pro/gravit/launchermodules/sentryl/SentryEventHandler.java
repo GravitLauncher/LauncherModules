@@ -1,9 +1,9 @@
 package pro.gravit.launchermodules.sentryl;
 
-import pro.gravit.launcher.events.request.AuthRequestEvent;
-import pro.gravit.launcher.events.request.ExitRequestEvent;
-import pro.gravit.launcher.request.RequestService;
-import pro.gravit.launcher.request.WebSocketEvent;
+import pro.gravit.launcher.base.events.request.AuthRequestEvent;
+import pro.gravit.launcher.base.events.request.ExitRequestEvent;
+import pro.gravit.launcher.base.request.RequestService;
+import pro.gravit.launcher.base.request.WebSocketEvent;
 
 public class SentryEventHandler implements RequestService.EventHandler {
     @Override

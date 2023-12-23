@@ -7,7 +7,7 @@ import io.sentry.SpanStatus;
 import io.sentry.protocol.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.events.request.ErrorRequestEvent;
+import pro.gravit.launcher.base.events.request.ErrorRequestEvent;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.WebSocketService;
 import pro.gravit.launchserver.socket.handlers.NettyServerSocketHandler;

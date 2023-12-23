@@ -1,9 +1,9 @@
 package pro.gravit.launchermodules.addhash;
 
-import pro.gravit.launcher.modules.LauncherInitContext;
-import pro.gravit.launcher.modules.LauncherModule;
-import pro.gravit.launcher.modules.LauncherModuleInfo;
-import pro.gravit.launcher.modules.events.PreConfigPhase;
+import pro.gravit.launcher.base.modules.LauncherInitContext;
+import pro.gravit.launcher.base.modules.LauncherModule;
+import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.addhash.verifier.BCryptPasswordVerifier;
 import pro.gravit.launchermodules.addhash.verifier.PhpHashPasswordVerifier;
 import pro.gravit.launchserver.auth.password.PasswordVerifier;

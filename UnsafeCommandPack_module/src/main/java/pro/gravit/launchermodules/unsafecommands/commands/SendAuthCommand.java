@@ -1,9 +1,9 @@
 package pro.gravit.launchermodules.unsafecommands.commands;
 
-import pro.gravit.launcher.ClientPermissions;
-import pro.gravit.launcher.events.RequestEvent;
-import pro.gravit.launcher.events.request.AuthRequestEvent;
-import pro.gravit.launcher.profiles.PlayerProfile;
+import pro.gravit.launcher.base.ClientPermissions;
+import pro.gravit.launcher.base.events.RequestEvent;
+import pro.gravit.launcher.base.events.request.AuthRequestEvent;
+import pro.gravit.launcher.base.profiles.PlayerProfile;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.core.User;
