@@ -1,6 +1,6 @@
 package pro.gravit.launchermodules.startscreen;
 
-import pro.gravit.launcher.LauncherInject;
+import pro.gravit.launcher.core.LauncherInject;
 
 public class Config {
     @LauncherInject(value = "modules.startscreen.imageurl")

@@ -1,10 +1,10 @@
 package pro.gravit.launchermodules.discordgame;
 
-import pro.gravit.launcher.client.events.ClientEngineInitPhase;
-import pro.gravit.launcher.client.events.ClientExitPhase;
-import pro.gravit.launcher.client.events.ClientUnlockConsoleEvent;
-import pro.gravit.launcher.client.events.client.ClientProcessBuilderParamsWrittedEvent;
-import pro.gravit.launcher.client.events.client.ClientProcessLaunchEvent;
+import pro.gravit.launcher.client.runtime.client.events.ClientEngineInitPhase;
+import pro.gravit.launcher.client.runtime.client.events.ClientExitPhase;
+import pro.gravit.launcher.client.runtime.client.events.ClientUnlockConsoleEvent;
+import pro.gravit.launcher.client.runtime.client.events.client.ClientProcessBuilderParamsWrittedEvent;
+import pro.gravit.launcher.client.runtime.client.events.client.ClientProcessLaunchEvent;
 import pro.gravit.launcher.modules.LauncherInitContext;
 import pro.gravit.launcher.modules.LauncherModule;
 import pro.gravit.launcher.modules.LauncherModuleInfo;

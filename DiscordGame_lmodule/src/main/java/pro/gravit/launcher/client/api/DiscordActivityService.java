@@ -1,10 +1,10 @@
-package pro.gravit.launcher.api;
+package pro.gravit.launcher.client.api;
 
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityButton;
 import de.jcm.discordgamesdk.activity.ActivityButtonsMode;
-import pro.gravit.launcher.client.ClientParams;
+import pro.gravit.launcher.client.runtime.client.ClientParams;
 import pro.gravit.launcher.profiles.PlayerProfile;
 import pro.gravit.launchermodules.discordgame.ClientModule;
 import pro.gravit.launchermodules.discordgame.DiscordBridge;

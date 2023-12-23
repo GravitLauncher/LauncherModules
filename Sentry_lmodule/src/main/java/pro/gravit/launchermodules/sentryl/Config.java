@@ -1,6 +1,6 @@
 package pro.gravit.launchermodules.sentryl;
 
-import pro.gravit.launcher.LauncherInject;
+import pro.gravit.launcher.core.LauncherInject;
 
 import java.util.ArrayList;
 import java.util.List;

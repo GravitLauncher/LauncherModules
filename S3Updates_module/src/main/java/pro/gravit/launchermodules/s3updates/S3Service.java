@@ -2,9 +2,9 @@ package pro.gravit.launchermodules.s3updates;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.hasher.HashedDir;
-import pro.gravit.launcher.hasher.HashedEntry;
-import pro.gravit.launcher.hasher.HashedFile;
+import pro.gravit.launcher.core.hasher.HashedDir;
+import pro.gravit.launcher.core.hasher.HashedEntry;
+import pro.gravit.launcher.core.hasher.HashedFile;
 import pro.gravit.launchserver.manangers.UpdatesManager;
 import pro.gravit.utils.helper.SecurityHelper;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;

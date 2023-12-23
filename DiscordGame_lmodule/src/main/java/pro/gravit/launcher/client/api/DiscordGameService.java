@@ -1,4 +1,4 @@
-package pro.gravit.launcher.api;
+package pro.gravit.launcher.client.api;
 
 
 import de.jcm.discordgamesdk.Core;
