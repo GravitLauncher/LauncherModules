@@ -41,21 +41,11 @@ public class DiscordBridge {
             core = new Core(params);
             core.setLogHook(getLogLevel(), (level, s) -> {
                 switch (level) {
-                    case ERROR -> {
-                        LogHelper.error(s);
-                    }
-                    case WARN -> {
-                        LogHelper.warning(s);
-                    }
-                    case INFO -> {
-                        LogHelper.info(s);
-                    }
-                    case DEBUG -> {
-                        LogHelper.debug(s);
-                    }
-                    case VERBOSE -> {
-                        LogHelper.dev(s);
-                    }
+                    case ERROR -> LogHelper.error(s);
+                    case WARN -> LogHelper.warning(s);
+                    case INFO -> LogHelper.info(s);
+                    case DEBUG -> LogHelper.debug(s);
+                    case VERBOSE -> LogHelper.dev(s);
                 }
             });
             {

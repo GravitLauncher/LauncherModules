@@ -8,10 +8,8 @@ import pro.gravit.launcher.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class SystemdNotifyModule extends LauncherModule {
     private transient final Logger logger = LogManager.getLogger(SystemdNotifyModule.class);

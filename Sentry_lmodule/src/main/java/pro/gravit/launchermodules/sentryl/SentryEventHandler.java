@@ -8,15 +8,13 @@ import pro.gravit.launcher.request.WebSocketEvent;
 public class SentryEventHandler implements RequestService.EventHandler {
     @Override
     public <T extends WebSocketEvent> boolean eventHandle(T event) {
-        if(event instanceof AuthRequestEvent) {
-            AuthRequestEvent authEvent = (AuthRequestEvent) event;
+        if(event instanceof AuthRequestEvent authEvent) {
             if(authEvent.playerProfile == null) {
                 return false;
             }
             SentryModule.currentHub.configureScope(scope -> scope.setUser(SentryModule.makeSentryUser(authEvent.playerProfile)));
         }
-        if(event instanceof ExitRequestEvent) {
-            ExitRequestEvent exitEvent = (ExitRequestEvent) event;
+        if(event instanceof ExitRequestEvent exitEvent) {
             if(exitEvent.reason == ExitRequestEvent.ExitReason.NO_EXIT) {
                 return false;
             }

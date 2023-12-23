@@ -83,12 +83,7 @@ public class DeDupLibrariesCommand extends Command {
                 }
                 logger.info("In path {} found {} libraries", key, value.size());
                 var version = value.stream()
-                        .filter((f) -> {
-                            if(key.contains("jopt-simple") && f.getFileName().toString().contains("6.0")) {
-                                return false;
-                            }
-                            return true;
-                        })
+                        .filter((f) -> !key.contains("jopt-simple") || !f.getFileName().toString().contains("6.0"))
                         .map(this::convertStringToVersion)
                         .max(Comparator.naturalOrder()).orElse(null);
                 logger.info("In path {} variants [{}] selected {} version", key,

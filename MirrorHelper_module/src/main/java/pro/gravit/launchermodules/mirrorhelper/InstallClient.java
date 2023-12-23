@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.mirrorhelper;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.modern.Downloader;
 import pro.gravit.launcher.profiles.ClientProfile;
@@ -23,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -156,24 +156,7 @@ public class InstallClient {
         }
         Path tmpFile = workdir.resolve("file.tmp");
         {
-            Path pathToLauncherAuthlib;
-            if (version.compareTo(ClientProfileVersions.MINECRAFT_1_16_5) < 0) {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib1.jar");
-            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_18) < 0) {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib2.jar");
-            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) < 0) {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3.jar");
-            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) == 0) {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.jar");
-            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20) < 0) {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.1.jar");
-            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20_2) < 0)  {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib4.jar");
-            } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20_3) < 0)  {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib5.jar");
-            } else  {
-                pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib6.jar");
-            }
+            Path pathToLauncherAuthlib = getPathToLauncherAuthlib();
             logger.info("Found launcher authlib in {}", pathToLauncherAuthlib);
             Path pathToOriginalAuthlib = findClientAuthlib(clientPath);
             logger.info("Found original authlib in {}", pathToOriginalAuthlib);
@@ -346,6 +329,29 @@ public class InstallClient {
         }
         launchServer.syncUpdatesDir(Collections.singleton(name));
         logger.info("Completed");
+    }
+
+    @NotNull
+    private Path getPathToLauncherAuthlib() {
+        Path pathToLauncherAuthlib;
+        if (version.compareTo(ClientProfileVersions.MINECRAFT_1_16_5) < 0) {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib1.jar");
+        } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_18) < 0) {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib2.jar");
+        } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) < 0) {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3.jar");
+        } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_19) == 0) {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.jar");
+        } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20) < 0) {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib3-1.19.1.jar");
+        } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20_2) < 0)  {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib4.jar");
+        } else if (version.compareTo(ClientProfileVersions.MINECRAFT_1_20_3) < 0)  {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib5.jar");
+        } else  {
+            pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib6.jar");
+        }
+        return pathToLauncherAuthlib;
     }
 
     private void copyDir(Path source, Path target) throws IOException {
