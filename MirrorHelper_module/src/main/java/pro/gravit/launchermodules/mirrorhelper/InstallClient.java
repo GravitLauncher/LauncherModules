@@ -181,23 +181,44 @@ public class InstallClient {
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Quilt installed");
             } else if (versionType == VersionType.FORGE) {
-                Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer.jar");
-                Path tmpDir = workdir.resolve("tmp");
-                IOHelper.transfer("{\"profiles\": {}}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
-                int counter = 5;
-                do {
-                    logger.info("Please install forge client into {} (require gui)", tmpDir.toAbsolutePath().toString());
-                    Process forgeProcess = new ProcessBuilder()
-                            .command("java", "-jar", forgeInstaller.toAbsolutePath().toString())
-                            .inheritIO()
-                            .start();
-                    int code = forgeProcess.waitFor();
-                    logger.info("Process return with status code {}", code);
-                    counter--;
-                    if (counter <= 0) {
-                        throw new RuntimeException("Forge not installed");
-                    }
-                } while (!Files.isDirectory(tmpDir.resolve("libraries")));
+                boolean noGui = true;
+                Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer-nogui.jar");
+                if(Files.notExists(forgeInstaller)) {
+                    logger.warn("{} not found", forgeInstaller.toAbsolutePath().toString());
+                    forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer.jar");
+                    noGui = false;
+                }
+                if(Files.notExists(forgeInstaller)) {
+                    throw new FileNotFoundException(forgeInstaller.toAbsolutePath().toString());
+                }
+                Path tmpDir = workdir.resolve("clients").resolve("forge").resolve(version.toString());
+                if(Files.notExists(tmpDir)) {
+                    Files.createDirectories(tmpDir);
+                    IOHelper.transfer("{\"profiles\": {}}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
+                    int counter = 5;
+                    do {
+                        Process forgeProcess;
+                        if(noGui) {
+                            logger.info("Install forge client into {} (no gui)", tmpDir.toAbsolutePath().toString());
+                            forgeProcess = new ProcessBuilder()
+                                    .command("java", "-jar", forgeInstaller.toAbsolutePath().toString(), "--install-client", tmpDir.toAbsolutePath().toString())
+                                    .inheritIO()
+                                    .start();
+                        } else {
+                            logger.info("Please install forge client into {} (require gui)", tmpDir.toAbsolutePath().toString());
+                            forgeProcess = new ProcessBuilder()
+                                    .command("java", "-jar", forgeInstaller.toAbsolutePath().toString())
+                                    .inheritIO()
+                                    .start();
+                        }
+                        int code = forgeProcess.waitFor();
+                        logger.info("Process return with status code {}", code);
+                        counter--;
+                        if (counter <= 0) {
+                            throw new RuntimeException("Forge not installed");
+                        }
+                    } while (!Files.isDirectory(tmpDir.resolve("libraries")));
+                }
                 copyDir(tmpDir.resolve("libraries"), clientPath.resolve("libraries"));
                 {
                     Path forgeClientDir = Files.list(tmpDir.resolve("versions"))
