@@ -49,6 +49,9 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
             event.processBuilder.executeFile = executeFile;
             event.processBuilder.useLegacyJavaClassPathProperty = config.useClasspathProperty;
             event.processBuilder.systemEnv.put("JAVA_HOME", javaVersion.jvmDir.toAbsolutePath().toString());
+            if(config.addExeAsAgent) {
+                event.processBuilder.jvmArgs.add("-agentlib:".concat(executeFile.toAbsolutePath().toString()));
+            }
         }
     }
 

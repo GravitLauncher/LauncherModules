@@ -20,6 +20,8 @@ public class Config {
     public boolean useClasspathProperty;
     @LauncherInject(value = "modules.launcherguard.protectlauncher")
     public boolean protectLauncher;
+    @LauncherInject(value = "modules.launcherguard.addexeasagent")
+    public boolean addExeAsAgent;
 
     public static Object getDefault() {
         Config config = new Config();
@@ -35,6 +37,7 @@ public class Config {
         config.renameExeFile = true;
         config.useClasspathProperty = true;
         config.protectLauncher = false;
+        config.addExeAsAgent = false;
         return config;
     }
 }
