@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.remotecontrol;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
@@ -18,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class RemoteControlModule extends LauncherModule {
+    private transient final Logger logger = LogManager.getLogger(RemoteControlModule.class);
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public RemoteControlConfig config;
     public JsonConfigurable<RemoteControlConfig> configurable;
@@ -41,7 +44,7 @@ public class RemoteControlModule extends LauncherModule {
         server.commandHandler.registerCommand("remotecontrol", new RemoteControlCommand(server));
         NettyWebAPIHandler.addNewSeverlet("remotecontrol/command", new RemoteControlWebSeverlet(this, server));
         if (config.enabled) {
-            LogHelper.info("RemoteControl enabled. Found %d access tokens", config.list.size());
+            logger.info("RemoteControl enabled. Found {} access tokens", config.list.size());
         }
     }
 
