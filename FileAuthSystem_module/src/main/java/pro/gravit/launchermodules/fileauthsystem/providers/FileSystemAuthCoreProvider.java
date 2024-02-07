@@ -13,6 +13,7 @@ import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemConfig;
 import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
+import pro.gravit.launchserver.auth.AuthProviderPair;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
@@ -290,7 +291,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    public void init(LaunchServer server) {
+    public void init(LaunchServer server, AuthProviderPair pair) {
         this.server = server;
         module = server.modulesManager.getModule(FileAuthSystemModule.class);
         dbPath = module.getDatabasePath();
