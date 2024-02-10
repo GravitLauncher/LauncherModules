@@ -14,7 +14,7 @@ import pro.gravit.launchermodules.mirrorhelper.installers.QuiltInstallerCommand;
 import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.command.hash.MakeProfileCommand;
+import pro.gravit.launchserver.command.profiles.MakeProfileCommand;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
