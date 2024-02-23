@@ -19,6 +19,7 @@ import pro.gravit.launchserver.auth.core.User;
 import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportExit;
 import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportRegistration;
+import pro.gravit.launchserver.auth.core.interfaces.provider.AuthSupportSudo;
 import pro.gravit.launchserver.auth.core.interfaces.user.UserSupportTextures;
 import pro.gravit.launchserver.auth.password.DigestPasswordVerifier;
 import pro.gravit.launchserver.auth.password.PasswordVerifier;
@@ -45,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.concurrent.TimeUnit.HOURS;
 
-public class FileSystemAuthCoreProvider extends AuthCoreProvider implements AuthSupportRegistration, AuthSupportExit {
+public class FileSystemAuthCoreProvider extends AuthCoreProvider implements AuthSupportRegistration, AuthSupportExit, AuthSupportSudo {
     private final transient Logger logger = LogManager.getLogger();
     public String databaseDir;
     public boolean autoSave = true;
@@ -288,6 +289,14 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             return AuthManager.AuthReport.ofOAuthWithMinecraft(session.minecraftAccessToken, session.accessToken, session.refreshToken, oauthTokenExpire, session);
         }
         return AuthManager.AuthReport.ofOAuth(session.accessToken, session.refreshToken, oauthTokenExpire, session);
+    }
+
+    @Override
+    public AuthManager.AuthReport sudo(User user, boolean shadow) throws IOException {
+        UserEntity entity = (UserEntity) user;
+        UserSessionEntity session = new UserSessionEntity(entity);
+        addNewSession(session);
+        return AuthManager.AuthReport.ofOAuthWithMinecraft(session.minecraftAccessToken, session.accessToken, session.refreshToken, oauthTokenExpire, session);
     }
 
     @Override
