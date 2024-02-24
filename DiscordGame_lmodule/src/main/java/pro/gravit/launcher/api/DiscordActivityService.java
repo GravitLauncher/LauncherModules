@@ -219,6 +219,9 @@ public class DiscordActivityService {
     public void onPlayerProfile(PlayerProfile playerProfile) {
         setParam("username", playerProfile.username);
         setParam("uuid", playerProfile.uuid.toString());
+        if (playerProfile.assets.get("AVATAR") != null) {
+            setParam("avatarUrl", playerProfile.assets.get("AVATAR").url);
+        }
     }
 
     private void setScope(ScopeConfig scopeConfig) {
