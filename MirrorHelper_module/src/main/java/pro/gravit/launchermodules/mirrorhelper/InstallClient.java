@@ -180,20 +180,22 @@ public class InstallClient {
                 quiltInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Quilt installed");
-            } else if (versionType == VersionType.FORGE) {
+            } else if (versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) {
+                String forgePrefix = versionType == VersionType.NEOFORGE ? "neoforge" : "forge";
                 boolean noGui = true;
-                Path forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer-nogui.jar");
+                Path forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer-nogui.jar");
                 if(Files.notExists(forgeInstaller)) {
                     logger.warn("{} not found", forgeInstaller.toAbsolutePath().toString());
-                    forgeInstaller = workdir.resolve("installers").resolve("forge-" + version + "-installer.jar");
+                    forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer.jar");
                     noGui = false;
                 }
                 if(Files.notExists(forgeInstaller)) {
                     throw new FileNotFoundException(forgeInstaller.toAbsolutePath().toString());
                 }
-                Path tmpDir = workdir.resolve("clients").resolve("forge").resolve(version.toString());
+                Path tmpDir = workdir.resolve("clients").resolve(forgePrefix).resolve(version.toString());
                 if(Files.notExists(tmpDir)) {
                     Files.createDirectories(tmpDir);
+                    Files.createDirectories(tmpDir.resolve("versions"));
                     IOHelper.transfer("{\"profiles\": {}}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
                     int counter = 5;
                     do {
@@ -254,7 +256,9 @@ public class InstallClient {
                         }
                     }
                 }
-                IOHelper.deleteDir(tmpDir, false);
+                if(config.deleteTmpDir) {
+                    IOHelper.deleteDir(tmpDir, true);
+                }
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Forge installed");
             }
@@ -283,6 +287,7 @@ public class InstallClient {
             String loaderName = switch (versionType) {
                 case VANILLA -> "";
                 case FABRIC -> "fabric";
+                case NEOFORGE -> "neoforge";
                 case FORGE -> "forge";
                 case QUILT -> "quilt";
             };
@@ -438,6 +443,6 @@ public class InstallClient {
     }
 
     public enum VersionType {
-        VANILLA, FABRIC, FORGE, QUILT
+        VANILLA, FABRIC, NEOFORGE, FORGE, QUILT
     }
 }
