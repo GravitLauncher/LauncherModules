@@ -1,0 +1,15 @@
+apply plugin: 'org.openjfx.javafxplugin'
+def mainClassName = "pro.gravit.launchermodules.fxruntimeoptimizer.FxRuntimeOptimizerModule"
+
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+jar {
+    manifest.attributes("Module-Main-Class": mainClassName)
+}
+
+
+javafx {
+    version = "21"
+    modules = ['javafx.controls', 'javafx.fxml']
+}
