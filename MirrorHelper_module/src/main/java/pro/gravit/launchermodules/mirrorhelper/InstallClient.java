@@ -203,7 +203,7 @@ public class InstallClient {
                         if(noGui) {
                             logger.info("Install forge client into {} (no gui)", tmpDir.toAbsolutePath().toString());
                             forgeProcess = new ProcessBuilder()
-                                    .command("java", "-jar", forgeInstaller.toAbsolutePath().toString(), "--install-client", tmpDir.toAbsolutePath().toString())
+                                    .command("java", "-jar", forgeInstaller.toAbsolutePath().toString(), "--installClient", tmpDir.toAbsolutePath().toString())
                                     .inheritIO()
                                     .start();
                         } else {
