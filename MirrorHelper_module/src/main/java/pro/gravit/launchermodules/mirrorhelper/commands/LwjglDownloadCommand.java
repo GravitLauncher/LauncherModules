@@ -9,6 +9,7 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,13 +88,13 @@ public class LwjglDownloadCommand extends Command {
                     .concat("/")
                     .concat(version)
                     .concat("/");
-            URL jarUrl = new URL(prepareUrl
-                    .concat("%s-%s.jar".formatted(component, version)));
+            URL jarUrl = new URI(prepareUrl
+                    .concat("%s-%s.jar".formatted(component, version))).toURL();
             logger.info("Download {} to {}", jarUrl, jarPath);
             download(jarUrl, jarPath);
             for (String arch : archs) {
-                URL nativesUrl = new URL(prepareUrl
-                        .concat("%s-%s-natives-%s.jar".formatted(component, version, arch)));
+                URL nativesUrl = new URI(prepareUrl
+                        .concat("%s-%s-natives-%s.jar".formatted(component, version, arch))).toURL();
                 var pair = getFromLwjglNativeName(arch);
                 Path nativesPath = natives.resolve(pair.os.name.toLowerCase()).resolve(pair.arch.name.toLowerCase());
                 IOHelper.createParentDirs(nativesPath);

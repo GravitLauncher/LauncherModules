@@ -5,6 +5,8 @@ import pro.gravit.utils.helper.IOHelper;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,7 @@ public class ClientDownloader {
         try {
             String workURL = null;
             JsonObject obj = GSON.fromJson(
-                    IOHelper.request(new URL("https://launchermeta.mojang.com/mc/game/version_manifest.json")),
+                    IOHelper.request(new URI("https://launchermeta.mojang.com/mc/game/version_manifest.json").toURL()),
                     JsonObject.class);
             if (obj.has("versions") && obj.get("versions").isJsonArray())
                 for (JsonElement el : obj.get("versions").getAsJsonArray())
@@ -29,11 +31,11 @@ public class ClientDownloader {
                             workURL = el.getAsJsonObject().get("url").getAsString();
                     }
             if (workURL != null) {
-                obj = GSON.fromJson(IOHelper.request(new URL(workURL)), JsonObject.class);
+                obj = GSON.fromJson(IOHelper.request(new URI(workURL).toURL()), JsonObject.class);
                 return obj;
             }
             throw new IOException("Client not found");
-        } catch (JsonSyntaxException | MalformedURLException e) {
+        } catch (JsonSyntaxException | MalformedURLException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

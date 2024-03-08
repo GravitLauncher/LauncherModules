@@ -7,6 +7,8 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -58,8 +60,8 @@ public class ClassLoaderCommand extends Command {
         String[] splits = s.split(";");
         return Arrays.stream(splits).map((e) -> {
             try {
-                return new URL(e);
-            } catch (MalformedURLException ex) {
+                return new URI(e);
+            } catch (URISyntaxException ex) {
                 LogHelper.error(ex);
                 return null;
             }

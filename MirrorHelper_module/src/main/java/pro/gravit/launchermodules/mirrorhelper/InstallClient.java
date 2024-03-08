@@ -19,6 +19,7 @@ import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -59,10 +60,10 @@ public class InstallClient {
         var modInfo = api.fetchModById(modId);
         long fileId = modInfo.findFileIdByGameVersion(version.toString());
         var fileInfo = api.fetchModFileById(modId, fileId);
-        URL url = new URL(fileInfo.downloadUrl());
+        URI url = new URI(fileInfo.downloadUrl());
         Path path = modsDir.resolve(fileInfo.fileName().replace("+", "-"));
         logger.info("Download {} {} into {}", fileInfo.fileName(), url, path);
-        try (InputStream input = IOHelper.newInput(url)) {
+        try (InputStream input = IOHelper.newInput(url.toURL())) {
             IOHelper.transfer(input, path);
         }
         logger.info("{} downloaded", fileInfo.fileName());
@@ -84,10 +85,10 @@ public class InstallClient {
         if(file == null) {
             throw new RuntimeException("Mod '%s' not found suitable file".formatted(slug));
         }
-        URL url = new URL(file.url());
+        URI url = new URI(file.url());
         Path path = modsDir.resolve(file.filename().replace("+", "-"));
         logger.info("Download {} {} into {}", file.filename(), url, path);
-        try (InputStream input = IOHelper.newInput(url)) {
+        try (InputStream input = IOHelper.newInput(url.toURL())) {
             IOHelper.transfer(input, path);
         }
         logger.info("{} downloaded", file.filename());
@@ -119,7 +120,7 @@ public class InstallClient {
                 .map(y -> new Downloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
         var downloader = Downloader.downloadList(applies, null, clientDir.resolve("libraries"), null, e, 4);
         if (info.client != null) {
-            IOHelper.transfer(IOHelper.newInput(new URL(info.client.url)), clientDir.resolve("minecraft.jar"));
+            IOHelper.transfer(IOHelper.newInput(new URI(info.client.url).toURL()), clientDir.resolve("minecraft.jar"));
         }
         LogHelper.subInfo("Downloaded client jar!");
         downloader.getFuture().get();
@@ -130,7 +131,7 @@ public class InstallClient {
 
     private void fetchNatives(Path resolve, List<ClientDownloader.Artifact> natives) {
         for (ClientDownloader.Artifact a : natives) {
-            try (ZipInputStream z = IOHelper.newZipInput(new URL(a.url))) {
+            try (ZipInputStream z = IOHelper.newZipInput(new URI(a.url).toURL())) {
                 ZipEntry e = z.getNextEntry();
                 while (e != null) {
                     if (!e.isDirectory() && !e.getName().startsWith("META-INF") && !e.getName().startsWith("/META-INF")) {

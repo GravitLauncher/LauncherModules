@@ -8,6 +8,7 @@ import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -81,7 +82,7 @@ public class ForgeInstallerCommand extends Command {
                 Path file = dir.resolve("tmp").resolve(info.downloads.artifact.path);
                 IOHelper.createParentDirs(file);
                 logger.debug("Download {}", info.downloads.artifact.url);
-                try (InputStream stream = IOHelper.newInput(new URL(info.downloads.artifact.url))) {
+                try (InputStream stream = IOHelper.newInput(new URI(info.downloads.artifact.url).toURL())) {
                     try (OutputStream output = IOHelper.newOutput(file)) {
                         IOHelper.transfer(stream, output);
                     }
