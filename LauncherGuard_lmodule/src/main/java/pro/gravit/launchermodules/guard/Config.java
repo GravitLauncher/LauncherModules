@@ -21,23 +21,25 @@ public class Config {
     @LauncherInject(value = "modules.launcherguard.protectlauncher")
     public boolean protectLauncher;
     @LauncherInject(value = "modules.launcherguard.addexeasagent")
-    public boolean addExeAsAgent;
+    public Map<String, String> nativeAgent;
 
     public static Object getDefault() {
         Config config = new Config();
         config.files = new HashMap<>();
         config.exeFile = new HashMap<>();
+        config.nativeAgent = new HashMap<>();
         List<String> windowsFiles = new ArrayList<>();
         windowsFiles.add("wrapper.exe");
-        windowsFiles.add("AntiInject.dll");
+        windowsFiles.add("GuardDLL.dll");
         config.files.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86_64, JVMHelper.OS.MUSTDIE), windowsFiles);
         config.files.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86, JVMHelper.OS.MUSTDIE), windowsFiles);
         config.exeFile.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86_64, JVMHelper.OS.MUSTDIE), "wrapper.exe");
         config.exeFile.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86, JVMHelper.OS.MUSTDIE), "wrapper.exe");
+        config.nativeAgent.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86_64, JVMHelper.OS.MUSTDIE), "GuardDLL");
+        config.nativeAgent.put(Launcher.makeSpecialGuardDirName(JVMHelper.ARCH.X86, JVMHelper.OS.MUSTDIE), "GuardDLL");
         config.renameExeFile = true;
         config.useClasspathProperty = true;
         config.protectLauncher = false;
-        config.addExeAsAgent = false;
         return config;
     }
 }

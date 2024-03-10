@@ -49,10 +49,21 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
             event.processBuilder.executeFile = executeFile;
             event.processBuilder.useLegacyJavaClassPathProperty = config.useClasspathProperty;
             event.processBuilder.systemEnv.put("JAVA_HOME", javaVersion.jvmDir.toAbsolutePath().toString());
-            if(config.addExeAsAgent) {
-                event.processBuilder.jvmArgs.add("-agentlib:".concat(executeFile.toAbsolutePath().toString()));
+            var agentArgument = makeAgentlibArgument(javaVersion);
+            if(agentArgument != null) {
+                event.processBuilder.jvmArgs.add(agentArgument);
             }
         }
+    }
+
+    public String makeAgentlibArgument(JavaHelper.JavaVersion javaVersion) {
+        String key = Launcher.makeSpecialGuardDirName(javaVersion.arch, JVMHelper.OS_TYPE);
+        String value = config.nativeAgent.get(key);
+        if(value != null) {
+            Path dir = DirBridge.getGuardDir().resolve(key);
+            return "-agentlib:".concat(dir.resolve(value).toString());
+        }
+        return null;
     }
 
     public Path unpackIfPossible(JavaHelper.JavaVersion javaVersion) {
@@ -115,6 +126,10 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
             context.useLegacyClasspathProperty = config.useClasspathProperty;
             Map<String, String> env = context.processBuilder.environment();
             env.put("JAVA_HOME", context.javaVersion.jvmDir.toAbsolutePath().toString());
+            var agentArgument = makeAgentlibArgument(context.javaVersion);
+            if(agentArgument != null) {
+                context.args.add(agentArgument);
+            }
         }
     }
 }
