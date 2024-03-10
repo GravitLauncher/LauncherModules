@@ -111,7 +111,7 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
         }
         Path executeFile = unpackIfPossible(context.javaVersion);
         if(executeFile != null) {
-            context.executePath = executeFile.toAbsolutePath();
+            context.executePath = executeFile;
             context.useLegacyClasspathProperty = config.useClasspathProperty;
             Map<String, String> env = context.processBuilder.environment();
             env.put("JAVA_HOME", context.javaVersion.jvmDir.toAbsolutePath().toString());
