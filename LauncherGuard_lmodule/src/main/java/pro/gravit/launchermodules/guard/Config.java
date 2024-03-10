@@ -20,7 +20,7 @@ public class Config {
     public boolean useClasspathProperty;
     @LauncherInject(value = "modules.launcherguard.protectlauncher")
     public boolean protectLauncher;
-    @LauncherInject(value = "modules.launcherguard.addexeasagent")
+    @LauncherInject(value = "modules.launcherguard.nativeagent")
     public Map<String, String> nativeAgent;
 
     public static Object getDefault() {
