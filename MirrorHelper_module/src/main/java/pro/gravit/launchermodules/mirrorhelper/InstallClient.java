@@ -267,16 +267,8 @@ public class InstallClient {
         {
             copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
-            if (version.compareTo(ClientProfileVersions.MINECRAFT_1_13) >= 0) {
-                copyDir(workdir.resolve("workdir").resolve("lwjgl3"), clientPath);
-            } else {
-                copyDir(workdir.resolve("workdir").resolve("lwjgl2"), clientPath);
-            }
-            if (version.compareTo(ClientProfileVersions.MINECRAFT_1_18) >= 0) {
-                copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
-            } else {
-                copyDir(workdir.resolve("workdir").resolve("java8"), clientPath);
-            }
+            copyDir(workdir.resolve("workdir").resolve("lwjgl3"), clientPath);
+            copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve(versionType.name()), clientPath);
             logger.info("Files copied");
