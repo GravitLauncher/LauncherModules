@@ -173,10 +173,10 @@ public class ApplyWorkspaceCommand extends Command {
                 logger.info("Execute {}", String.join(" ", cmd));
                 var workdirString = context.replace(inst.workdir());
                 Path workdir = workdirString != null ? Path.of(workdirString) : context.scriptBuildDir;
-                if(!cmd.isEmpty() && cmd.get(0).startsWith("%")) {
-                    BuildInCommand buildInCommand = buildInCommands.get(cmd.get(0));
+                if(!cmd.isEmpty() && cmd.getFirst().startsWith("%")) {
+                    BuildInCommand buildInCommand = buildInCommands.get(cmd.getFirst());
                     if(buildInCommand == null) {
-                        throw new IllegalArgumentException(String.format("Build-in command %s not found", cmd.get(0)));
+                        throw new IllegalArgumentException(String.format("Build-in command %s not found", cmd.getFirst()));
                     }
                     List<String> cmdArgs = cmd.subList(1, cmd.size());
                     buildInCommand.run(cmdArgs, context, module, server, workdir);

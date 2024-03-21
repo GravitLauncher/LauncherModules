@@ -276,7 +276,7 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     public record MicrosoftXBoxLiveResponse(String IssueInstant, String NotAfter, String Token,
                                             Map<String, List<Map<String, String>>> DisplayClaims) { //XBox Live and XSTS
         public String getUHS() {
-            return DisplayClaims.get("xui").get(0).get("uhs");
+            return DisplayClaims.get("xui").getFirst().get("uhs");
         }
     }
 

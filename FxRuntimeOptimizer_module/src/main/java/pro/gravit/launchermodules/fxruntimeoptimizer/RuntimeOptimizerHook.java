@@ -12,7 +12,6 @@ import pro.gravit.utils.helper.IOHelper;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.stream.Stream;
 
 public class RuntimeOptimizerHook implements MainBuildTask.IOHookSet.IOHook<BuildContext> {
     private transient final Logger logger = LogManager.getLogger(RuntimeOptimizerHook.class);

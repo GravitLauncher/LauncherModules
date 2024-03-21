@@ -12,8 +12,6 @@ import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
-import java.io.IOException;
-
 public class FxRuntimeOptimizerModule extends LauncherModule {
     private transient final Logger logger = LogManager.getLogger(FxRuntimeOptimizerModule.class);
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.STABLE);

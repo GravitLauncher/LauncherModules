@@ -62,7 +62,7 @@ public class RemoteControlWebSeverlet implements NettyWebAPIHandler.SimpleSeverl
                     sendHttpResponse(ctx, simpleJsonResponse(HttpResponseStatus.BAD_REQUEST, new RemoteControlResponse<Void>("Missing required parameter: command")));
                     return;
                 }
-                command = token.commands.get(0);
+                command = token.commands.getFirst();
             }
             String finalCommand = command;
             if (token.startWithMode ? token.commands.stream().noneMatch(finalCommand::startsWith) : !token.commands.contains(command)) {
