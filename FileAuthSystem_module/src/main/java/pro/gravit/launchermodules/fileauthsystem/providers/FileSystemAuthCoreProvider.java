@@ -335,7 +335,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         try {
             addUser(entity);
         } catch (RequestException e) {
-            return null;
+            throw new RuntimeException("Failed to add user", e);
         }
         return entity;
     }
