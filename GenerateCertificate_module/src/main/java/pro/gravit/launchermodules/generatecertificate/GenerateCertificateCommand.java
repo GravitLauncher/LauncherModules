@@ -144,13 +144,14 @@ public class GenerateCertificateCommand extends Command {
         LogHelper.info("KeyAlias may be incorrect. Usage: 'keytool -storepass %s -keystore %s -list' for check alias", passwd, conf.keyStore);
         LogHelper.warning("Must save your store password");
         if (!server.config.sign.enabled) {
-            LogHelper.info("Write temporary sign config(in memory, reset on restart)");
+            LogHelper.info("Write config");
             server.config.sign = conf;
             LogHelper.info("Add your RootCA to truststore");
             Path pathToRootCA = server.dir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
             Files.deleteIfExists(pathToRootCA);
             Files.copy(server.dir.resolve(projectName.concat("RootCA.crt")), pathToRootCA);
             server.certificateManager.readTrustStore(server.dir.resolve("truststore"));
+            server.launchServerConfigManager.writeConfig(server.config);
         } else {
             Path pathToRootCA = server.dir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
             Files.deleteIfExists(pathToRootCA);
