@@ -217,15 +217,25 @@ public class InstallClient {
                         logger.info("Process return with status code {}", code);
                         counter--;
                         if (counter <= 0) {
+                            IOHelper.deleteDir(tmpDir, true);
                             throw new RuntimeException("Forge not installed");
                         }
                     } while (!Files.isDirectory(tmpDir.resolve("libraries")));
                 }
                 copyDir(tmpDir.resolve("libraries"), clientPath.resolve("libraries"));
                 {
-                    Path forgeClientDir = Files.list(tmpDir.resolve("versions"))
-                            .filter(x -> x.getFileName().toString().toLowerCase(Locale.ROOT).contains("forge")).findFirst().orElseThrow();
-                    Path forgeProfileFile = Files.list(forgeClientDir).filter(p -> p.getFileName().toString().endsWith(".json")).findFirst().orElseThrow();
+                    Path forgeClientDir;
+                    try (Stream<Path> stream = Files.list(tmpDir.resolve("versions"))
+                                 .filter(x -> {
+                                     String fname = x.getFileName().toString().toLowerCase(Locale.ROOT);
+                                     return  fname.contains("forge") || fname.contains("cleanroom");
+                                 })) {
+                        forgeClientDir = stream.findFirst().orElseThrow();
+                    }
+                    Path forgeProfileFile;
+                    try(Stream<Path> stream = Files.list(forgeClientDir).filter(p -> p.getFileName().toString().endsWith(".json"))) {
+                        forgeProfileFile = stream.findFirst().orElseThrow();
+                    }
                     logger.debug("Forge profile {}", forgeProfileFile.toString());
                     FabricInstallerCommand.MinecraftProfile fabricProfile;
                     try (Reader reader = IOHelper.newReader(forgeProfileFile)) {
