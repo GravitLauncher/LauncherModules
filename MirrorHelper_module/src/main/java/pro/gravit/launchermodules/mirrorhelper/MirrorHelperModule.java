@@ -26,8 +26,10 @@ import java.nio.file.Paths;
 public class MirrorHelperModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     private final Logger logger = LogManager.getLogger();
+    LaunchServer server;
     public Config config;
     public JsonConfigurable<Config> configurable;
+    public WorkspaceTools tools;
 
     public MirrorHelperModule() {
         super(new LauncherModuleInfo("MirrorHelper", version, new String[]{"LaunchServerCore"}));
@@ -62,6 +64,8 @@ public class MirrorHelperModule extends LauncherModule {
 
     public void initialize(LaunchServer server) {
         MirrorHelperModule module = this;
+        this.server = server;
+        this.tools = new WorkspaceTools(this);
         configurable = new JsonConfigurable<>(Config.class, modulesConfigManager.getModuleConfig(moduleInfo.name)) {
             @Override
             public Config getConfig() {

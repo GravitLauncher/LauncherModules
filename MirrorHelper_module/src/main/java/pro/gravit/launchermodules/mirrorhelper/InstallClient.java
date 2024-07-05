@@ -39,15 +39,17 @@ public class InstallClient {
     private final Path workdir;
     private final String name;
     private final ClientProfile.Version version;
+    private final WorkspaceTools tools;
 
     private final List<String> mods;
     private final VersionType versionType;
     private final MirrorWorkspace mirrorWorkspace;
 
-    public InstallClient(LaunchServer launchServer, Config config, Path workdir, String name, ClientProfile.Version version, List<String> mods, VersionType versionType, MirrorWorkspace mirrorWorkspace) {
-        this.launchServer = launchServer;
-        this.config = config;
-        this.workdir = workdir;
+    public InstallClient(MirrorHelperModule module, String name, ClientProfile.Version version, List<String> mods, VersionType versionType, MirrorWorkspace mirrorWorkspace) {
+        this.launchServer = module.server;
+        this.config = module.config;
+        this.workdir = module.getWorkspaceDir();
+        this.tools = module.tools;
         this.name = name;
         this.version = version;
         this.mods = mods;
@@ -145,6 +147,9 @@ public class InstallClient {
     }
 
     public void run() throws Exception {
+        if(mirrorWorkspace == null) {
+            throw new RuntimeException("Workspace not found! Please use 'applyworkspace'");
+        }
         logger.info("Install client {} {}", version.toString(), versionType);
         Path clientPath = launchServer.updatesDir.resolve(name);
         {
@@ -274,6 +279,25 @@ public class InstallClient {
             }
         }
         {
+            for(var entry : mirrorWorkspace.build().entrySet()) {
+                var k = entry.getKey();
+                var v = entry.getValue();
+                if(!v.check(versionType, version)) {
+                    continue;
+                }
+                Path target = workdir.resolve(v.path());
+                if(Files.notExists(target)) {
+                    logger.info("Build {}", k);
+                    try {
+                        tools.build(k, v);
+                    } catch (Throwable e) {
+                        logger.error("Build error", e);
+                    }
+                }
+            }
+        }
+        logger.info("Build required libraries");
+        {
             copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
             copyDir(workdir.resolve("workdir").resolve("lwjgl3"), clientPath);
@@ -314,36 +338,22 @@ public class InstallClient {
             }
             logger.info("Mods installed");
         }
-        if (mirrorWorkspace != null) {
-            logger.info("Install multiMods");
-            for (var m : mirrorWorkspace.multiMods().entrySet()) {
-                var k = m.getKey();
-                var v = m.getValue();
-                if(v.type() != null && v.type() != versionType) {
-                    continue;
-                }
-                if (v.minVersion() != null) {
-                    ClientProfile.Version min = ClientProfile.Version.of(v.minVersion());
-                    if (version.compareTo(min) < 0) {
-                        continue;
-                    }
-                }
-                if (v.maxVersion() != null) {
-                    ClientProfile.Version max = ClientProfile.Version.of(v.maxVersion());
-                    if (version.compareTo(max) > 0) {
-                        continue;
-                    }
-                    Path file = workdir.resolve("multimods").resolve(k.concat(".jar"));
-                    if (Files.notExists(file)) {
-                        logger.warn("File {} not exist", file);
-                        continue;
-                    }
-                    Path targetMod = clientPath.resolve("mods").resolve(file.getFileName());
-                    logger.info("Copy {} to {}", file, targetMod);
-                    IOHelper.copy(file, targetMod);
-                }
-                logger.info("MultiMods installed");
+        logger.info("Install multiMods");
+        for (var m : mirrorWorkspace.multiMods().entrySet()) {
+            var k = m.getKey();
+            var v = m.getValue();
+            if(!v.check(versionType, version)) {
+                continue;
             }
+            Path file = workdir.resolve("multimods").resolve(k.concat(".jar"));
+            if (Files.notExists(file)) {
+                logger.warn("File {} not exist", file);
+                continue;
+            }
+            Path targetMod = clientPath.resolve("mods").resolve(file.getFileName());
+            logger.info("Copy {} to {}", file, targetMod);
+            IOHelper.copy(file, targetMod);
+            logger.info("MultiMods installed");
         }
         {
             DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);

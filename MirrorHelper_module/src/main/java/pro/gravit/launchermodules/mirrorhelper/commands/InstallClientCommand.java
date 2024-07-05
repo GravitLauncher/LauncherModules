@@ -49,7 +49,7 @@ public class InstallClientCommand extends Command {
         if (args.length > 3) {
             mods = Arrays.stream(args[3].split(",")).toList();
         }
-        InstallClient run = new InstallClient(server, module.config, module.getWorkspaceDir(), name, version, mods, versionType, mirrorWorkspace);
+        InstallClient run = new InstallClient(module, name, version, mods, versionType, mirrorWorkspace);
         run.run();
     }
 }
