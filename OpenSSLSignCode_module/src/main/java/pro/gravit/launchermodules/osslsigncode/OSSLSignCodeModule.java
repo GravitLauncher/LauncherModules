@@ -7,6 +7,7 @@ import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.exe.BuildExeMainTask;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
@@ -26,11 +27,11 @@ public class OSSLSignCodeModule extends LauncherModule {
         if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
             initOSSLSignCode(launchServerInitContext.server);
         } else {
-            registerEvent(this::registerTask, LaunchServerFullInitEvent.class);
+            registerEvent(this::registerTask, LaunchServerPostInitPhase.class);
         }
     }
 
-    public void registerTask(LaunchServerFullInitEvent event) {
+    public void registerTask(LaunchServerPostInitPhase event) {
         initOSSLSignCode(event.server);
     }
 

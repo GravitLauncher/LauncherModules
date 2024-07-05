@@ -8,6 +8,7 @@ import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 
 import java.nio.file.Path;
@@ -24,14 +25,14 @@ public class FileAuthSystemModule extends LauncherModule {
         AuthCoreProvider.providers.register("fileauthsystem", FileSystemAuthCoreProvider.class);
     }
 
-    public void finish(LaunchServerFullInitEvent event) {
+    public void finish(LaunchServerPostInitPhase event) {
         event.server.commandHandler.registerCommand("fileauthsystem", new FileAuthSystemCommand(event.server, this));
     }
 
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preConfig, PreConfigPhase.class);
-        registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        registerEvent(this::finish, LaunchServerPostInitPhase.class);
         Path dbPath = modulesConfigManager.getModuleConfigDir(moduleInfo.name);
         jsonConfigurable = modulesConfigManager.getConfigurable(FileAuthSystemConfig.class, moduleInfo.name);
     }

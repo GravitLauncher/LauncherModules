@@ -10,6 +10,7 @@ import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launchermodules.mirrorhelper.commands.*;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.command.BaseCommandCategory;
@@ -55,7 +56,7 @@ public class MirrorHelperModule extends LauncherModule {
     }
 
 
-    public void finish(LaunchServerFullInitEvent event) {
+    public void finish(LaunchServerPostInitPhase event) {
         initialize(event.server);
     }
 
@@ -98,7 +99,7 @@ public class MirrorHelperModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        registerEvent(this::finish, LaunchServerPostInitPhase.class);
         if (initContext instanceof LaunchServerInitContext launchServerInitContext) {
             initialize(launchServerInitContext.server);
         }

@@ -9,6 +9,7 @@ import pro.gravit.launcher.base.modules.events.ClosePhase;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
@@ -23,7 +24,7 @@ public class FxRuntimeOptimizerModule extends LauncherModule {
     }
 
 
-    public void finish(LaunchServerFullInitEvent event) {
+    public void finish(LaunchServerPostInitPhase event) {
         installHooks(event.server);
     }
 
@@ -35,7 +36,7 @@ public class FxRuntimeOptimizerModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        registerEvent(this::finish, LaunchServerPostInitPhase.class);
         registerEvent(this::close, ClosePhase.class);
         if (initContext instanceof LaunchServerInitContext ctx) {
             installHooks(ctx.server);

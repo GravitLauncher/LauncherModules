@@ -8,6 +8,7 @@ import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.events.LaunchServerUpdatesSyncEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
@@ -30,7 +31,7 @@ public class S3UpdatesModule extends LauncherModule {
         if (initContext instanceof LaunchServerInitContext context) {
             initSwiftUpdatesModule(context.server);
         } else {
-            registerEvent(this::finish, LaunchServerFullInitEvent.class);
+            registerEvent(this::finish, LaunchServerPostInitPhase.class);
         }
         registerEvent(this::onUpdatePush, LaunchServerUpdatesSyncEvent.class);
     }
@@ -73,7 +74,7 @@ public class S3UpdatesModule extends LauncherModule {
         server.commandHandler.registerCommand("s3upload", new S3UpdatesCleanupCommand(server, s3Service, config));
     }
 
-    public void finish(LaunchServerFullInitEvent event) {
+    public void finish(LaunchServerPostInitPhase event) {
         initSwiftUpdatesModule(event.server);
     }
 

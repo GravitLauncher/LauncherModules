@@ -10,6 +10,7 @@ import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
+import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
 
@@ -32,7 +33,7 @@ public class SentryProguardUploadModule extends LauncherModule {
     }
 
 
-    public void finish(LaunchServerFullInitEvent event) {
+    public void finish(LaunchServerPostInitPhase event) {
         init(event.server);
     }
 
@@ -72,7 +73,7 @@ public class SentryProguardUploadModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent(this::finish, LaunchServerFullInitEvent.class);
+        registerEvent(this::finish, LaunchServerPostInitPhase.class);
         if (initContext instanceof LaunchServerInitContext ctx) {
             init(ctx.server);
         }
