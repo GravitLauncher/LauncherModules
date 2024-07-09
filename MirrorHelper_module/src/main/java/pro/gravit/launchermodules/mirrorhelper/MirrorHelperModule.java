@@ -97,6 +97,7 @@ public class MirrorHelperModule extends LauncherModule {
         commands.registerCommand("lwjgldownload", new LwjglDownloadCommand(server));
         commands.registerCommand("patchauthlib", new PatchAuthlibCommand(server));
         commands.registerCommand("applyworkspace", new ApplyWorkspaceCommand(server, this));
+        commands.registerCommand("workspace", new WorkspaceCommand(server, this));
         CommandHandler.Category category = new CommandHandler.Category(commands, "mirror");
         server.commandHandler.registerCategory(category);
     }

@@ -5,7 +5,7 @@ import pro.gravit.launcher.base.profiles.ClientProfile;
 import java.util.List;
 import java.util.Map;
 
-public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, List<String> forgeMods, String lwjgl3version, String fabricLoaderVersion, Map<String, MultiMod> multiMods, List<Library> libraries, Map<String, BuildScript> build) {
+public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, List<String> forgeMods, String lwjgl3version, List<LwjglVersions> lwjglVersionOverride, String fabricLoaderVersion, Map<String, MultiMod> multiMods, List<Library> libraries, Map<String, BuildScript> build) {
     public record Library(String path, String url, String data, Map<String, String> unpack, List<String> prefixFilter) {
     }
     public record MultiMod(ClientProfile.Version minVersion, ClientProfile.Version maxVersion, InstallClient.VersionType type, String url) {
@@ -39,6 +39,10 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
     }
 
     public record BuildCommand(String workdir, List<String> cmd, boolean ignoreErrorCode, Map<String, String> env) {
+
+    }
+
+    public record LwjglVersions(String minVersion, String maxVersion, String value) {
 
     }
 }
