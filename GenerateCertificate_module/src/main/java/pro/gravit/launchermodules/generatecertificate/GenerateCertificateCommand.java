@@ -107,7 +107,7 @@ public class GenerateCertificateCommand extends Command {
             logger.info("Write config");
             server.config.sign = conf;
             logger.info("Add your RootCA to truststore");
-            Path pathToRootCA = targetDir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
+            Path pathToRootCA = server.dir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
             Files.deleteIfExists(pathToRootCA);
             Files.copy(rootCACrtPath, pathToRootCA);
             server.certificateManager.readTrustStore(targetDir.resolve("truststore"));
