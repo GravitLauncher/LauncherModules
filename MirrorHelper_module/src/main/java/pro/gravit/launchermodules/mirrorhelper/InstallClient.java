@@ -356,7 +356,7 @@ public class InstallClient {
                 logger.warn("File {} not exist", file);
                 continue;
             }
-            Path targetMod = clientPath.resolve("mods").resolve(file.getFileName());
+            Path targetMod = v.target() != null ? clientPath.resolve(v.target()) : clientPath.resolve("mods").resolve(file.getFileName());
             logger.info("Copy {} to {}", file, targetMod);
             IOHelper.copy(file, targetMod);
             logger.info("MultiMods installed");

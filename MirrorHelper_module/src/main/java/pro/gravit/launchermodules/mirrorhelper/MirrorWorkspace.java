@@ -8,7 +8,7 @@ import java.util.Map;
 public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, List<String> forgeMods, String lwjgl3version, List<LwjglVersions> lwjglVersionOverride, String fabricLoaderVersion, Map<String, MultiMod> multiMods, List<Library> libraries, Map<String, BuildScript> build) {
     public record Library(String path, String url, String data, Map<String, String> unpack, List<String> prefixFilter) {
     }
-    public record MultiMod(ClientProfile.Version minVersion, ClientProfile.Version maxVersion, InstallClient.VersionType type, String url) {
+    public record MultiMod(ClientProfile.Version minVersion, ClientProfile.Version maxVersion, InstallClient.VersionType type, String url, String target) {
         boolean check(InstallClient.VersionType type, ClientProfile.Version version) {
             if(this.type != null && this.type != type) {
                 return false;
