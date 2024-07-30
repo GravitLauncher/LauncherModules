@@ -29,20 +29,23 @@ public class FabricInstallerCommand extends Command {
     }
 
     public static NamedURL makeURL(String mavenUrl, String mavenId) throws URISyntaxException, MalformedURLException {
-        URI baseUri = new URI(mavenUrl);
-        String scheme = baseUri.getScheme();
-        String host = baseUri.getHost();
-        int port = baseUri.getPort();
-        if (port != -1)
-            host = host + ":" + port;
-        String path = baseUri.getPath();
         //
         String[] mavenIdSplit = mavenId.split(":");
         String artifact = "%s/%s/%s/%s-%s.jar".formatted(mavenIdSplit[0].replaceAll("\\.", "/"),
                 mavenIdSplit[1], mavenIdSplit[2], mavenIdSplit[1], mavenIdSplit[2]);
         //
-        URL url = new URI(scheme, host, path + artifact, "", "").toURL();
-        return new NamedURL(url, artifact);
+        URI baseUri = new URI(mavenUrl);
+        if(mavenUrl.endsWith("/")) {
+            String scheme = baseUri.getScheme();
+            String host = baseUri.getHost();
+            int port = baseUri.getPort();
+            if (port != -1)
+                host = host + ":" + port;
+            String path = baseUri.getPath();
+            URL url = new URI(scheme, host, path + artifact, "", "").toURL();
+            return new NamedURL(url, artifact);
+        }
+        return new NamedURL(baseUri.toURL(), artifact);
     }
 
     @Override

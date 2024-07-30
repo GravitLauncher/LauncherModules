@@ -3,10 +3,13 @@ package pro.gravit.launchermodules.mirrorhelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.Downloader;
+import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -17,6 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -28,6 +35,9 @@ public class WorkspaceTools {
     private static final Map<String, BuildInCommand> buildInCommands = new HashMap<>();
     static {
         buildInCommands.put("%download", new DownloadCommand());
+        buildInCommands.put("%findJar", new FindJar());
+        buildInCommands.put("%fetchManifestValue", new FetchManifestValue());
+        buildInCommands.put("%if", new If());
     }
 
     public WorkspaceTools(MirrorHelperModule module) {
@@ -116,9 +126,11 @@ public class WorkspaceTools {
         }
     }
 
-    public void build(String scriptName, MirrorWorkspace.BuildScript buildScript) throws IOException {
+    public void build(String scriptName, MirrorWorkspace.BuildScript buildScript, Path clientDir) throws IOException {
         BuildContext context = new BuildContext();
+        context.targetClientDir = clientDir;
         context.scriptBuildDir = context.createNewBuildDir(scriptName);
+        context.update();
         logger.info("Script build dir {}", context.scriptBuildDir);
         try {
             for(var inst : buildScript.script()) {
@@ -146,7 +158,7 @@ public class WorkspaceTools {
             }
             if(buildScript.result() != null && buildScript.path() != null) {
                 var from = Path.of(context.replace(buildScript.result()));
-                var to = module.getWorkspaceDir().resolve(buildScript.path());
+                var to = buildScript.dynamic() ? clientDir.resolve(context.replace(buildScript.path())) : module.getWorkspaceDir().resolve(buildScript.path());
                 logger.info("Copy {} to {}", from, to);
                 IOHelper.createParentDirs(to);
                 IOHelper.copy(from, to);
@@ -160,13 +172,21 @@ public class WorkspaceTools {
     private class BuildContext {
         public final Logger logger = LogManager.getLogger(BuildContext.class);
         public Path scriptBuildDir;
+        public Path targetClientDir;
+        public Map<String, String> variables = new HashMap<>();
+        public void update() {
+            variables.put("scripttmpdir", scriptBuildDir.toString());
+            variables.put("clientdir", targetClientDir.toString());
+            variables.put("projectname", server.config.projectName);
+        }
         public String replace(String str) {
             if(str == null) {
                 return null;
             }
-            return str
-                    .replace("%scripttmpdir%", scriptBuildDir.toString())
-                    .replace("%projectname%", server.config.projectName);
+            for(var e : variables.entrySet()) {
+                str = str.replace("%"+e.getKey()+"%", e.getValue());
+            }
+            return str;
         }
 
         public Path createNewBuildDir(String scriptName) throws IOException {
@@ -186,6 +206,86 @@ public class WorkspaceTools {
             Path target = Path.of(args.get(1));
             context.logger.info("Download {} to {}", uri, target);
             Downloader.downloadFile(uri, target, null).getFuture().get();
+        }
+    }
+
+    private static final class FindJar implements BuildInCommand {
+
+        @Override
+        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
+            Path filePath = context.targetClientDir.resolve(args.get(0));
+            String varName = args.get(1);
+            if(Files.notExists(filePath)) {
+                throw new FileNotFoundException(filePath.toAbsolutePath().toString());
+            }
+            if(Files.isDirectory(filePath)) {
+                try(Stream<Path> stream = Files.walk(filePath)) {
+                    filePath = stream.filter(e -> !Files.isDirectory(e) && e.getFileName().toString().endsWith(".jar")).findFirst().orElseThrow();
+                }
+            }
+            context.variables.put(varName, filePath.toAbsolutePath().toString());
+            if(args.size() >= 3) {
+                var version = filePath.getParent().getFileName().toString();
+                context.variables.put(args.get(2), version);
+            }
+        }
+    }
+
+    private static final class FetchManifestValue implements BuildInCommand {
+
+        @Override
+        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
+            Path filePath = context.targetClientDir.resolve(args.get(0));
+            String[] splited = args.get(1).split(",");
+            String varName = args.get(2);
+            try(JarInputStream input = new JarInputStream(IOHelper.newInput(filePath))) {
+                Manifest manifest = input.getManifest();
+                Attributes attributes = manifest.getMainAttributes();
+                for(var e : splited) {
+                    var value = attributes.getValue(e);
+                    if(value != null) {
+                        context.variables.put(varName, value);
+                        return;
+                    }
+                    for(var entity : manifest.getEntries().entrySet()) {
+                        value = entity.getValue().getValue(e);
+                        if(value != null) {
+                            context.variables.put(varName, value);
+                            return;
+                        }
+                    }
+                }
+                throw new RuntimeException(String.format("Manifest values %s not found in %s", args.get(1), filePath));
+            }
+        }
+    }
+
+    private static final class If implements BuildInCommand {
+
+        @Override
+        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
+            int ArgOffset = 1;
+            boolean ifValue;
+            if(args.get(0).equals("version")) {
+                var first = ClientProfile.Version.of(args.get(1));
+                var op = args.get(2);
+                var second = ClientProfile.Version.of(args.get(3));
+                ArgOffset += 3;
+                ifValue = switch (op) {
+                    case ">" -> first.compareTo(second) > 0;
+                    case ">=" -> first.compareTo(second) >= 0;
+                    case "<" -> first.compareTo(second) < 0;
+                    case "<=" -> first.compareTo(second) <= 0;
+                    default -> throw new IllegalStateException("Unexpected value: " + op);
+                };
+            } else {
+                throw new UnsupportedOperationException(args.get(0));
+            }
+            if(ifValue) {
+                context.variables.put(args.get(ArgOffset), args.get(ArgOffset+1));
+            } else if(args.size() > ArgOffset+1) {
+                context.variables.put(args.get(ArgOffset), args.get(ArgOffset+2));
+            }
         }
     }
 }

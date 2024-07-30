@@ -23,7 +23,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
         }
     }
 
-    public record BuildScript(List<BuildCommand> script, String result, String path, InstallClient.VersionType type, ClientProfile.Version minVersion, ClientProfile.Version maxVersion) {
+    public record BuildScript(List<BuildCommand> script, String result, String path, InstallClient.VersionType type, ClientProfile.Version minVersion, ClientProfile.Version maxVersion, boolean dynamic) {
         boolean check(InstallClient.VersionType type, ClientProfile.Version version) {
             if(this.type != null && this.type != type) {
                 return false;

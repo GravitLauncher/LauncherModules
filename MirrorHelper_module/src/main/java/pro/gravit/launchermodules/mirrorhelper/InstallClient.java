@@ -13,6 +13,7 @@ import pro.gravit.launchermodules.mirrorhelper.installers.FabricInstallerCommand
 import pro.gravit.launchermodules.mirrorhelper.installers.QuiltInstallerCommand;
 import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
+import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfile;
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfileModifier;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.profiles.MakeProfileCommand;
@@ -245,24 +246,26 @@ public class InstallClient {
                     }
                     originalMinecraftProfile = forgeProfileFile;
                     logger.debug("Forge profile {}", forgeProfileFile.toString());
-                    FabricInstallerCommand.MinecraftProfile fabricProfile;
+                    ForgeProfile forgeProfile;
                     try (Reader reader = IOHelper.newReader(forgeProfileFile)) {
-                        fabricProfile = Launcher.gsonManager.configGson.fromJson(reader, FabricInstallerCommand.MinecraftProfile.class);
+                        forgeProfile = Launcher.gsonManager.configGson.fromJson(reader, ForgeProfile.class);
                     }
-                    for (FabricInstallerCommand.MinecraftProfileLibrary library : fabricProfile.libraries) {
-                        if (library.url == null) {
-                            library.url = "https://libraries.minecraft.net/";
+                    for (ForgeProfile.ForgeProfileLibrary library : forgeProfile.libraries()) {
+                        String libUrl = library.downloads() == null ? null : library.downloads().artifact().url();
+                        String name = library.name();
+                        if (libUrl == null) {
+                            libUrl = "https://libraries.minecraft.net/";
                         }
-                        if(library.name.endsWith("@jar")) {
-                            library.name = library.name.substring(0, library.name.length()-4);
+                        if(name.endsWith("@jar")) {
+                            name = name.substring(0, name.length()-4);
                         }
-                        FabricInstallerCommand.NamedURL url = FabricInstallerCommand.makeURL(library.url, library.name);
-                        logger.info("Download {} into {}", url.url.toString(), url.name);
+                        FabricInstallerCommand.NamedURL url = FabricInstallerCommand.makeURL(libUrl, name);
                         Path file = clientPath.resolve("libraries").resolve(url.name);
                         IOHelper.createParentDirs(file);
                         if (Files.exists(file)) {
                             continue;
                         }
+                        logger.info("Download {} into {}", url.url.toString(), url.name);
                         try {
                             try (InputStream stream = IOHelper.newInput(url.url)) {
                                 try (OutputStream output = IOHelper.newOutput(file)) {
@@ -289,10 +292,10 @@ public class InstallClient {
                     continue;
                 }
                 Path target = workdir.resolve(v.path());
-                if(Files.notExists(target)) {
+                if(entry.getValue().dynamic() || Files.notExists(target)) {
                     logger.info("Build {}", k);
                     try {
-                        tools.build(k, v);
+                        tools.build(k, v, clientPath);
                     } catch (Throwable e) {
                         logger.error("Build error", e);
                     }
