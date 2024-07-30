@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Predicate;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
@@ -38,6 +39,7 @@ public class WorkspaceTools {
         buildInCommands.put("%findJar", new FindJar());
         buildInCommands.put("%fetchManifestValue", new FetchManifestValue());
         buildInCommands.put("%if", new If());
+        buildInCommands.put("%updateGradle", new UpdateGradle());
     }
 
     public WorkspaceTools(MirrorHelperModule module) {
@@ -256,6 +258,24 @@ public class WorkspaceTools {
                     }
                 }
                 throw new RuntimeException(String.format("Manifest values %s not found in %s", args.get(1), filePath));
+            }
+        }
+    }
+
+    private static final class UpdateGradle implements BuildInCommand {
+
+        @Override
+        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
+            var repoDir = args.get(0);
+            var toVersion = args.get(1);
+            var propertiesPath = Path.of(repoDir).resolve("gradle").resolve("wrapper").resolve("gradle-wrapper.properties");
+            Properties properties = new Properties();
+            try(var input = IOHelper.newInput(propertiesPath)) {
+                properties.load(input);
+            }
+            properties.put("distributionUrl", "https://services.gradle.org/distributions/gradle-"+toVersion+"-bin.zip");
+            try(var output = IOHelper.newOutput(propertiesPath)) {
+                properties.store(output, null);
             }
         }
     }
