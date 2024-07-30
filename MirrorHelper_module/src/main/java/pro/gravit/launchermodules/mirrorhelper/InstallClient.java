@@ -13,6 +13,7 @@ import pro.gravit.launchermodules.mirrorhelper.installers.FabricInstallerCommand
 import pro.gravit.launchermodules.mirrorhelper.installers.QuiltInstallerCommand;
 import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
+import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfileModifier;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.profiles.MakeProfileCommand;
 import pro.gravit.utils.helper.IOHelper;
@@ -151,6 +152,7 @@ public class InstallClient {
             throw new RuntimeException("Workspace not found! Please use 'applyworkspace'");
         }
         logger.info("Install client {} {}", version.toString(), versionType);
+        Path originalMinecraftProfile = null;
         Path clientPath = launchServer.updatesDir.resolve(name);
         {
             Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.toString());
@@ -241,6 +243,7 @@ public class InstallClient {
                     try(Stream<Path> stream = Files.list(forgeClientDir).filter(p -> p.getFileName().toString().endsWith(".json"))) {
                         forgeProfileFile = stream.findFirst().orElseThrow();
                     }
+                    originalMinecraftProfile = forgeProfileFile;
                     logger.debug("Forge profile {}", forgeProfileFile.toString());
                     FabricInstallerCommand.MinecraftProfile fabricProfile;
                     try (Reader reader = IOHelper.newReader(forgeProfileFile)) {
@@ -364,6 +367,13 @@ public class InstallClient {
             MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
             makeProfileCommand.invoke(name, version.toString(), name);
             logger.info("makeprofile completed");
+        }
+        if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
+            ClientProfile profile = launchServer.config.profileProvider.getProfile(name);
+            logger.info("Run ForgeProfileModifier");
+            ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, profile, clientPath);
+            profile = modifier.build();
+            launchServer.config.profileProvider.addProfile(profile);
         }
         launchServer.syncUpdatesDir(Collections.singleton(name));
         logger.info("Completed");
