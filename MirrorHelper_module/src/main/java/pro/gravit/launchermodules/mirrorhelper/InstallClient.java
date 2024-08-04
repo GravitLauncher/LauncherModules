@@ -253,7 +253,7 @@ public class InstallClient {
                     for (ForgeProfile.ForgeProfileLibrary library : forgeProfile.libraries()) {
                         String libUrl = library.downloads() == null ? null : library.downloads().artifact().url();
                         String name = library.name();
-                        if (libUrl == null) {
+                        if (libUrl == null || libUrl.isEmpty()) {
                             libUrl = "https://libraries.minecraft.net/";
                         }
                         if(name.endsWith("@jar")) {
