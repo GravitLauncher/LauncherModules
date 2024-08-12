@@ -44,8 +44,8 @@ public class InstallClient {
     private final WorkspaceTools tools;
 
     private final List<String> mods;
-    private final VersionType versionType;
     private final MirrorWorkspace mirrorWorkspace;
+    private VersionType versionType;
 
     public InstallClient(MirrorHelperModule module, String name, ClientProfile.Version version, List<String> mods, VersionType versionType, MirrorWorkspace mirrorWorkspace) {
         this.launchServer = module.server;
@@ -188,7 +188,7 @@ public class InstallClient {
                 quiltInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Quilt installed");
-            } else if (versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) {
+            } else if (versionType == VersionType.FORGE || versionType == VersionType.CLEANROOM || versionType == VersionType.NEOFORGE) {
                 String forgePrefix = versionType == VersionType.NEOFORGE ? "neoforge" : "forge";
                 boolean noGui = true;
                 Path forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer-nogui.jar");
@@ -236,6 +236,7 @@ public class InstallClient {
                     try (Stream<Path> stream = Files.list(tmpDir.resolve("versions"))
                                  .filter(x -> {
                                      String fname = x.getFileName().toString().toLowerCase(Locale.ROOT);
+                                     if (fname.contains("cleanroom")) versionType = VersionType.CLEANROOM;
                                      return  fname.contains("forge") || fname.contains("cleanroom");
                                  })) {
                         forgeClientDir = stream.findFirst().orElseThrow();
@@ -320,7 +321,7 @@ public class InstallClient {
                 case VANILLA -> "";
                 case FABRIC -> "fabric";
                 case NEOFORGE -> "neoforge";
-                case FORGE -> "forge";
+                case FORGE, CLEANROOM -> "forge";
                 case QUILT -> "quilt";
             };
             for (var modId : mods) {
@@ -376,6 +377,13 @@ public class InstallClient {
             logger.info("Run ForgeProfileModifier");
             ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, profile, clientPath);
             profile = modifier.build();
+            launchServer.config.profileProvider.addProfile(profile);
+        }
+        if (versionType == VersionType.CLEANROOM) {
+            ClientProfile profile = launchServer.config.profileProvider.getProfile(name);
+            logger.info("Run ForgeProfileModifierCleanRoom");
+            ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, profile, clientPath);
+            profile = modifier.buildCleanRoom();
             launchServer.config.profileProvider.addProfile(profile);
         }
         launchServer.syncUpdatesDir(Collections.singleton(name));
@@ -468,6 +476,6 @@ public class InstallClient {
     }
 
     public enum VersionType {
-        VANILLA, FABRIC, NEOFORGE, FORGE, QUILT
+        VANILLA, FABRIC, NEOFORGE, FORGE, CLEANROOM, QUILT
     }
 }

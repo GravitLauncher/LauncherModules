@@ -3,6 +3,8 @@ package pro.gravit.launchermodules.mirrorhelper.newforge;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.ClientProfileBuilder;
+import pro.gravit.launcher.base.profiles.ClientProfileVersions;
+import pro.gravit.launchermodules.mirrorhelper.helpers.ClientToolkit;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.launch.LaunchOptions;
 
@@ -90,6 +92,20 @@ public class ForgeProfileModifier {
 //        builder.setCompatClasses(compatClasses);
         builder.setCompatClasses(List.of("pro.gravit.compat.filesystem.FileSystemFixer"));
         builder.setModuleConf(conf);
+        return builder.createClientProfile();
+    }
+
+    public ClientProfile buildCleanRoom() {
+        ClientProfileBuilder builder = new ClientProfileBuilder(profile);
+        builder.setMainClass(forgeProfile.mainClass());
+        builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
+
+        List<String> clientArgs = new ArrayList<>();
+        clientArgs.addAll(ClientToolkit.findValuesForKey(forgeProfile.minecraftArguments(), "tweakClass"));
+        clientArgs.addAll(ClientToolkit.findValuesForKey(forgeProfile.minecraftArguments(), "versionType"));
+        builder.setClientArgs(clientArgs);
+        builder.setRecommendJavaVersion(21);
+        builder.setMinJavaVersion(21);
         return builder.createClientProfile();
     }
 

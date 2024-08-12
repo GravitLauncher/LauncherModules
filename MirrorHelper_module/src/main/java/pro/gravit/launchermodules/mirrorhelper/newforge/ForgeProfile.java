@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.mirrorhelper.newforge;
 
 import java.util.List;
 
-public record ForgeProfile(String mainClass, ForgeProfileArguments arguments, List<ForgeProfileLibrary> libraries) {
+public record ForgeProfile(String mainClass, String minecraftArguments, ForgeProfileArguments arguments, List<ForgeProfileLibrary> libraries) {
     public record ForgeProfileArguments(List<String> game, List<String> jvm) {
 
     }
