@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -160,7 +161,10 @@ public class InstallClient {
             if (Files.notExists(fetchDir)) {
                 downloadVanillaTo(fetchDir);
             }
-            copyDir(fetchDir, clientPath);
+            copyDir(fetchDir, clientPath, path -> !(path.toString().contains("icu4j-core-mojang") &&
+                    version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0 &&
+                    (versionType == VersionType.FORGE || versionType == VersionType.CLEANROOM)
+            ));
         }
         Path tmpFile = workdir.resolve("file.tmp");
         {
@@ -414,11 +418,14 @@ public class InstallClient {
     }
 
     private void copyDir(Path source, Path target) throws IOException {
+        copyDir(source, target, path -> true);
+    }
+    private void copyDir(Path source, Path target, Predicate<Path> predicate) throws IOException {
         if (Files.notExists(source)) {
             return;
         }
         try (Stream<Path> stream = Files.walk(source)) {
-            stream.forEach(src -> {
+            stream.filter(predicate).forEach(src -> {
                 try {
                     Path dest = target.resolve(source.relativize(src));
                     if (Files.isDirectory(src)) {
