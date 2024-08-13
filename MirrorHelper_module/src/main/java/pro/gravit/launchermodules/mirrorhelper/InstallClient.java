@@ -161,9 +161,10 @@ public class InstallClient {
             if (Files.notExists(fetchDir)) {
                 downloadVanillaTo(fetchDir);
             }
-            copyDir(fetchDir, clientPath, path -> !(path.toString().contains("icu4j-core-mojang") &&
-                    version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0 &&
-                    (versionType == VersionType.FORGE || versionType == VersionType.CLEANROOM)
+            copyDir(fetchDir, clientPath, path -> !(
+                    path.toString().contains("icu4j-core-mojang") &&
+                            versionType == VersionType.FORGE &&
+                            version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0
             ));
         }
         Path tmpFile = workdir.resolve("file.tmp");
@@ -192,7 +193,7 @@ public class InstallClient {
                 quiltInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Quilt installed");
-            } else if (versionType == VersionType.FORGE || versionType == VersionType.CLEANROOM || versionType == VersionType.NEOFORGE) {
+            } else if (versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) {
                 String forgePrefix = versionType == VersionType.NEOFORGE ? "neoforge" : "forge";
                 boolean noGui = true;
                 Path forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer-nogui.jar");
@@ -240,7 +241,6 @@ public class InstallClient {
                     try (Stream<Path> stream = Files.list(tmpDir.resolve("versions"))
                                  .filter(x -> {
                                      String fname = x.getFileName().toString().toLowerCase(Locale.ROOT);
-                                     if (fname.contains("cleanroom")) versionType = VersionType.CLEANROOM;
                                      return  fname.contains("forge") || fname.contains("cleanroom");
                                  })) {
                         forgeClientDir = stream.findFirst().orElseThrow();
@@ -325,7 +325,7 @@ public class InstallClient {
                 case VANILLA -> "";
                 case FABRIC -> "fabric";
                 case NEOFORGE -> "neoforge";
-                case FORGE, CLEANROOM -> "forge";
+                case FORGE -> "forge";
                 case QUILT -> "quilt";
             };
             for (var modId : mods) {
@@ -383,7 +383,7 @@ public class InstallClient {
             profile = modifier.build();
             launchServer.config.profileProvider.addProfile(profile);
         }
-        if (versionType == VersionType.CLEANROOM) {
+        if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
             ClientProfile profile = launchServer.config.profileProvider.getProfile(name);
             logger.info("Run ForgeProfileModifierCleanRoom");
             ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, profile, clientPath);
@@ -425,7 +425,7 @@ public class InstallClient {
             return;
         }
         try (Stream<Path> stream = Files.walk(source)) {
-            stream.filter(predicate).forEach(src -> {
+            stream.filter(e -> predicate.test(source.relativize(e))).forEach(src -> {
                 try {
                     Path dest = target.resolve(source.relativize(src));
                     if (Files.isDirectory(src)) {
@@ -483,6 +483,6 @@ public class InstallClient {
     }
 
     public enum VersionType {
-        VANILLA, FABRIC, NEOFORGE, FORGE, CLEANROOM, QUILT
+        VANILLA, FABRIC, NEOFORGE, FORGE, QUILT
     }
 }
