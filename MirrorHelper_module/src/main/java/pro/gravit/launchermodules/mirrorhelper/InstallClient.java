@@ -46,7 +46,7 @@ public class InstallClient {
 
     private final List<String> mods;
     private final MirrorWorkspace mirrorWorkspace;
-    private VersionType versionType;
+    private final VersionType versionType;
 
     public InstallClient(MirrorHelperModule module, String name, ClientProfile.Version version, List<String> mods, VersionType versionType, MirrorWorkspace mirrorWorkspace) {
         this.launchServer = module.server;
