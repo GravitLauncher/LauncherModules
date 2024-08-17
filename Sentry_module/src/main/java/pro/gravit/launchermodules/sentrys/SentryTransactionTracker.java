@@ -17,12 +17,12 @@ import java.util.Map;
 
 public class SentryTransactionTracker {
     private final Logger logger = LogManager.getLogger(SentryTransactionTracker.class);
-    private final ModuleImpl module;
+    private final SentryModule module;
     private final ThreadLocal<WebSocketService.WebSocketRequestContext> contextThreadLocal = new ThreadLocal<>();
     private final ThreadLocal<Object> latestSendEvent = new ThreadLocal<>();
     private final ThreadLocal<ITransaction> sentryTransaction = new ThreadLocal<>();
 
-    public SentryTransactionTracker(ModuleImpl module) {
+    public SentryTransactionTracker(SentryModule module) {
         this.module = module;
     }
 

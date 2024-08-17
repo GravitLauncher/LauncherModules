@@ -1,13 +1,13 @@
-def mainClassName = "pro.gravit.launchermodules.sentrys.ModuleImpl"
+def mainClassName = "pro.gravit.launchermodules.sentrys.SentryModule"
 
 sourceCompatibility = '21'
 targetCompatibility = '21'
 
 dependencies {
-    implementation('io.sentry:sentry:6.18.1') {
+    implementation('io.sentry:sentry:8.0.0-alpha.4') {
         exclude group: 'org.slf4j'
     }
-    implementation('io.sentry:sentry-log4j2:6.18.1') {
+    implementation('io.sentry:sentry-log4j2:8.0.0-alpha.4') {
         exclude group: 'org.apache.logging.log4j'
     }
 }

@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.sentryl;
 
-import io.sentry.IHub;
+import io.sentry.IScopes;
+import io.sentry.Scope;
 import io.sentry.Sentry;
 import io.sentry.protocol.User;
 import pro.gravit.launcher.base.Launcher;
@@ -28,7 +29,7 @@ public class SentryModule extends LauncherModule {
 
     public static Config config = new Config();
 
-    public static IHub currentHub;
+    public static IScopes currentScopes;
 
     @LauncherInject("modules.sentry.proguarduuid")
     public static String proguardUuid;
@@ -70,10 +71,10 @@ public class SentryModule extends LauncherModule {
                 options.setProguardUuid(proguardUuid);
             }
         }, true);
-        currentHub = Sentry.getCurrentHub();
+        currentScopes = Sentry.getCurrentScopes();
         Sentry.configureScope(scope -> {
-            BasicProperties.setupBasicProperties(scope);
-            OshiUtils.systemProperties(scope);
+            BasicProperties.setupBasicProperties((Scope) scope);
+            OshiUtils.systemProperties((Scope) scope);
         });
         LogHelper.addExcCallback(Sentry::captureException);
         if (Request.isAvailable()) {

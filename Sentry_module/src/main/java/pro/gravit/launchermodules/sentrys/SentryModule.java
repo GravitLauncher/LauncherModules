@@ -21,7 +21,7 @@ import pro.gravit.utils.helper.JVMHelper;
 import java.nio.file.Path;
 import java.util.*;
 
-public class ModuleImpl extends LauncherModule {
+public class SentryModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     private static final String DEFAULT_DSN = "YOUR_DSN";
     private transient final Logger logger = LogManager.getLogger();
@@ -31,7 +31,7 @@ public class ModuleImpl extends LauncherModule {
     private LaunchServer server;
     private SentryAppender appender;
 
-    public ModuleImpl() {
+    public SentryModule() {
         super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE - 200, new String[]{"LaunchServerCore"}));
     }
 
