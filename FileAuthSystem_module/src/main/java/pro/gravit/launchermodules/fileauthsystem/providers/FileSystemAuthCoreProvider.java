@@ -72,6 +72,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                 if (entity == null)
                     throw new IllegalArgumentException("User %s not found".formatted(args[0]));
                 entity.setPassword(passwordVerifier.encrypt(args[1]));
+                exitUser(entity);
                 logger.info("Password changed");
             }
         });
