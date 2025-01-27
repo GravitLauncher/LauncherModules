@@ -103,19 +103,24 @@ public class GenerateCertificateCommand extends Command {
         logger.info("Configuration: {}", Launcher.gsonManager.configGson.toJson(conf));
         logger.info("KeyAlias may be incorrect. Usage: 'keytool -storepass {} -keystore {} -list' for check alias", passwd, conf.keyStore);
         logger.warn("Must save your store password");
+        Path pathToTruststore = server.certificateManager.getTruststorePath();
+        if(pathToTruststore == null) {
+            pathToTruststore = server.dir.resolve("truststore");
+        }
         if (!server.config.sign.enabled) {
             logger.info("Write config");
             server.config.sign = conf;
             logger.info("Add your RootCA to truststore");
-            Path pathToRootCA = server.dir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
+            Path pathToRootCA = pathToTruststore.resolve(projectName.concat("RootCA.crt"));
             Files.deleteIfExists(pathToRootCA);
             Files.copy(rootCACrtPath, pathToRootCA);
-            server.certificateManager.readTrustStore(targetDir.resolve("truststore"));
+            server.certificateManager.readTrustStore(pathToTruststore);
             server.launchServerConfigManager.writeConfig(server.config);
         } else {
-            Path pathToRootCA = targetDir.resolve("truststore").resolve(projectName.concat("RootCA.crt"));
+            Path pathToRootCA = pathToTruststore.resolve(projectName.concat("RootCA.crt"));
             Files.deleteIfExists(pathToRootCA);
             Files.copy(rootCACrtPath, pathToRootCA);
+            server.certificateManager.readTrustStore(pathToTruststore);
         }
         //caKey = PrivateKeyFactory.createKey(pair.getPrivate().getEncoded());
     }
