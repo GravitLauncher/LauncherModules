@@ -6,6 +6,13 @@ targetCompatibility = '17'
 
 repositories {
     maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://maven.gravit-support.ru/repository/jitpack'
+        credentials {
+            username = 'gravitlauncher'
+            password = 'gravitlauncher'
+        }
+    }
 }
 
 dependencies {
