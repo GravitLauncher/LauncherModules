@@ -9,23 +9,12 @@ import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.SecurityHelper;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 public class ApplyWorkspaceCommand extends Command {
     private final MirrorHelperModule module;

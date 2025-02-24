@@ -3,7 +3,6 @@ package pro.gravit.launchermodules.mirrorhelper.newforge;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.ClientProfileBuilder;
-import pro.gravit.launcher.base.profiles.ClientProfileVersions;
 import pro.gravit.launchermodules.mirrorhelper.helpers.ClientToolkit;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.launch.LaunchOptions;
@@ -114,31 +113,32 @@ public class ForgeProfileModifier {
     }
 
     private void processArg(String key, String value, LaunchOptions.ModuleConf conf) {
-        if(key.equals("-p")) {
-            String[] splited = value.split("\\$\\{classpath_separator}");
-            conf.modulePath = new ArrayList<>(List.of(splited));
-            return;
-        }
-        if(key.equals("--add-modules")) {
-            String[] splited = value.split(",");
-            conf.modules = new ArrayList<>(List.of(splited));
-            return;
-        }
-        if(key.equals("--add-opens")) {
-            String[] splited = value.split("=");
-            if(conf.opens == null) {
-                conf.opens = new HashMap<>();
+        switch (key) {
+            case "-p" -> {
+                String[] splited = value.split("\\$\\{classpath_separator}");
+                conf.modulePath = new ArrayList<>(List.of(splited));
+                return;
             }
-            conf.opens.put(splited[0], splited[1]);
-            return;
-        }
-        if(key.equals("--add-exports")) {
-            String[] splited = value.split("=");
-            if(conf.exports == null) {
-                conf.exports = new HashMap<>();
+            case "--add-modules" -> {
+                String[] splited = value.split(",");
+                conf.modules = new ArrayList<>(List.of(splited));
+                return;
             }
-            conf.exports.put(splited[0], splited[1]);
-            return;
+            case "--add-opens" -> {
+                String[] splited = value.split("=");
+                if (conf.opens == null) {
+                    conf.opens = new HashMap<>();
+                }
+                conf.opens.put(splited[0], splited[1]);
+                return;
+            }
+            case "--add-exports" -> {
+                String[] splited = value.split("=");
+                if (conf.exports == null) {
+                    conf.exports = new HashMap<>();
+                }
+                conf.exports.put(splited[0], splited[1]);
+            }
         }
     }
 }

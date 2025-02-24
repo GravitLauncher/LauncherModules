@@ -84,11 +84,11 @@ public class SentryTransactionTracker {
                 } else {
                     transaction.finish(SpanStatus.UNKNOWN_ERROR);
                 }
-                sentryTransaction.set(null);
+                sentryTransaction.remove();
             }
         }
-        contextThreadLocal.set(null);
-        latestSendEvent.set(null);
+        contextThreadLocal.remove();
+        latestSendEvent.remove();
         return false;
     }
 

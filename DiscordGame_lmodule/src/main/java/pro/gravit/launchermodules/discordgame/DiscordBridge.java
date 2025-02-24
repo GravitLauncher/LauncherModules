@@ -22,7 +22,7 @@ public class DiscordBridge {
     private static CreateParams params;
     private static Activity activity;
 
-    private static void initCore() throws IOException {
+    private static void initCore() {
     }
 
     public static void init(long appId, boolean isClient) throws IOException {

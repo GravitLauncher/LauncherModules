@@ -7,7 +7,6 @@ import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
-import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.utils.Version;
 

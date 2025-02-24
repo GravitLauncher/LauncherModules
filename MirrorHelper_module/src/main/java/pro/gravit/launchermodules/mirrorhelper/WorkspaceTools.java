@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.Downloader;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
@@ -283,7 +282,7 @@ public class WorkspaceTools {
     private static final class If implements BuildInCommand {
 
         @Override
-        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) throws Exception {
+        public void run(List<String> args, BuildContext context, MirrorHelperModule module, LaunchServer server, Path workdir) {
             int ArgOffset = 1;
             boolean ifValue;
             if(args.get(0).equals("version")) {
@@ -299,7 +298,7 @@ public class WorkspaceTools {
                     default -> throw new IllegalStateException("Unexpected value: " + op);
                 };
             } else {
-                throw new UnsupportedOperationException(args.get(0));
+                throw new UnsupportedOperationException(args.getFirst());
             }
             if(ifValue) {
                 context.variables.put(args.get(ArgOffset), args.get(ArgOffset+1));

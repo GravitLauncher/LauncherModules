@@ -8,7 +8,6 @@ import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launcher.base.modules.events.ClosePhase;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
-import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;

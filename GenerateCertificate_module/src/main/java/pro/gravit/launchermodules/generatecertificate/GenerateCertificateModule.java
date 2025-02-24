@@ -4,7 +4,6 @@ import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;

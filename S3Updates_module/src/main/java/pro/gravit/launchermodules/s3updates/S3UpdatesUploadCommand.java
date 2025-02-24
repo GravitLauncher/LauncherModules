@@ -24,7 +24,7 @@ public class S3UpdatesUploadCommand extends Command {
     }
 
     @Override
-    public void invoke(String... args) throws Exception {
+    public void invoke(String... args) {
         if (args.length == 0) {
             s3Service.uploadDir(server.updatesDir, config.s3Bucket, config.behavior.prefix, config.behavior.forceUpload, server.updatesManager);
         } else {

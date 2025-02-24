@@ -191,7 +191,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    public User checkServer(Client client, String username, String serverID) throws IOException {
+    public User checkServer(Client client, String username, String serverID) {
         UserSessionEntity session = getSessionByServerId(serverID);
         if(session == null) {
             return null;
@@ -203,7 +203,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    public boolean joinServer(Client client, String username, UUID uuid, String accessToken, String serverID) throws IOException {
+    public boolean joinServer(Client client, String username, UUID uuid, String accessToken, String serverID) {
         UserSessionEntity session = getSessionByMinecraftAccessToken(accessToken);
         if(session == null) {
             return false;
@@ -293,7 +293,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     }
 
     @Override
-    public AuthManager.AuthReport sudo(User user, boolean shadow) throws IOException {
+    public AuthManager.AuthReport sudo(User user, boolean shadow) {
         UserEntity entity = (UserEntity) user;
         UserSessionEntity session = new UserSessionEntity(entity);
         addNewSession(session);
