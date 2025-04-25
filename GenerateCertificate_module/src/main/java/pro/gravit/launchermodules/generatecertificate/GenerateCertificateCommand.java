@@ -21,7 +21,6 @@ import org.bouncycastle.pkcs.*;
 import org.bouncycastle.pkcs.bc.BcPKCS12MacCalculatorBuilder;
 import org.bouncycastle.pkcs.bc.BcPKCS12PBEOutputEncryptorBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS12SafeBagBuilder;
-import org.jetbrains.annotations.NotNull;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
@@ -146,7 +145,7 @@ public class GenerateCertificateCommand extends Command {
         return pkcsBuilder.build(new BcPKCS12MacCalculatorBuilder(), passwd.toCharArray());
     }
 
-    private static @NotNull GeneratedCertificate generateEndCertificate(String projectName, X500Name subject, PrivateKey issuerPrivateKey, LocalDateTime startDate) throws CertIOException, OperatorCreationException, NoSuchAlgorithmException {
+    private static GeneratedCertificate generateEndCertificate(String projectName, X500Name subject, PrivateKey issuerPrivateKey, LocalDateTime startDate) throws CertIOException, OperatorCreationException, NoSuchAlgorithmException {
         SecureRandom random = SecurityHelper.newRandom();
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048, random);

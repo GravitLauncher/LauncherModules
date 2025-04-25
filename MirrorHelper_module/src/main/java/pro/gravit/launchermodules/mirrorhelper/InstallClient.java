@@ -3,7 +3,6 @@ package pro.gravit.launchermodules.mirrorhelper;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.Downloader;
 import pro.gravit.launcher.base.profiles.ClientProfile;
@@ -394,7 +393,6 @@ public class InstallClient {
         logger.info("Completed");
     }
 
-    @NotNull
     private Path getPathToLauncherAuthlib() {
         Path pathToLauncherAuthlib;
         if (version.compareTo(ClientProfileVersions.MINECRAFT_1_16_5) < 0) {
