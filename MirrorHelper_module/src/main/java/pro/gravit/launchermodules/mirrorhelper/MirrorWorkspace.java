@@ -10,7 +10,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
     }
     public record MultiMod(ClientProfile.Version minVersion, ClientProfile.Version maxVersion, List<InstallClient.VersionType> clientType, String url, String target) {
         boolean check(InstallClient.VersionType type, ClientProfile.Version version) {
-            if(this.clientType != null && !this.clientType.isEmpty() && this.clientType.contains(type)) {
+            if(this.clientType != null && !this.clientType.isEmpty() && !this.clientType.contains(type)) {
                 return false;
             }
             if(this.minVersion != null && version.compareTo(this.minVersion) < 0) {
@@ -25,7 +25,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
 
     public record BuildScript(List<BuildCommand> script, String result, String path, List<InstallClient.VersionType> clientType, ClientProfile.Version minVersion, ClientProfile.Version maxVersion, boolean dynamic) {
         boolean check(InstallClient.VersionType type, ClientProfile.Version version) {
-            if(this.clientType != null && !this.clientType.isEmpty() && this.clientType.contains(type)) {
+            if(this.clientType != null && !this.clientType.isEmpty() && !this.clientType.contains(type)) {
                 return false;
             }
             if(this.minVersion != null && version.compareTo(this.minVersion) < 0) {
