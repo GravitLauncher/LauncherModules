@@ -15,10 +15,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
@@ -115,16 +112,28 @@ public class WorkspaceTools {
                 Downloader.downloadFile(new URI(e.getValue().url()), target, null).getFuture().get();
             }
             logger.info("Install lwjgl3 directory");
-            server.commandHandler.findCommand("lwjgldownload").invoke(workspace.lwjgl3version(), "mirrorhelper-tmp-lwjgl3");
-            Path lwjgl3Path = workspacePath.resolve("workdir").resolve("lwjgl3");
-            IOHelper.move(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"), lwjgl3Path);
-            Files.deleteIfExists(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"));
+            Set<String> lwjglVersions = new HashSet<>();
+            lwjglVersions.add(workspace.lwjgl3version());
+            for(var e : workspace.lwjglVersionOverride()) {
+                lwjglVersions.add(e.value());
+            }
+            for(var lwjgl3Version : lwjglVersions) {
+                downloadLwjgl3(lwjgl3Version, workspacePath);
+            }
             logger.info("Save config");
             module.config.workspaceFile = workspaceFilePath.toString();
             module.configurable.saveConfig();
         } finally {
             IOHelper.deleteDir(tmp, true);
         }
+    }
+
+    private void downloadLwjgl3(String lwjgl3version, Path workspacePath) throws Exception {
+        server.commandHandler.findCommand("lwjgldownload").invoke(lwjgl3version, "mirrorhelper-tmp-lwjgl3");
+        Path lwjgl3Path = workspacePath.resolve("workdir").resolve("lwjgl").resolve(lwjgl3version);
+        IOHelper.createParentDirs(lwjgl3Path);
+        IOHelper.move(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"), lwjgl3Path);
+        Files.deleteIfExists(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"));
     }
 
     public void build(String scriptName, MirrorWorkspace.BuildScript buildScript, Path clientDir) throws IOException {

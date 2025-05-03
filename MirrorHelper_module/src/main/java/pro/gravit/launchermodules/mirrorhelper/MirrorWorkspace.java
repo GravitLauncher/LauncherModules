@@ -42,7 +42,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
 
     }
 
-    public record LwjglVersions(String minVersion, String maxVersion, String value) {
+    public record LwjglVersions(ClientProfile.Version minVersion, ClientProfile.Version maxVersion, String value) {
 
     }
 }

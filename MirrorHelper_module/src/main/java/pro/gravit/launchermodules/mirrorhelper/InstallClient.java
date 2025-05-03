@@ -307,10 +307,20 @@ public class InstallClient {
             }
         }
         logger.info("Build required libraries");
+        String lwjgl3Version = mirrorWorkspace.lwjgl3version();
+        for(var e : mirrorWorkspace.lwjglVersionOverride()) {
+            if(version.compareTo(e.minVersion()) < 0) {
+                continue;
+            }
+            if(version.compareTo(e.maxVersion()) > 0) {
+                continue;
+            }
+            lwjgl3Version = e.value();
+        }
         {
             copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
-            copyDir(workdir.resolve("workdir").resolve("lwjgl3"), clientPath);
+            copyDir(workdir.resolve("workdir").resolve("lwjgl").resolve(lwjgl3Version), clientPath);
             copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve("ALL"), clientPath);
             copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve(versionType.name()), clientPath);
