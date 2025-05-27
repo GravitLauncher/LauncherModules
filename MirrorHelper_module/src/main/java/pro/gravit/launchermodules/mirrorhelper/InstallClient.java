@@ -12,6 +12,7 @@ import pro.gravit.launchermodules.mirrorhelper.installers.FabricInstallerCommand
 import pro.gravit.launchermodules.mirrorhelper.installers.QuiltInstallerCommand;
 import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
+import pro.gravit.launchermodules.mirrorhelper.newforge.CleanroomProfileModifier;
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfile;
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfileModifier;
 import pro.gravit.launchserver.LaunchServer;
@@ -394,9 +395,9 @@ public class InstallClient {
         }
         if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
             ClientProfile profile = launchServer.config.profileProvider.getProfile(name);
-            logger.info("Run ForgeProfileModifierCleanRoom");
-            ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, profile, clientPath);
-            profile = modifier.buildCleanRoom();
+            logger.info("Run CleanroomProfileModifier");
+            CleanroomProfileModifier modifier = new CleanroomProfileModifier(originalMinecraftProfile, profile, clientPath);
+            profile = modifier.build();
             launchServer.config.profileProvider.addProfile(profile);
         }
         launchServer.syncUpdatesDir(Collections.singleton(name));

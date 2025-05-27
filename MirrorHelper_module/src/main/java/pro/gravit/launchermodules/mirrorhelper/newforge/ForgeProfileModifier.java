@@ -21,7 +21,7 @@ public class ForgeProfileModifier {
     private final ForgeProfile forgeProfile;
     private final ClientProfile profile;
     private final Path clientDir;
-    public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client");
+    public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge");
     private static List<String> prevArgsList = List.of("-p", "--add-modules", "--add-opens", "--add-exports");
 
     public ForgeProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
@@ -91,20 +91,6 @@ public class ForgeProfileModifier {
 //        builder.setCompatClasses(compatClasses);
         builder.setCompatClasses(List.of("pro.gravit.compat.filesystem.FileSystemFixer"));
         builder.setModuleConf(conf);
-        return builder.createClientProfile();
-    }
-
-    public ClientProfile buildCleanRoom() {
-        ClientProfileBuilder builder = new ClientProfileBuilder(profile);
-        builder.setMainClass(forgeProfile.mainClass());
-        builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
-
-        List<String> clientArgs = new ArrayList<>();
-        clientArgs.addAll(ClientToolkit.findValuesForKey(forgeProfile.minecraftArguments(), "tweakClass"));
-        clientArgs.addAll(ClientToolkit.findValuesForKey(forgeProfile.minecraftArguments(), "versionType"));
-        builder.setClientArgs(clientArgs);
-        builder.setRecommendJavaVersion(21);
-        builder.setMinJavaVersion(21);
         return builder.createClientProfile();
     }
 
