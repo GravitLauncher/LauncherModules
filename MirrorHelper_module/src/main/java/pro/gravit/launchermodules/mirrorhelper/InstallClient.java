@@ -197,15 +197,15 @@ public class InstallClient {
                 String forgePrefix = versionType == VersionType.NEOFORGE ? "neoforge" : "forge";
                 boolean noGui = true;
                 Path forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer-nogui.jar");
+                Path tmpDir = workdir.resolve("clients").resolve(forgePrefix).resolve(version.toString());
                 if(Files.notExists(forgeInstaller)) {
                     logger.warn("{} not found", forgeInstaller.toAbsolutePath().toString());
                     forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer.jar");
                     noGui = false;
                 }
-                if(Files.notExists(forgeInstaller)) {
+                if(Files.notExists(forgeInstaller) && Files.notExists(tmpDir)) {
                     throw new FileNotFoundException(forgeInstaller.toAbsolutePath().toString());
                 }
-                Path tmpDir = workdir.resolve("clients").resolve(forgePrefix).resolve(version.toString());
                 if(Files.notExists(tmpDir)) {
                     Files.createDirectories(tmpDir);
                     Files.createDirectories(tmpDir.resolve("versions"));
