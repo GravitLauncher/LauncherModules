@@ -200,7 +200,7 @@ public class WorkspaceTools {
         }
 
         public Path createNewBuildDir(String scriptName) throws IOException {
-            return Files.createTempDirectory(scriptName);
+            return server.createTempDirectory(scriptName);
         }
     }
 

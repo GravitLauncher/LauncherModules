@@ -73,7 +73,7 @@ public class LwjglDownloadCommand extends Command {
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
         String version = args[0];
-        Path clientDir = server.updatesDir.resolve(args[1]);
+        Path clientDir = Path.of(args[1]);
         Path lwjglDir = clientDir.resolve("libraries").resolve("org").resolve("lwjgl");
         Path natives = clientDir.resolve("natives");
         List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc");

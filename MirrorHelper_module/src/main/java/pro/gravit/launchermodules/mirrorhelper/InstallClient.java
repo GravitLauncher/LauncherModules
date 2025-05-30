@@ -155,7 +155,7 @@ public class InstallClient {
         }
         logger.info("Install client {} {}", version.toString(), versionType);
         Path originalMinecraftProfile = null;
-        Path clientPath = launchServer.updatesDir.resolve(name);
+        Path clientPath = launchServer.createTempDirectory(name);
         {
             Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.toString());
             if (Files.notExists(fetchDir)) {
@@ -182,15 +182,15 @@ public class InstallClient {
             if (versionType == VersionType.FABRIC) {
                 FabricInstallerCommand fabricInstallerCommand = new FabricInstallerCommand(launchServer);
                 if(mirrorWorkspace == null || mirrorWorkspace.fabricLoaderVersion() == null) {
-                    fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
+                    fabricInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
                 } else {
-                    fabricInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString(), mirrorWorkspace.fabricLoaderVersion());
+                    fabricInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString(), mirrorWorkspace.fabricLoaderVersion());
                 }
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Fabric installed");
             } else if (versionType == VersionType.QUILT) {
                 QuiltInstallerCommand quiltInstallerCommand = new QuiltInstallerCommand(launchServer);
-                quiltInstallerCommand.invoke(version.toString(), name, workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
+                quiltInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
                 Files.createDirectories(clientPath.resolve("mods"));
                 logger.info("Quilt installed");
             } else if (versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) {
@@ -383,7 +383,7 @@ public class InstallClient {
         }
         {
             MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
-            makeProfileCommand.invoke(name, version.toString(), name);
+            makeProfileCommand.invoke(clientPath.toAbsolutePath().toString(), version.toString(), clientPath.toString());
             logger.info("makeprofile completed");
         }
         if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
@@ -400,6 +400,8 @@ public class InstallClient {
             profile = modifier.build();
             launchServer.config.profileProvider.addProfile(profile);
         }
+        launchServer.config.updatesProvider.create(name);
+        launchServer.config.updatesProvider.upload(name, clientPath, true);
         launchServer.syncUpdatesDir(Collections.singleton(name));
         logger.info("Completed");
     }

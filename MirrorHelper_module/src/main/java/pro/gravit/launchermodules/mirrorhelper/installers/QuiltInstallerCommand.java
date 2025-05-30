@@ -59,7 +59,7 @@ public class QuiltInstallerCommand extends Command {
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 3);
         String version = args[0];
-        Path vanillaDir = server.updatesDir.resolve(args[1]);
+        Path vanillaDir = Path.of(args[1]);
         if (!Files.exists(vanillaDir)) {
             throw new FileNotFoundException(vanillaDir.toString());
         }

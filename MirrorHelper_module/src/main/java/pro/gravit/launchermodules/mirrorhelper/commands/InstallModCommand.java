@@ -39,7 +39,7 @@ public class InstallModCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 4);
-        Path dir = server.updatesDir.resolve(args[0]);
+        Path dir = server.updatesDir.resolve(args[0]); // TODO
         if (Files.notExists(dir)) {
             throw new FileNotFoundException(dir.toString());
         }

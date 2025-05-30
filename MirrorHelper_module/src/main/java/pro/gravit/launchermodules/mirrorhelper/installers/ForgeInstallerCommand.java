@@ -39,7 +39,7 @@ public class ForgeInstallerCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
-        Path dir = server.updatesDir.resolve(args[0]);
+        Path dir = Path.of(args[0]);
         if (!Files.exists(dir)) {
             throw new FileNotFoundException(dir.toString());
         }

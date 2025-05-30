@@ -37,7 +37,7 @@ public class DeDupLibrariesCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 1);
-        Path dir = server.updatesDir.resolve(args[0]).resolve("libraries");
+        Path dir = Path.of(args[0]).resolve("libraries");
         if (!Files.isDirectory(dir)) {
             throw new FileNotFoundException(dir.toString());
         }

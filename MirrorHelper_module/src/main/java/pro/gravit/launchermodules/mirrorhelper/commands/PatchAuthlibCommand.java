@@ -38,7 +38,7 @@ public class PatchAuthlibCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
-        Path dir = server.updatesDir.resolve(args[0]);
+        Path dir = Path.of(args[0]);
         Path originalAuthlib;
         if (Files.isDirectory(dir)) {
             Optional<Path> authlibDir = Files.list(dir.resolve("libraries/com/mojang/authlib")).findFirst();

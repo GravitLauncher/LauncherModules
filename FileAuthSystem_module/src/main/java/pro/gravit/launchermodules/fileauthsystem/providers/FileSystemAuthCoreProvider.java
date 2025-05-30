@@ -135,11 +135,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                         Path pathToSkin = Paths.get(textureUrl);
                         byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
                         String hexDigest = SecurityHelper.toHex(digest);
-                        Path target = server.updatesDir.resolve("skins").resolve(hexDigest);
-                        IOHelper.createParentDirs(target);
-                        if (Files.notExists(target)) {
-                            Files.copy(pathToSkin, target);
-                        }
+                        server.config.updatesProvider.upload("skins", Map.of(hexDigest, pathToSkin), false);
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
                         texture = new Texture(url, digest, metadata);
                     } else {
@@ -168,11 +164,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                         Path pathToSkin = Paths.get(textureUrl);
                         byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
                         String hexDigest = SecurityHelper.toHex(digest);
-                        Path target = server.updatesDir.resolve("skins").resolve(hexDigest);
-                        IOHelper.createParentDirs(target);
-                        if (Files.notExists(target)) {
-                            Files.copy(pathToSkin, target);
-                        }
+                        server.config.updatesProvider.upload("skins", Map.of(hexDigest, pathToSkin), false);
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
                         texture = new Texture(url, digest, null);
                     } else {
