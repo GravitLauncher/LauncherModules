@@ -27,13 +27,12 @@ public class SentryTransactionTracker {
     }
 
     public void register(NettyServerSocketHandler handler) {
-        handler.nettyServer.service.hookBeforeParsing.registerHook(this::onBeforeParsing);
         handler.nettyServer.service.hookBeforeExecute.registerHook(this::onBeforeExecute);
         handler.nettyServer.service.hookComplete.registerHook(this::onComplete);
         handler.nettyServer.service.hookSend.registerHook(this::onSend);
     }
 
-    protected boolean onBeforeParsing(WebSocketService.WebSocketRequestContext context) {
+    protected boolean onBeforeExecute(WebSocketService.WebSocketRequestContext context) {
         var before = contextThreadLocal.get();
         if(before != null) {
             Sentry.configureScope(scope -> {
@@ -56,10 +55,6 @@ public class SentryTransactionTracker {
             }
         });
         contextThreadLocal.set(context);
-        return false;
-    }
-
-    protected boolean onBeforeExecute(WebSocketService.WebSocketRequestContext context) {
         if(context.response != null) {
             sentryTransaction.set(Sentry.startTransaction(context.response.getType(), "process"));
         } else {
