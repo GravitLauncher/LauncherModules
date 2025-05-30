@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.discordgame;
 
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.runtime.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientUnlockConsoleEvent;
@@ -7,7 +8,6 @@ import pro.gravit.launcher.runtime.client.events.ClientProcessBuilderParamsWritt
 import pro.gravit.launcher.client.events.ClientProcessLaunchEvent;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launcher.base.request.Request;
 import pro.gravit.launchermodules.discordgame.commands.DiscordCommand;
 import pro.gravit.utils.Version;
@@ -23,7 +23,7 @@ public class ClientModule extends LauncherModule {
     private static volatile boolean isClosed = false;
 
     public ClientModule() {
-        super(new LauncherModuleInfo("DiscordGame", version, new String[]{"ClientLauncherCore"}));
+        super(new LauncherModuleInfoBuilder().setName("DiscordGame").setVersion(version).setDependencies(new String[]{"ClientLauncherCore"}).createLauncherModuleInfo());
     }
 
     /**

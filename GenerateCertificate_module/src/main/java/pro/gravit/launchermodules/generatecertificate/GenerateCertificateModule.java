@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.generatecertificate;
 
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -10,7 +10,7 @@ import pro.gravit.utils.Version;
 
 public class GenerateCertificateModule extends LauncherModule {
     public GenerateCertificateModule() {
-        super(new LauncherModuleInfo("GenerateCertificate", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("GenerateCertificate").setVersion(new Version(1, 0, 0)).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     @Override

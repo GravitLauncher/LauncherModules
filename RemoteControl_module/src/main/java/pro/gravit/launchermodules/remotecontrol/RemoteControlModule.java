@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchermodules.remotecontrol.commands.RemoteControlCommand;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
@@ -26,7 +26,7 @@ public class RemoteControlModule extends LauncherModule {
     public JsonConfigurable<RemoteControlConfig> configurable;
 
     public RemoteControlModule() {
-        super(new LauncherModuleInfo("RemoteControl", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("RemoteControl").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
 

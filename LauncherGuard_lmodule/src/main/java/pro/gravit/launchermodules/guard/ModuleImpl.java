@@ -1,5 +1,6 @@
 package pro.gravit.launchermodules.guard;
 
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.runtime.client.DirBridge;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.runtime.client.events.ClientGuiPhase;
@@ -11,7 +12,6 @@ import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.start.ClientWrapperModule;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.*;
 
@@ -26,7 +26,7 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
     public static final Config config = new Config();
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LauncherGuard", version, Integer.MAX_VALUE - 300, new String[]{"ClientLauncherCore"}));
+        super(new LauncherModuleInfoBuilder().setName("LauncherGuard").setVersion(version).setPriority(Integer.MAX_VALUE - 300).setDependencies(new String[]{"ClientLauncherCore"}).createLauncherModuleInfo());
     }
 
     @Override

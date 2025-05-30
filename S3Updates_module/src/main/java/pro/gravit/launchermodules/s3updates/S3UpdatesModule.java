@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.events.LaunchServerUpdatesSyncEvent;
@@ -22,7 +22,7 @@ public class S3UpdatesModule extends LauncherModule {
     private S3Service s3Service = null;
 
     public S3UpdatesModule() {
-        super(new LauncherModuleInfo("S3Updates", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("S3Updates").setVersion(new Version(1, 0, 0)).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     @Override

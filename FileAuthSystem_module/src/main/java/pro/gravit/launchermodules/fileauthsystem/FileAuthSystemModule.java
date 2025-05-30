@@ -3,7 +3,7 @@ package pro.gravit.launchermodules.fileauthsystem;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
@@ -17,7 +17,7 @@ public class FileAuthSystemModule extends LauncherModule {
     public JsonConfigurable<FileAuthSystemConfig> jsonConfigurable;
 
     public FileAuthSystemModule() {
-        super(new LauncherModuleInfo("FileAuthSystem", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("FileAuthSystem").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     public void preConfig(PreConfigPhase preConfigPhase) {

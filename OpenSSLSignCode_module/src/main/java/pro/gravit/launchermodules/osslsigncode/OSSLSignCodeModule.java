@@ -3,7 +3,7 @@ package pro.gravit.launchermodules.osslsigncode;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.exe.BuildExeMainTask;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
@@ -18,7 +18,7 @@ public class OSSLSignCodeModule extends LauncherModule {
     public OSSLSignCodeConfig config;
 
     public OSSLSignCodeModule() {
-        super(new LauncherModuleInfo("OSSLSignCode", new Version(1, 0, 0), new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("OSSLSignCode").setVersion(new Version(1, 0, 0)).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     @Override

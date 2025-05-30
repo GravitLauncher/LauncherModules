@@ -10,6 +10,7 @@ import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.log4j.LogAppender;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
@@ -32,7 +33,7 @@ public class SentryModule extends LauncherModule {
     private SentryAppender appender;
 
     public SentryModule() {
-        super(new LauncherModuleInfo("SentryServerModule", version, Integer.MAX_VALUE - 200, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("SentryServerModule").setVersion(version).setPriority(Integer.MAX_VALUE - 200).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     @Override

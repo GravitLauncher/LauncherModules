@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
@@ -28,7 +28,7 @@ public class SentryProguardUploadModule extends LauncherModule {
     public JsonConfigurable<Config> configurable;
 
     public SentryProguardUploadModule() {
-        super(new LauncherModuleInfo("SentryProGuardUpload", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("SentryProGuardUpload").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
 

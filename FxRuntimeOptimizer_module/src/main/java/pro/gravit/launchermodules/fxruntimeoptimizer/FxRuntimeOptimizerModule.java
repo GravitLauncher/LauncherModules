@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.base.modules.events.ClosePhase;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
@@ -19,7 +19,7 @@ public class FxRuntimeOptimizerModule extends LauncherModule {
     private transient MainBuildTask task;
 
     public FxRuntimeOptimizerModule() {
-        super(new LauncherModuleInfo("FxRuntimeOptimizer", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("FxRuntimeOptimizer").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
 

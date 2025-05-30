@@ -4,7 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.modules.events.LaunchServerFullInitEvent;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
 import pro.gravit.utils.Version;
@@ -16,7 +16,7 @@ public class SystemdNotifyModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
 
     public SystemdNotifyModule() {
-        super(new LauncherModuleInfo("SystemdNotifer", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("SystemdNotifer").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
 

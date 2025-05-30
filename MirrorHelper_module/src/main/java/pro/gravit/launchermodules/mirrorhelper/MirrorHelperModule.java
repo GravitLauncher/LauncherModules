@@ -6,7 +6,7 @@ import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchermodules.mirrorhelper.commands.*;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
@@ -31,7 +31,7 @@ public class MirrorHelperModule extends LauncherModule {
     public WorkspaceTools tools;
 
     public MirrorHelperModule() {
-        super(new LauncherModuleInfo("MirrorHelper", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("MirrorHelper").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     public Path getWorkspaceDir() {

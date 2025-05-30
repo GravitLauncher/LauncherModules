@@ -6,6 +6,7 @@ import io.sentry.Sentry;
 import io.sentry.protocol.User;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.api.AuthService;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.runtime.LauncherEngine;
 import pro.gravit.launcher.runtime.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientProcessInitPhase;
@@ -13,7 +14,6 @@ import pro.gravit.launcher.client.events.ClientProcessPreInvokeMainClassEvent;
 import pro.gravit.launcher.core.LauncherInject;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.PlayerProfile;
 import pro.gravit.launcher.base.request.Request;
@@ -35,7 +35,7 @@ public class SentryModule extends LauncherModule {
     public static String proguardUuid;
 
     public SentryModule() {
-        super(new LauncherModuleInfo("Sentry", Version.of(2, 0, 0), new String[]{"ClientLauncherCore"}));
+        super(new LauncherModuleInfoBuilder().setName("Sentry").setVersion(Version.of(2, 0, 0)).setDependencies(new String[]{"ClientLauncherCore"}).createLauncherModuleInfo());
     }
 
     @Override

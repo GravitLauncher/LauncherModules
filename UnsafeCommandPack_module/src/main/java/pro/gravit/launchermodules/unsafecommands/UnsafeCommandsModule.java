@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.unsafecommands;
 
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchermodules.unsafecommands.commands.*;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
@@ -15,7 +15,7 @@ public class UnsafeCommandsModule extends LauncherModule {
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.EXPERIMENTAL);
 
     public UnsafeCommandsModule() {
-        super(new LauncherModuleInfo("UnsafeCommands", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("UnsafeCommands").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
     public void init(LaunchServer server) {

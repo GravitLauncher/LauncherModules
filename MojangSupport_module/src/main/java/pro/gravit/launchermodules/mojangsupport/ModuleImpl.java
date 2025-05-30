@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.mojangsupport;
 
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchserver.auth.core.AuthCoreProvider;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -13,7 +13,7 @@ public class ModuleImpl extends LauncherModule {
     private static boolean registred = false;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LegacySupport", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("LegacySupport").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
 

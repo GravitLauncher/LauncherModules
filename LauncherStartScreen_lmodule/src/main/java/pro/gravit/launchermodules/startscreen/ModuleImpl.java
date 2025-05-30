@@ -1,12 +1,12 @@
 package pro.gravit.launchermodules.startscreen;
 
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.runtime.client.events.ClientGuiPhase;
 import pro.gravit.launcher.runtime.client.events.ClientPreGuiPhase;
 import pro.gravit.launcher.client.events.ClientProcessPreInvokeMainClassEvent;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
@@ -19,7 +19,7 @@ public class ModuleImpl extends LauncherModule {
     public ImageDisplay screen = null;
 
     public ModuleImpl() {
-        super(new LauncherModuleInfo("LauncherStartScreen", version, Integer.MAX_VALUE - 200, new String[]{"ClientLauncherCore"}));
+        super(new LauncherModuleInfoBuilder().setName("LauncherStartScreen").setVersion(version).setPriority(Integer.MAX_VALUE - 200).setDependencies(new String[]{"ClientLauncherCore"}).createLauncherModuleInfo());
     }
 
     @Override

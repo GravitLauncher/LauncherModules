@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.addhash;
 
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.modules.LauncherModuleInfo;
+import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.base.modules.events.PreConfigPhase;
 import pro.gravit.launchermodules.addhash.verifier.BCryptPasswordVerifier;
 import pro.gravit.launchermodules.addhash.verifier.PhpHashPasswordVerifier;
@@ -14,7 +14,7 @@ public class AddHashModule extends LauncherModule {
     private static boolean registred = false;
 
     public AddHashModule() {
-        super(new LauncherModuleInfo("AddHash", version, new String[]{"LaunchServerCore"}));
+        super(new LauncherModuleInfoBuilder().setName("AddHash").setVersion(version).setDependencies(new String[]{"LaunchServerCore"}).createLauncherModuleInfo());
     }
 
 
