@@ -129,11 +129,9 @@ public class WorkspaceTools {
     }
 
     private void downloadLwjgl3(String lwjgl3version, Path workspacePath) throws Exception {
-        server.commandHandler.findCommand("lwjgldownload").invoke(lwjgl3version, "mirrorhelper-tmp-lwjgl3");
         Path lwjgl3Path = workspacePath.resolve("workdir").resolve("lwjgl").resolve(lwjgl3version);
-        IOHelper.createParentDirs(lwjgl3Path);
-        IOHelper.move(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"), lwjgl3Path);
-        Files.deleteIfExists(server.updatesDir.resolve("mirrorhelper-tmp-lwjgl3"));
+        Files.createDirectories(lwjgl3Path);
+        server.commandHandler.findCommand("lwjgldownload").invoke(lwjgl3version, lwjgl3Path.toAbsolutePath().toString());
     }
 
     public void build(String scriptName, MirrorWorkspace.BuildScript buildScript, Path clientDir) throws IOException {

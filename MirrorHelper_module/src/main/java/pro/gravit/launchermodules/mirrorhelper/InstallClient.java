@@ -383,7 +383,7 @@ public class InstallClient {
         }
         {
             MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
-            makeProfileCommand.invoke(clientPath.toAbsolutePath().toString(), version.toString(), clientPath.toString());
+            makeProfileCommand.invoke(name, version.toString(), clientPath.toString());
             logger.info("makeprofile completed");
         }
         if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
