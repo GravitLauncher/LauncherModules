@@ -16,14 +16,25 @@
 ```json
 {
   "files": {
-    "x86-mustdie": ["wrapper.exe", "AntiInject.dll"],
-    "x86-64-mustdie": ["wrapper.exe", "AntiInject.dll"]
+    "x86-64-mustdie": [
+      "GravitGuard2.exe",
+      "GuardDLL.dll"
+    ],
+    "x86-mustdie": [
+      "GravitGuard2.exe",
+      "GuardDLL.dll"
+    ]
   },
   "exeFile": {
-    "x86-mustdie": "wrapper.exe",
-    "x86-64-mustdie": "wrapper.exe"
+    "x86-64-mustdie": "GravitGuard2.exe",
+    "x86-mustdie": "GravitGuard2.exe"
   },
   "renameExeFile": true,
-  "useClasspathProperty": true
+  "useClasspathProperty": true,
+  "protectLauncher": false,
+  "nativeAgent": {
+    "x86-64-mustdie": "GuardDLL",
+    "x86-mustdie": "GuardDLL"
+  }
 }
 ```

@@ -1,8 +1,8 @@
 package pro.gravit.launchermodules.guard;
 
 import pro.gravit.launcher.ClientLauncherWrapper;
-import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.ClientWrapperModule;
+import pro.gravit.launcher.Launcher;
 import pro.gravit.launcher.client.DirBridge;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.client.events.ClientGuiPhase;
@@ -49,7 +49,21 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
             event.processBuilder.executeFile = executeFile;
             event.processBuilder.useLegacyJavaClassPathProperty = config.useClasspathProperty;
             event.processBuilder.systemEnv.put("JAVA_HOME", javaVersion.jvmDir.toAbsolutePath().toString());
+            var agentArgument = makeAgentlibArgument(javaVersion);
+            if(agentArgument != null) {
+                event.processBuilder.jvmArgs.add(agentArgument);
+            }
         }
+    }
+
+    public String makeAgentlibArgument(JavaHelper.JavaVersion javaVersion) {
+        String key = Launcher.makeSpecialGuardDirName(javaVersion.arch, JVMHelper.OS_TYPE);
+        String value = config.nativeAgent.get(key);
+        if(value != null) {
+            Path dir = DirBridge.getGuardDir().resolve(key);
+            return "-agentlib:".concat(dir.resolve(value).toString());
+        }
+        return null;
     }
 
     public Path unpackIfPossible(JavaHelper.JavaVersion javaVersion) {
@@ -108,10 +122,14 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
         }
         Path executeFile = unpackIfPossible(context.javaVersion);
         if(executeFile != null) {
-            context.executePath = executeFile.toAbsolutePath();
+            context.executePath = executeFile;
             context.useLegacyClasspathProperty = config.useClasspathProperty;
             Map<String, String> env = context.processBuilder.environment();
             env.put("JAVA_HOME", context.javaVersion.jvmDir.toAbsolutePath().toString());
+            var agentArgument = makeAgentlibArgument(context.javaVersion);
+            if(agentArgument != null) {
+                context.args.add(agentArgument);
+            }
         }
     }
 }
