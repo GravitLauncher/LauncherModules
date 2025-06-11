@@ -16,7 +16,8 @@ import pro.gravit.launchermodules.mirrorhelper.newforge.CleanroomProfileModifier
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfile;
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfileModifier;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.command.profiles.MakeProfileCommand;
+import pro.gravit.launchserver.command.profiles.CreateProfileCommand;
+import pro.gravit.launchserver.helper.MakeProfileHelper;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.LogHelper;
 
@@ -381,28 +382,26 @@ public class InstallClient {
             deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
             logger.info("deduplibraries completed");
         }
+        ClientProfile clientProfile;
         {
-            MakeProfileCommand makeProfileCommand = new MakeProfileCommand(launchServer);
-            makeProfileCommand.invoke(name, version.toString(), clientPath.toString());
+            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientPath, version);
+            for (MakeProfileHelper.MakeProfileOption option : options) {
+                logger.debug("Detected option {}", option.getClass().getSimpleName());
+            }
+            clientProfile = MakeProfileHelper.makeProfile(version, name, options);
             logger.info("makeprofile completed");
         }
         if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
-            ClientProfile profile = launchServer.config.profileProvider.getProfile(name);
             logger.info("Run ForgeProfileModifier");
-            ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, profile, clientPath);
-            profile = modifier.build();
-            launchServer.config.profileProvider.addProfile(profile);
+            ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+            clientProfile = modifier.build();
         }
         if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
-            ClientProfile profile = launchServer.config.profileProvider.getProfile(name);
             logger.info("Run CleanroomProfileModifier");
-            CleanroomProfileModifier modifier = new CleanroomProfileModifier(originalMinecraftProfile, profile, clientPath);
-            profile = modifier.build();
-            launchServer.config.profileProvider.addProfile(profile);
+            CleanroomProfileModifier modifier = new CleanroomProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+            clientProfile = modifier.build();
         }
-        launchServer.config.updatesProvider.create(name);
-        launchServer.config.updatesProvider.upload(name, clientPath, true);
-        launchServer.syncUpdatesDir(Collections.singleton(name));
+        CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfile, clientPath);
         logger.info("Completed");
     }
 

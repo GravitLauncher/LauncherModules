@@ -135,7 +135,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                         Path pathToSkin = Paths.get(textureUrl);
                         byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
                         String hexDigest = SecurityHelper.toHex(digest);
-                        server.config.updatesProvider.upload("skins", Map.of(hexDigest, pathToSkin), false);
+                        //server.config.updatesProvider.upload("skins", Map.of(hexDigest, pathToSkin), false);
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
                         texture = new Texture(url, digest, metadata);
                     } else {
@@ -164,7 +164,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                         Path pathToSkin = Paths.get(textureUrl);
                         byte[] digest = SecurityHelper.digest(SecurityHelper.DigestAlgorithm.MD5, pathToSkin);
                         String hexDigest = SecurityHelper.toHex(digest);
-                        server.config.updatesProvider.upload("skins", Map.of(hexDigest, pathToSkin), false);
+                        //server.config.updatesProvider.upload("skins", Map.of(hexDigest, pathToSkin), false);
                         String url = CommonHelper.replace(server.config.netty.downloadURL, "dirname", "skins").concat(hexDigest);
                         texture = new Texture(url, digest, null);
                     } else {

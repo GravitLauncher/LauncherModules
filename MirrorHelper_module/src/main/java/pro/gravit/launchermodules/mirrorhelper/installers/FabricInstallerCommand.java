@@ -106,7 +106,6 @@ public class FabricInstallerCommand extends Command {
         }
         logger.info("Clearing...");
         IOHelper.deleteDir(vanillaDir.resolve("versions"), true);
-        server.updatesManager.syncUpdatesDir(List.of(args[1]));
         logger.info("Fabric installed successful. Please use `makeprofile` command");
     }
 

@@ -99,7 +99,6 @@ public class QuiltInstallerCommand extends Command {
         }
         logger.info("Clearing...");
         IOHelper.deleteDir(vanillaDir.resolve("versions"), true);
-        server.updatesManager.syncUpdatesDir(List.of(args[1]));
         logger.info("Quilt installed successful. Please use `makeprofile` command");
     }
 
