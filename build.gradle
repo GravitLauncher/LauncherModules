@@ -15,7 +15,7 @@ if (!project.tasks.findByName('build')) {
 }
 
 subprojects {
-    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'com.gradleup.shadow'
 
     shadowJar {
         duplicatesStrategy = 'EXCLUDE'
