@@ -21,7 +21,7 @@ public class ForgeProfileModifier {
     private final ForgeProfile forgeProfile;
     private final ClientProfile profile;
     private final Path clientDir;
-    public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge");
+    public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge", "libraries/net/neoforged/installertools");
     private static List<String> prevArgsList = List.of("-p", "--add-modules", "--add-opens", "--add-exports");
 
     public ForgeProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
