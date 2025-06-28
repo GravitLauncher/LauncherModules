@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.osslsigncode;
 
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.PipelineContext;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
 import pro.gravit.launchserver.config.LaunchServerConfig;
 import pro.gravit.utils.helper.IOHelper;
@@ -113,9 +114,9 @@ public class OSSLSignTask implements LauncherBuildTask {
     }
 
     @Override
-    public Path process(Path inputFile) throws IOException {
-        Path resultFile = server.launcherEXEBinary.nextPath(getName());
-        signLaunch4j(config, signConf, inputFile, resultFile);
+    public Path process(PipelineContext context) throws IOException {
+        Path resultFile = context.makeTempPath("signed", "exe");
+        signLaunch4j(config, signConf, context.getLastest(), resultFile);
         return resultFile;
     }
 

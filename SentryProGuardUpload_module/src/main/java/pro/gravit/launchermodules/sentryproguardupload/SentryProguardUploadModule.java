@@ -7,6 +7,7 @@ import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.PipelineContext;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
@@ -65,7 +66,7 @@ public class SentryProguardUploadModule extends LauncherModule {
         var mainTask = launchServer.launcherBinary.getTaskByClass(MainBuildTask.class).orElseThrow();
         mainTask.preBuildHook.registerHook((context ->  {
             proguardUuid.set(UUID.randomUUID());
-            mainTask.properties.put("modules.sentry.proguarduuid", proguardUuid.get().toString());
+            context.properties.put("modules.sentry.proguarduuid", proguardUuid.get().toString());
         }));
         launchServer.launcherBinary.tasks.add(new ProguardUploadTask());
     }
@@ -86,7 +87,7 @@ public class SentryProguardUploadModule extends LauncherModule {
         }
 
         @Override
-        public Path process(Path inputFile) throws IOException {
+        public Path process(PipelineContext context) throws IOException {
             List<String> args = new ArrayList<>();
             args.add(config.sentryCliPath);
             if(config.url != null) {
@@ -122,7 +123,7 @@ public class SentryProguardUploadModule extends LauncherModule {
             } catch (InterruptedException e) {
                 throw new IOException(e);
             }
-            return inputFile;
+            return null;
         }
     }
 }
