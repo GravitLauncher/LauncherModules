@@ -16,6 +16,7 @@ import pro.gravit.launchermodules.mirrorhelper.newforge.CleanroomProfileModifier
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfile;
 import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfileModifier;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.command.profiles.CreateProfileCommand;
 import pro.gravit.launchserver.helper.MakeProfileHelper;
 import pro.gravit.utils.helper.IOHelper;
@@ -118,18 +119,13 @@ public class InstallClient {
         ClientDownloader.ClientInfo info = ClientDownloader.getClient(obj);
         // Download required files
         LogHelper.subInfo("Downloading client, it may take some time");
-        ExecutorService e = Executors.newFixedThreadPool(4);
         //info.libraries.addAll(info.natives); // Hack
         List<Downloader.SizedFile> applies = info.libraries.stream()
                 .filter(l -> !(l.name.contains("natives")))
-                .map(y -> new Downloader.SizedFile(y.url, y.path, y.size)).collect(Collectors.toList());
-        var downloader = Downloader.downloadList(applies, null, clientDir.resolve("libraries"), null, e, 4);
-        if (info.client != null) {
-            IOHelper.transfer(IOHelper.newInput(new URI(info.client.url).toURL()), clientDir.resolve("minecraft.jar"));
-        }
-        LogHelper.subInfo("Downloaded client jar!");
+                .map(y -> new Downloader.SizedFile(y.url, Path.of("libraries").resolve(y.path).toString(), y.size)).collect(Collectors.toList());
+        applies.add(new Downloader.SizedFile(info.client.url, "minecraft.jar"));
+        var downloader = Command.downloadWithProgressBar(version.toString(), applies, null, clientDir);
         downloader.getFuture().get();
-        e.shutdownNow();
         // Finished
         LogHelper.subInfo("Client downloaded!");
     }
