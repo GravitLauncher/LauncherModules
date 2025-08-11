@@ -1,8 +1,11 @@
 def mainClassName = "pro.gravit.launchermodules.guard.ModuleImpl"
 def configClassName = "pro.gravit.launchermodules.guard.Config"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
             "Module-Config-Class": configClassName,

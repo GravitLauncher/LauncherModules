@@ -1,8 +1,11 @@
 def mainClassName = "pro.gravit.launchermodules.startscreen.ModuleImpl"
 def configClassName = "pro.gravit.launchermodules.startscreen.Config"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 jar {
     manifest.attributes("Module-Main-Class": mainClassName,
             "Module-Config-Class": configClassName,

@@ -1,8 +1,11 @@
 def mainClassName = "pro.gravit.launchermodules.sentryl.SentryModule"
 def configClassName = "pro.gravit.launchermodules.sentryl.Config"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 dependencies {
     implementation('io.sentry:sentry:8.0.0-alpha.4') {

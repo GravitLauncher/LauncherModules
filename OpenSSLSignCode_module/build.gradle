@@ -1,7 +1,10 @@
 def mainClassName = "pro.gravit.launchermodules.osslsigncode.OSSLSignCodeModule"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 dependencies {
 

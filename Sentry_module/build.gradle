@@ -1,7 +1,10 @@
 def mainClassName = "pro.gravit.launchermodules.sentrys.SentryModule"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 dependencies {
     implementation('io.sentry:sentry:8.0.0-alpha.4') {

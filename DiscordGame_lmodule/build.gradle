@@ -1,8 +1,11 @@
 def mainClassName = "pro.gravit.launchermodules.discordgame.ClientModule"
 def configClassName = "pro.gravit.launchermodules.discordgame.Config"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     maven { url 'https://jitpack.io' }

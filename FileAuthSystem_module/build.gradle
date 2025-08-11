@@ -1,7 +1,10 @@
 def mainClassName = "pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule"
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 jar {
     manifest.attributes("Module-Main-Class": mainClassName)
