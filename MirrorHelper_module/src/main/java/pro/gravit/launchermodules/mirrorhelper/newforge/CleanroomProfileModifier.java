@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.mirrorhelper.newforge;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.ClientProfileBuilder;
@@ -8,11 +10,13 @@ import pro.gravit.utils.helper.IOHelper;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CleanroomProfileModifier {
+    private final transient Logger logger = LogManager.getLogger(CleanroomProfileModifier.class);
     private final ForgeProfile forgeProfile;
     private final ClientProfile profile;
     private final Path clientDir;
@@ -28,16 +32,31 @@ public class CleanroomProfileModifier {
     }
 
     public ClientProfile build() {
+        try {
+            Files.deleteIfExists(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl"));
+            Files.deleteIfExists(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl_util"));
+        } catch (IOException e) {
+            logger.error("Failed to delete old lwjgl libraries", e);
+        }
         ClientProfileBuilder builder = new ClientProfileBuilder(profile);
         builder.setMainClass(forgeProfile.mainClass());
         builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
-
         List<String> clientArgs = new ArrayList<>();
         clientArgs.addAll(ClientToolkit.findValuesForKey(forgeProfile.minecraftArguments(), "tweakClass"));
         clientArgs.addAll(ClientToolkit.findValuesForKey(forgeProfile.minecraftArguments(), "versionType"));
         builder.setClientArgs(clientArgs);
+        List<String> jvmArgs = new ArrayList<>(profile.getJvmArgs());
+        jvmArgs.add("--add-opens");
+        jvmArgs.add("java.base/java.lang.invoke=ALL-UNNAMED");
+        builder.setJvmArgs(jvmArgs);
+        builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS));
+        builder.setCompatClasses(List.of("com.gravitlauncher.compatpatches.patches.FoundationPatches"));
         builder.setRecommendJavaVersion(21);
         builder.setMinJavaVersion(21);
         return builder.createClientProfile();
+    }
+
+    private String processPlaceholders(String value) {
+        return value.replace("${library_directory}", "libraries");
     }
 }
