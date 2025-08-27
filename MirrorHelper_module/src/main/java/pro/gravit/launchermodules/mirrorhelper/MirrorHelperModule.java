@@ -8,6 +8,7 @@ import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchermodules.mirrorhelper.commands.*;
+import pro.gravit.launchermodules.mirrorhelper.installers.DownloadInstallerCommand;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -96,6 +97,7 @@ public class MirrorHelperModule extends LauncherModule {
         commands.registerCommand("lwjgldownload", new LwjglDownloadCommand(server));
         commands.registerCommand("patchauthlib", new PatchAuthlibCommand(server));
         commands.registerCommand("applyworkspace", new ApplyWorkspaceCommand(server, this));
+        commands.registerCommand("downloadinstaller", new DownloadInstallerCommand(server, this));
         commands.registerCommand("workspace", new WorkspaceCommand(server, this));
         CommandHandler.Category category = new CommandHandler.Category(commands, "mirror");
         server.commandHandler.registerCategory(category);
