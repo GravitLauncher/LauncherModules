@@ -13,6 +13,7 @@ import pro.gravit.utils.helper.IOHelper;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -83,6 +84,12 @@ public class DownloadInstallerCommand extends Command {
                     IOHelper.transfer(input, path);
                 }
                 logger.info("Download completed");
+                Path cachePath = module.getWorkspaceDir().resolve("clients").resolve("neoforge").resolve(version.toString());
+                if(Files.exists(cachePath)) {
+                    logger.info("Clear cache {}", cachePath);
+                    IOHelper.deleteDir(cachePath, true);
+                    logger.info("Cache cleared");
+                }
             }
             case FORGE -> {
                 if(forgeVersion == null || forgeVersion.equals("latest")) {
@@ -111,6 +118,12 @@ public class DownloadInstallerCommand extends Command {
                     IOHelper.transfer(input, path);
                 }
                 logger.info("Download completed");
+                Path cachePath = module.getWorkspaceDir().resolve("clients").resolve("forge").resolve(version.toString());
+                if(Files.exists(cachePath)) {
+                    logger.info("Clear cache {}", cachePath);
+                    IOHelper.deleteDir(cachePath, true);
+                    logger.info("Cache cleared");
+                }
             }
             default -> {
                 throw new UnsupportedOperationException(String.format("Unknown installer type %s", type));
