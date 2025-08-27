@@ -60,6 +60,7 @@ public class ForgeProfileModifier {
                     .map(e -> clientDir.relativize(e).toString())
                     .filter(e -> !containsInExclusionList(e)).toList());
         }
+        fixSlf4jLibraries(cp);
         builder.setClassPath(cp);
         builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
         builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS));
@@ -92,6 +93,25 @@ public class ForgeProfileModifier {
         builder.setCompatClasses(List.of("pro.gravit.compat.filesystem.FileSystemFixer"));
         builder.setModuleConf(conf);
         return builder.createClientProfile();
+    }
+
+    private void fixSlf4jLibraries(List<String> classpath) {
+        boolean containsSlf4j2Impl = false;
+        boolean containsSlf4j2Api = false;
+        for(var e : classpath) {
+            if(e.startsWith("libraries/org/apache/logging/log4j/log4j-slf4j2-impl")) {
+                containsSlf4j2Impl = true;
+            }
+            if(e.startsWith("libraries/org/slf4j/slf4j-api/2.")) {
+                containsSlf4j2Api = true;
+            }
+        }
+        if(containsSlf4j2Impl && containsSlf4j2Api) {
+            classpath.removeIf((e) -> e.startsWith("libraries/org/apache/logging/log4j/log4j-slf4j18-impl"));
+        }
+        if(containsSlf4j2Impl && !containsSlf4j2Api) {
+            classpath.removeIf((e) -> e.startsWith("libraries/org/apache/logging/log4j/log4j-slf4j2-impl"));
+        }
     }
 
     private String processPlaceholders(String value) {
