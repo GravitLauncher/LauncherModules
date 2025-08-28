@@ -4,7 +4,9 @@ import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
+import pro.gravit.launcher.core.api.features.CoreFeatureAPI;
 import pro.gravit.launchserver.LaunchServer;
+import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
 import pro.gravit.launchserver.binary.tasks.exe.BuildExeMainTask;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
 import pro.gravit.launchserver.modules.impl.LaunchServerInitContext;
@@ -61,6 +63,17 @@ public class OSSLSignCodeModule extends LauncherModule {
         }
         config = configurable.getConfig();
         server.commandHandler.registerCommand("osslsignexe", new OSSLSignEXECommand(server, config));
-        server.launcherEXEBinary.addAfter((t) -> t instanceof BuildExeMainTask, new OSSLSignTask(server, config));
+        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_X86_64, new OSSLSignTask(server, config));
+        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_X86, new OSSLSignTask(server, config));
+        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_ARM64, new OSSLSignTask(server, config));
+    }
+
+    public boolean tryAddTask(LaunchServer server, CoreFeatureAPI.UpdateVariant variant, LauncherBuildTask task) {
+        var launcherBinary = server.launcherBinaries.get(variant);
+        if(launcherBinary == null) {
+            return false;
+        }
+        launcherBinary.addAfter((t) -> t instanceof BuildExeMainTask, task);
+        return true;
     }
 }

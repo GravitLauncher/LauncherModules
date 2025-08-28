@@ -6,6 +6,7 @@ import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.base.modules.events.ClosePhase;
+import pro.gravit.launcher.core.api.features.CoreFeatureAPI;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.tasks.MainBuildTask;
 import pro.gravit.launchserver.modules.events.LaunchServerPostInitPhase;
@@ -29,7 +30,7 @@ public class FxRuntimeOptimizerModule extends LauncherModule {
 
     public void installHooks(LaunchServer server) {
         hook = new RuntimeOptimizerHook(server, this);
-        task = server.launcherBinary.getTaskByClass(MainBuildTask.class).orElseThrow();
+        task = server.launcherBinaries.get(CoreFeatureAPI.UpdateVariant.JAR).getTaskByClass(MainBuildTask.class).orElseThrow();
         task.preBuildHook.registerHook(hook);
     }
 

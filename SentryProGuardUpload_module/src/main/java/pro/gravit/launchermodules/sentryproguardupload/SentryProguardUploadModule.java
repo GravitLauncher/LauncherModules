@@ -6,6 +6,7 @@ import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
+import pro.gravit.launcher.core.api.features.CoreFeatureAPI;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.PipelineContext;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
@@ -63,12 +64,12 @@ public class SentryProguardUploadModule extends LauncherModule {
             config = configurable.getDefaultConfig();
         }
 
-        var mainTask = launchServer.launcherBinary.getTaskByClass(MainBuildTask.class).orElseThrow();
+        var mainTask = launchServer.launcherBinaries.get(CoreFeatureAPI.UpdateVariant.JAR).getTaskByClass(MainBuildTask.class).orElseThrow();
         mainTask.preBuildHook.registerHook((context ->  {
             proguardUuid.set(UUID.randomUUID());
             context.properties.put("modules.sentry.proguarduuid", proguardUuid.get().toString());
         }));
-        launchServer.launcherBinary.tasks.add(new ProguardUploadTask());
+        launchServer.launcherBinaries.get(CoreFeatureAPI.UpdateVariant.JAR).tasks.add(new ProguardUploadTask());
     }
 
     @Override
