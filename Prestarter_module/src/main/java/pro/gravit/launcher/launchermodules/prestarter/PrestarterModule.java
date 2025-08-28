@@ -6,7 +6,7 @@ import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.modules.LauncherModuleInfo;
-import pro.gravit.launchserver.modules.events.LaunchServerLauncherExeInit;
+import pro.gravit.launchserver.modules.events.LaunchServerLauncherBinaryInit;
 import pro.gravit.utils.Version;
 
 import java.io.IOException;
@@ -23,11 +23,13 @@ public class PrestarterModule extends LauncherModule {
 
     @Override
     public void init(LauncherInitContext initContext) {
-        registerEvent(this::init, LaunchServerLauncherExeInit.class);
+        registerEvent(this::init, LaunchServerLauncherBinaryInit.class);
     }
 
-    public void init(LaunchServerLauncherExeInit init) {
-        init.binary = new PrestarterLauncherBinary(init.server, this);
+    public void init(LaunchServerLauncherBinaryInit init) {
+        for(var path : config.paths.entrySet()) {
+            init.binary.put(path.getKey(), new PrestarterLauncherBinary(init.server, this, path.getKey()));
+        }
         PrestarterModule module = this;
         configurable = new JsonConfigurable<>(Config.class, modulesConfigManager.getModuleConfig(moduleInfo.name)) {
             @Override
