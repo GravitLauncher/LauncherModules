@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.ClientProfileBuilder;
+import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.launch.LaunchOptions;
 
 import java.io.IOException;
@@ -31,10 +32,20 @@ public abstract class ProfileModifier {
 
     public void apply(ClientProfileBuilder builder) throws IOException {
         try {
-            Files.deleteIfExists(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl"));
-            Files.deleteIfExists(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl_util"));
+            deleteDirIfExist(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl"));
+            deleteDirIfExist(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl_util"));
         } catch (IOException e) {
             logger.error("Failed to delete old lwjgl libraries", e);
+        }
+    }
+
+    protected void deleteDirIfExist(Path path) throws IOException {
+        if(Files.exists(path)) {
+            if(Files.isDirectory(path)) {
+                IOHelper.deleteDir(path, true);
+            } else {
+                Files.delete(path);
+            }
         }
     }
 
