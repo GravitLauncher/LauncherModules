@@ -76,7 +76,7 @@ public class LwjglDownloadCommand extends Command {
         Path clientDir = Path.of(args[1]);
         Path lwjglDir = clientDir.resolve("libraries").resolve("org").resolve("lwjgl");
         Path natives = clientDir.resolve("natives");
-        List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc");
+        List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc", "lwjgl-freetype");
         List<String> archs = List.of("linux", "windows", "windows-x86", "windows-arm64", "macos", "macos-arm64", "linux-arm64", "linux-arm32");
         String mirror = "https://repo1.maven.org/maven2/org/lwjgl/";
         for (String component : components) {
@@ -91,7 +91,11 @@ public class LwjglDownloadCommand extends Command {
             URL jarUrl = new URI(prepareUrl
                     .concat("%s-%s.jar".formatted(component, version))).toURL();
             logger.info("Download {} to {}", jarUrl, jarPath);
-            download(jarUrl, jarPath);
+            try {
+                download(jarUrl, jarPath);
+            } catch (FileNotFoundException e) {
+                logger.warn("{} not found, skipping", jarUrl);
+            }
             for (String arch : archs) {
                 URL nativesUrl = new URI(prepareUrl
                         .concat("%s-%s-natives-%s.jar".formatted(component, version, arch))).toURL();
