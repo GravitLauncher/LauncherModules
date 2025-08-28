@@ -6,6 +6,11 @@ repositories {
     }
 }
 
+val copyModules = tasks.register("copyModules", Copy::class) {
+    from(subprojects.map { it -> it.tasks["jar"].outputs })
+    into(layout.buildDirectory.dir("all-modules"))
+}
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
@@ -26,4 +31,8 @@ subprojects {
             api(project(":Launcher"))
         }
     }
+}
+
+tasks.assemble {
+    dependsOn(copyModules)
 }
