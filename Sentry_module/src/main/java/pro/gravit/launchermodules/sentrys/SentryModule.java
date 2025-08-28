@@ -70,7 +70,6 @@ public class SentryModule extends LauncherModule {
             Sentry.init(options -> {
                 options.setDsn(c.dsn);
                 options.setSampleRate(c.sampleRate);
-                options.setEnableTracing(c.enableTracing);
                 options.setTracesSampleRate(c.tracingSampleRate);
                 options.setRelease(Version.getVersion().getVersionString());
                 options.setEnvironment(Version.getVersion().release.name());
@@ -89,7 +88,7 @@ public class SentryModule extends LauncherModule {
                 scope.setContexts("modules", modulesList());
             });
             if (c.addSentryAppender) {
-                appender = SentryAppender.createAppender("Sentry", Level.getLevel(c.appenderLogLevel), null, null, null, null, null);
+                appender = SentryAppender.createAppender("Sentry", Level.getLevel(c.appenderLogLevel), null, null, null, null, null, null);
                 appender.start();
                 LogAppender.getInstance().addListener(this::append);
             }
@@ -126,7 +125,6 @@ public class SentryModule extends LauncherModule {
     public static class Config {
         public String dsn = DEFAULT_DSN;
         public double sampleRate = 1.0;
-        public boolean enableTracing = false;
         public double tracingSampleRate = 1.0;
         public boolean addSentryAppender = true;
         public boolean filterExceptions = true;
