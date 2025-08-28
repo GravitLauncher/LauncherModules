@@ -1,4 +1,6 @@
-
+plugins {
+    id("maven-publish")
+}
 
 group = "com.gravitlauncher.launcher.modules"
 
