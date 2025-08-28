@@ -1,4 +1,7 @@
 
+
+group = "com.gravitlauncher.launcher.modules"
+
 repositories {
     mavenCentral()
     maven {
@@ -14,6 +17,7 @@ val copyModules = tasks.register("copyModules", Copy::class) {
 subprojects {
     apply(plugin = "java")
     apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
 
     repositories {
         mavenCentral()
@@ -24,11 +28,27 @@ subprojects {
 
     if(project.name.endsWith("_module")) {
         dependencies {
-            api(project(":LaunchServer"))
+            api(project(":components:launchserver"))
         }
     } else if(project.name.endsWith("_lmodule")) {
         dependencies {
-            api(project(":Launcher"))
+            api(project(":components:launcher-runtime"))
+        }
+    }
+
+    publishing {
+        repositories {
+            mavenLocal()
+        }
+        publications {
+            var name = project.name
+            create<MavenPublication>("maven") {
+                groupId = "com.gravitlauncher.launcher.modules"
+                artifactId = name
+                version = project.version as String?
+
+                from(components["java"])
+            }
         }
     }
 }
