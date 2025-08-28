@@ -3,7 +3,6 @@ package pro.gravit.launchermodules.mirrorhelper.newforge;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.ClientProfileBuilder;
-import pro.gravit.launchermodules.mirrorhelper.helpers.ClientToolkit;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.launch.LaunchOptions;
 
@@ -17,25 +16,20 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
-public class ForgeProfileModifier {
+public class Forge118ProfileModifier extends ProfileModifier {
     private final ForgeProfile forgeProfile;
     private final ClientProfile profile;
     private final Path clientDir;
     public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge", "libraries/net/neoforged/installertools");
     private static final List<String> prevArgsList = List.of("-p", "--add-modules", "--add-opens", "--add-exports");
 
-    public ForgeProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
+    public Forge118ProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
+        super(profile, clientDir);
         try(Reader reader = IOHelper.newReader(forgeProfilePath)) {
             this.forgeProfile = Launcher.gsonManager.gson.fromJson(reader, ForgeProfile.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.profile = profile;
-        this.clientDir = clientDir;
-    }
-
-    public ForgeProfileModifier(ForgeProfile forgeProfile, ClientProfile profile, Path clientDir) {
-        this.forgeProfile = forgeProfile;
         this.profile = profile;
         this.clientDir = clientDir;
     }
@@ -49,10 +43,11 @@ public class ForgeProfileModifier {
         return false;
     }
 
-    public ClientProfile build() throws IOException {
-        ClientProfileBuilder builder = new ClientProfileBuilder(profile);
+    @Override
+    public void apply(ClientProfileBuilder builder) throws IOException {
+        super.apply(builder);
         builder.setMainClass(forgeProfile.mainClass());
-        List<String> cp = new ArrayList<>(32);
+        List<String> cp = builder.getClassPath();
         Path librariesPath = clientDir.resolve("libraries");
         try(Stream<Path> stream = Files.walk(librariesPath)) {
             cp.addAll(stream
@@ -60,7 +55,6 @@ public class ForgeProfileModifier {
                     .map(e -> clientDir.relativize(e).toString())
                     .filter(e -> !containsInExclusionList(e)).toList());
         }
-        fixSlf4jLibraries(cp);
         builder.setClassPath(cp);
         builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
         builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS));
@@ -92,56 +86,9 @@ public class ForgeProfileModifier {
 //        builder.setCompatClasses(compatClasses);
         builder.setCompatClasses(List.of("pro.gravit.compat.filesystem.FileSystemFixer"));
         builder.setModuleConf(conf);
-        return builder.createClientProfile();
-    }
-
-    private void fixSlf4jLibraries(List<String> classpath) {
-        boolean containsSlf4j2Impl = false;
-        boolean containsSlf4j2Api = false;
-        for(var e : classpath) {
-            if(e.startsWith("libraries/org/apache/logging/log4j/log4j-slf4j2-impl")) {
-                containsSlf4j2Impl = true;
-            }
-            if(e.startsWith("libraries/org/slf4j/slf4j-api/2.")) {
-                containsSlf4j2Api = true;
-            }
-        }
-        if(containsSlf4j2Impl && containsSlf4j2Api) {
-            classpath.removeIf((e) -> e.startsWith("libraries/org/apache/logging/log4j/log4j-slf4j18-impl"));
-        }
-        if(containsSlf4j2Impl && !containsSlf4j2Api) {
-            classpath.removeIf((e) -> e.startsWith("libraries/org/apache/logging/log4j/log4j-slf4j2-impl"));
-        }
     }
 
     private String processPlaceholders(String value) {
         return value.replace("${library_directory}", "libraries");
-    }
-
-    private void processArg(String key, String value, LaunchOptions.ModuleConf conf) {
-        switch (key) {
-            case "-p" -> {
-                String[] splited = value.split("\\$\\{classpath_separator}");
-                conf.modulePath = new ArrayList<>(List.of(splited));
-            }
-            case "--add-modules" -> {
-                String[] splited = value.split(",");
-                conf.modules = new ArrayList<>(List.of(splited));
-            }
-            case "--add-opens" -> {
-                String[] splited = value.split("=");
-                if (conf.opens == null) {
-                    conf.opens = new HashMap<>();
-                }
-                conf.opens.put(splited[0], splited[1]);
-            }
-            case "--add-exports" -> {
-                String[] splited = value.split("=");
-                if (conf.exports == null) {
-                    conf.exports = new HashMap<>();
-                }
-                conf.exports.put(splited[0], splited[1]);
-            }
-        }
     }
 }

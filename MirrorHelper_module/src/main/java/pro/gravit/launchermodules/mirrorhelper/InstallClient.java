@@ -12,9 +12,7 @@ import pro.gravit.launchermodules.mirrorhelper.installers.FabricInstallerCommand
 import pro.gravit.launchermodules.mirrorhelper.installers.QuiltInstallerCommand;
 import pro.gravit.launchermodules.mirrorhelper.modapi.CurseforgeAPI;
 import pro.gravit.launchermodules.mirrorhelper.modapi.ModrinthAPI;
-import pro.gravit.launchermodules.mirrorhelper.newforge.CleanroomProfileModifier;
-import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfile;
-import pro.gravit.launchermodules.mirrorhelper.newforge.ForgeProfileModifier;
+import pro.gravit.launchermodules.mirrorhelper.newforge.*;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.command.profiles.CreateProfileCommand;
@@ -28,8 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -387,16 +383,21 @@ public class InstallClient {
             clientProfile = MakeProfileHelper.makeProfile(version, name, options);
             logger.info("makeprofile completed");
         }
+        ProfileModifier modifier;
         if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
-            logger.info("Run ForgeProfileModifier");
-            ForgeProfileModifier modifier = new ForgeProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
-            clientProfile = modifier.build();
-        }
-        if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
+            logger.info("Run Forge118ProfileModifier");
+            modifier = new Forge118ProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+        } else if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
             logger.info("Run CleanroomProfileModifier");
-            CleanroomProfileModifier modifier = new CleanroomProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
-            clientProfile = modifier.build();
+            modifier = new CleanroomProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+        } else if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_7_10) == 0) {
+            logger.info("Run Lwjgl3ifyProfileModifier");
+            modifier = new Lwjgl3ifyProfileModifier(clientProfile, clientPath);
+        } else {
+            logger.info("Run BasicProfileModifier");
+            modifier = new BasicProfileModifier(clientProfile, clientPath);
         }
+        clientProfile = modifier.build();
         CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfile, clientPath);
         logger.info("Completed");
     }

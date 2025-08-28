@@ -15,30 +15,21 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CleanroomProfileModifier {
-    private final transient Logger logger = LogManager.getLogger(CleanroomProfileModifier.class);
+public class CleanroomProfileModifier extends ProfileModifier {
     private final ForgeProfile forgeProfile;
-    private final ClientProfile profile;
-    private final Path clientDir;
 
     public CleanroomProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
+        super(profile, clientDir);
         try(Reader reader = IOHelper.newReader(forgeProfilePath)) {
             this.forgeProfile = Launcher.gsonManager.gson.fromJson(reader, ForgeProfile.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        this.profile = profile;
-        this.clientDir = clientDir;
     }
 
-    public ClientProfile build() {
-        try {
-            Files.deleteIfExists(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl"));
-            Files.deleteIfExists(clientDir.resolve("libraries/org/lwjgl/lwjgl/lwjgl_util"));
-        } catch (IOException e) {
-            logger.error("Failed to delete old lwjgl libraries", e);
-        }
-        ClientProfileBuilder builder = new ClientProfileBuilder(profile);
+    @Override
+    public void apply(ClientProfileBuilder builder) throws IOException {
+        super.apply(builder);
         builder.setMainClass(forgeProfile.mainClass());
         builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
         List<String> clientArgs = new ArrayList<>();
@@ -53,10 +44,5 @@ public class CleanroomProfileModifier {
         builder.setCompatClasses(List.of("com.gravitlauncher.compatpatches.patches.FoundationPatches"));
         builder.setRecommendJavaVersion(21);
         builder.setMinJavaVersion(21);
-        return builder.createClientProfile();
-    }
-
-    private String processPlaceholders(String value) {
-        return value.replace("${library_directory}", "libraries");
     }
 }
