@@ -36,9 +36,6 @@ public abstract class ProfileModifier {
         } catch (IOException e) {
             logger.error("Failed to delete old lwjgl libraries", e);
         }
-        var cp = new ArrayList<>(builder.getClassPath());
-        fixSlf4jLibraries(cp);
-        builder.setClassPath(cp);
     }
 
     protected void fixSlf4jLibraries(List<String> classpath) {

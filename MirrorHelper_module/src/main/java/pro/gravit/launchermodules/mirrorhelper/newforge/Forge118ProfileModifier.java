@@ -47,7 +47,7 @@ public class Forge118ProfileModifier extends ProfileModifier {
     public void apply(ClientProfileBuilder builder) throws IOException {
         super.apply(builder);
         builder.setMainClass(forgeProfile.mainClass());
-        List<String> cp = builder.getClassPath();
+        List<String> cp = new ArrayList<>(32);
         Path librariesPath = clientDir.resolve("libraries");
         try(Stream<Path> stream = Files.walk(librariesPath)) {
             cp.addAll(stream
@@ -55,9 +55,10 @@ public class Forge118ProfileModifier extends ProfileModifier {
                     .map(e -> clientDir.relativize(e).toString())
                     .filter(e -> !containsInExclusionList(e)).toList());
         }
+        fixSlf4jLibraries(cp);
         builder.setClassPath(cp);
         builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.SYSTEM_ARGS);
-        builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS, ClientProfile.CompatibilityFlags.DONT_ADD_YOURSELF_TO_CLASSPATH_PROPERTY));
+        builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS, ClientProfile.CompatibilityFlags.HIDE_SYSTEM_ARGS_CLASSPATH));
         LaunchOptions.ModuleConf conf = new LaunchOptions.ModuleConf();
         List<String> jvmArgs = new ArrayList<>(forgeProfile.arguments().jvm().stream().map(this::processPlaceholders).toList());
         AtomicReference<String> prevArg = new AtomicReference<>();
