@@ -16,10 +16,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
             if(this.minVersion != null && version.compareTo(this.minVersion) < 0) {
                 return false;
             }
-            if(this.maxVersion != null && version.compareTo(this.maxVersion) > 0) {
-                return false;
-            }
-            return true;
+            return this.maxVersion == null || version.compareTo(this.maxVersion) <= 0;
         }
     }
 
@@ -31,10 +28,7 @@ public record MirrorWorkspace(List<String> fabricMods, List<String> quiltMods, L
             if(this.minVersion != null && version.compareTo(this.minVersion) < 0) {
                 return false;
             }
-            if(this.maxVersion != null && version.compareTo(this.maxVersion) > 0) {
-                return false;
-            }
-            return true;
+            return this.maxVersion == null || version.compareTo(this.maxVersion) <= 0;
         }
     }
 

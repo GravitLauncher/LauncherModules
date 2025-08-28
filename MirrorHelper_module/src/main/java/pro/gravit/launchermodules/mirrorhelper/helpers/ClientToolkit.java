@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class ClientToolkit {
     public static List<String> findValuesForKey(String input, String key) {
-        String regex = "--" + Pattern.quote(key) + "\\s+([^\s-][^\s]*)";
+        String regex = "--" + Pattern.quote(key) + "\\s+([^ -][^ ]*)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(input);
 

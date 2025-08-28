@@ -22,7 +22,7 @@ public class ForgeProfileModifier {
     private final ClientProfile profile;
     private final Path clientDir;
     public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge", "libraries/net/neoforged/installertools");
-    private static List<String> prevArgsList = List.of("-p", "--add-modules", "--add-opens", "--add-exports");
+    private static final List<String> prevArgsList = List.of("-p", "--add-modules", "--add-opens", "--add-exports");
 
     public ForgeProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
         try(Reader reader = IOHelper.newReader(forgeProfilePath)) {
@@ -123,12 +123,10 @@ public class ForgeProfileModifier {
             case "-p" -> {
                 String[] splited = value.split("\\$\\{classpath_separator}");
                 conf.modulePath = new ArrayList<>(List.of(splited));
-                return;
             }
             case "--add-modules" -> {
                 String[] splited = value.split(",");
                 conf.modules = new ArrayList<>(List.of(splited));
-                return;
             }
             case "--add-opens" -> {
                 String[] splited = value.split("=");
@@ -136,7 +134,6 @@ public class ForgeProfileModifier {
                     conf.opens = new HashMap<>();
                 }
                 conf.opens.put(splited[0], splited[1]);
-                return;
             }
             case "--add-exports" -> {
                 String[] splited = value.split("=");
