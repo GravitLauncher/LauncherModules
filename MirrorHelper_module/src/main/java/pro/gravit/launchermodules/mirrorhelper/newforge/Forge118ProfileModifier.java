@@ -56,8 +56,8 @@ public class Forge118ProfileModifier extends ProfileModifier {
                     .filter(e -> !containsInExclusionList(e)).toList());
         }
         builder.setClassPath(cp);
-        builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
-        builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS));
+        builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.SYSTEM_ARGS);
+        builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS, ClientProfile.CompatibilityFlags.DONT_ADD_YOURSELF_TO_CLASSPATH_PROPERTY));
         LaunchOptions.ModuleConf conf = new LaunchOptions.ModuleConf();
         List<String> jvmArgs = new ArrayList<>(forgeProfile.arguments().jvm().stream().map(this::processPlaceholders).toList());
         AtomicReference<String> prevArg = new AtomicReference<>();
@@ -84,7 +84,7 @@ public class Forge118ProfileModifier extends ProfileModifier {
 //            }
 //        }
 //        builder.setCompatClasses(compatClasses);
-        builder.setCompatClasses(List.of("pro.gravit.compat.filesystem.FileSystemFixer"));
+        //builder.setCompatClasses(List.of("pro.gravit.compat.filesystem.FileSystemFixer"));
         builder.setModuleConf(conf);
     }
 
