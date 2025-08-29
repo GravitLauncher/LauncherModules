@@ -27,9 +27,6 @@ public class PrestarterModule extends LauncherModule {
     }
 
     public void init(LaunchServerLauncherBinaryInit init) {
-        for(var path : config.paths.entrySet()) {
-            init.binary.put(path.getKey(), new PrestarterLauncherBinary(init.server, this, path.getKey()));
-        }
         PrestarterModule module = this;
         configurable = new JsonConfigurable<>(Config.class, modulesConfigManager.getModuleConfig(moduleInfo.name)) {
             @Override
@@ -52,6 +49,9 @@ public class PrestarterModule extends LauncherModule {
         } catch (IOException e) {
             logger.error(e);
             config = configurable.getDefaultConfig();
+        }
+        for(var path : config.paths.entrySet()) {
+            init.binary.put(path.getKey(), new PrestarterLauncherBinary(init.server, this, path.getKey()));
         }
     }
 
