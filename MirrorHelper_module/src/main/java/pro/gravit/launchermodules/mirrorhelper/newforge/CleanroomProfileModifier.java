@@ -42,7 +42,7 @@ public class CleanroomProfileModifier extends ProfileModifier {
         builder.setJvmArgs(jvmArgs);
         builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS));
         builder.setCompatClasses(List.of("com.gravitlauncher.compatpatches.patches.FoundationPatches"));
-        builder.setRecommendJavaVersion(21);
-        builder.setMinJavaVersion(21);
+        builder.setRecommendJavaVersion(24);
+        builder.setMinJavaVersion(24);
     }
 }
