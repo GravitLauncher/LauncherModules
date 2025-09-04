@@ -27,6 +27,15 @@ subprojects {
             url = uri("https://repo.clojars.org")
         }
     }
+    tasks.jar {
+        archiveFileName.set(project.name+".jar")
+    }
+    tasks.sourcesJar {
+        archiveFileName.set(project.name+"-sources.jar")
+    }
+    tasks.javadocJar {
+        archiveFileName.set(project.name+"-javadoc.jar")
+    }
 
     if(project.name.endsWith("_module")) {
         dependencies {
