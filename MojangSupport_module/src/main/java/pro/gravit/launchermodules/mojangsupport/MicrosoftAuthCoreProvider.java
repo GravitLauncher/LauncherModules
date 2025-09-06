@@ -11,6 +11,8 @@ import pro.gravit.launcher.request.auth.details.AuthWebViewDetails;
 import pro.gravit.launcher.request.auth.password.AuthCodePassword;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
+import pro.gravit.utils.helper.CommonHelper;
+import pro.gravit.utils.helper.QueryHelper;
 import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launchserver.helper.HttpHelper;
 import pro.gravit.launchserver.manangers.AuthManager;
@@ -76,7 +78,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
             throw AuthException.wrongPassword();
         }
         AuthCodePassword codePassword = (AuthCodePassword) password;
-        var code = codePassword.code;
+        var uri = URI.create(codePassword.uri);
+        var queries = QueryHelper.splitUriQuery(uri);
+        var code = CommonHelper.multimapFirstOrNullValue("code", queries);
         try {
             var token = sendMicrosoftOAuthTokenRequest(code);
             if (token == null) {
