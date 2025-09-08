@@ -17,7 +17,7 @@ public class Lwjgl3ifyProfileModifier extends ProfileModifier {
     public void apply(ClientProfileBuilder builder) throws IOException {
         super.apply(builder);
         {
-            Path launchwrapperPath = clientDir.resolve("libraries/com/minecraft/launchwrapper");
+            Path launchwrapperPath = clientDir.resolve("libraries/net/minecraft/launchwrapper");
             if(Files.exists(launchwrapperPath)) {
                 IOHelper.deleteDir(launchwrapperPath, true);
             }
