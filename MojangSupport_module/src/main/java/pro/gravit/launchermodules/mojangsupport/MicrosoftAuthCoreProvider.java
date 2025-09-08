@@ -112,31 +112,32 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     }
 
     private URI makeOAuthTokenRequestURI(String code) throws IOException {
-        URI uri;
+        StringBuilder builder = new StringBuilder("https://login.live.com/oauth20_token.srf?");
+
+        builder.append("client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8));
+        if (clientSecret != null)
+            builder.append("&client_secret=").append(URLEncoder.encode(clientSecret, StandardCharsets.UTF_8));
+        builder.append("&code=").append(URLEncoder.encode(code, StandardCharsets.UTF_8));
+        builder.append("&grant_type=authorization_code");
+        builder.append("&redirect_uri=").append(URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8));
+
         try {
-            if (clientSecret != null) {
-                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&code=%s&grant_type=authorization_code&redirect_uri=%s".formatted(clientId, clientSecret, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
-            } else {
-                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&code=%s&grant_type=authorization_code&redirect_uri=%s".formatted(clientId, code, URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8)));
-            }
+            return new URI(builder.toString());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
-        return uri;
     }
 
-    private URI makeOAuthRefreshTokenRequestURI(String refreshToken) throws IOException {
-        URI uri;
-        try {
-            if (clientSecret != null) {
-                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token".formatted(clientId, clientSecret, refreshToken));
-            } else {
-                uri = new URI("https://login.live.com/oauth20_token.srf?client_id=%s&refresh_token=%s&grant_type=refresh_token".formatted(clientId, refreshToken));
-            }
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-        return uri;
+    private String makeOAuthRefreshTokenRequestBody(String refreshToken) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8));
+        if (clientSecret != null)
+            builder.append("&client_secret=").append(URLEncoder.encode(clientSecret, StandardCharsets.UTF_8));
+        builder.append("&refresh_token=").append(URLEncoder.encode(refreshToken, StandardCharsets.UTF_8));
+        builder.append("&grant_type=refresh_token");
+
+        return builder.toString();
     }
 
     private MicrosoftOAuthTokenResponse sendMicrosoftOAuthTokenRequest(String code) throws IOException {
@@ -151,8 +152,8 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
 
     private MicrosoftOAuthTokenResponse sendMicrosoftOAuthRefreshTokenRequest(String refreshToken) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(makeOAuthRefreshTokenRequestURI(refreshToken))
-                .POST(HttpRequest.BodyPublishers.noBody())
+                .uri(URI.create("https://login.live.com/oauth20_token.srf"))
+                .POST(HttpRequest.BodyPublishers.ofString(makeOAuthRefreshTokenRequestBody(refreshToken)))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
