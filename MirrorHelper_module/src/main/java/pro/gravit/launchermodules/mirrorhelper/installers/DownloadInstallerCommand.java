@@ -44,7 +44,7 @@ public class DownloadInstallerCommand extends Command {
     public void invoke(String[] args) throws Exception {
         verifyArgs(args, 2);
         InstallClient.VersionType type = InstallClient.VersionType.valueOf(args[0]);
-        ClientProfile.Version version = ClientProfile.Version.of(args[1]);
+        ClientProfile.Version version = parseClientVersion(args[1]);
         String forgeVersion = args.length > 2 ? args[2] : null;
         switch (type) {
             case NEOFORGE -> {
@@ -97,8 +97,11 @@ public class DownloadInstallerCommand extends Command {
                     try(Reader reader = IOHelper.newReader(URI.create(FORGE_PROMOTIONS_URL).toURL())) {
                         forgePromotionsData = Launcher.gsonManager.gson.fromJson(reader, ForgePromotionsData.class);
                     }
-                    String key = version.toString();
+                    String key = version.toString().concat("-latest");
                     forgeVersion = forgePromotionsData.promos().get(key);
+                    if(forgeVersion == null) {
+                        throw new IllegalArgumentException(String.format("Version '%s' not found", key));
+                    }
                 }
                 String url;
                 Path path;
