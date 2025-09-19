@@ -26,6 +26,9 @@ subprojects {
         maven {
             url = uri("https://repo.clojars.org")
         }
+        maven {
+            url = uri("https://maven.gravitlauncher.com/")
+        }
     }
     tasks.jar {
         archiveFileName.set(project.name+".jar")
