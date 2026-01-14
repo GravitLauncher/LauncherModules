@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.patcher.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.objectweb.asm.*;
 import pro.gravit.launchermodules.unsafecommands.patcher.ClassTransformerPatcher;
 import pro.gravit.utils.helper.LogHelper;
@@ -8,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FindSystemPatcher extends ClassTransformerPatcher {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(FindSystemPatcher.class);
+
     public static List<String> noTriggeredMethods = new ArrayList<>();
     public static List<String> noTriggeredMethodsCL = new ArrayList<>();
 
@@ -32,10 +38,10 @@ public class FindSystemPatcher extends ClassTransformerPatcher {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                         if (opcode == Opcodes.INVOKESTATIC && (("java/lang/System".equals(owner) && !noTriggeredMethods.contains(name)) || ("java/lang/ClassLoader".equals(owner) && !noTriggeredMethodsCL.contains(name)))) {
-                            LogHelper.info("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
+                            logger.info("Class {} method {} call {}.{}({})", reader.getClassName(), methodName, owner, name, descriptor);
                         }
                         if ("defineClass".equals(name)) {
-                            LogHelper.info("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
+                            logger.info("Class {} method {} call {}.{}({})", reader.getClassName(), methodName, owner, name, descriptor);
                         }
                         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                     }

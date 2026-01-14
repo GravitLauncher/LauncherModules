@@ -38,7 +38,7 @@ public class RemoteControlModule extends LauncherModule {
         try {
             configurable.loadConfig();
         } catch (IOException e) {
-            LogHelper.error(e);
+            logger.error("", e);
             config = configurable.getDefaultConfig();
         }
         server.commandHandler.registerCommand("remotecontrol", new RemoteControlCommand(server));

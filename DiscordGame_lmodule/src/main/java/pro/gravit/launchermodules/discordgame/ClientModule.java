@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.discordgame;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.runtime.client.events.ClientEngineInitPhase;
 import pro.gravit.launcher.client.events.ClientExitPhase;
@@ -14,6 +16,10 @@ import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.LogHelper;
 
 public class ClientModule extends LauncherModule {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ClientModule.class);
+
     public static final Version version = new Version(1, 1, 0, 1, Version.Type.LTS);
     private static final Object lock = new Object();
     public static Config config;
@@ -60,7 +66,7 @@ public class ClientModule extends LauncherModule {
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
             Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
-            LogHelper.error(e);
+            logger.error("", e);
         }
     }
 
@@ -75,7 +81,7 @@ public class ClientModule extends LauncherModule {
             RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);
             Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
-            LogHelper.error(e);
+            logger.error("", e);
         }
     }
 

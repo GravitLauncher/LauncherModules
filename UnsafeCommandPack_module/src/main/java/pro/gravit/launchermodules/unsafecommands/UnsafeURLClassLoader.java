@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.utils.helper.LogHelper;
 
 import java.net.URL;
@@ -13,6 +15,10 @@ import java.util.Map;
 import java.util.jar.Manifest;
 
 public class UnsafeURLClassLoader extends URLClassLoader {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(UnsafeURLClassLoader.class);
+
     public static Map<String, UnsafeURLClassLoader> classLoaderMap = new HashMap<>();
 
     public UnsafeURLClassLoader(URL[] urls, ClassLoader parent) {
@@ -29,13 +35,13 @@ public class UnsafeURLClassLoader extends URLClassLoader {
 
     @Override
     public void addURL(URL url) {
-        LogHelper.debug("[ClassLoader] addURL %s", url == null ? "null" : url.toString());
+        logger.debug("[ClassLoader] addURL {}", url == null ? "null" : url.toString());
         super.addURL(url);
     }
 
     @Override
     public Package definePackage(String name, Manifest man, URL url) throws IllegalArgumentException {
-        LogHelper.debug("[ClassLoader] definePackage %s", url == null ? "null" : url.toString());
+        logger.debug("[ClassLoader] definePackage {}", url == null ? "null" : url.toString());
         return super.definePackage(name, man, url);
     }
 
@@ -51,8 +57,7 @@ public class UnsafeURLClassLoader extends URLClassLoader {
 
     @Override
     public Package definePackage(String name, String specTitle, String specVersion, String specVendor, String implTitle, String implVersion, String implVendor, URL sealBase) throws IllegalArgumentException {
-        LogHelper.debug("[ClassLoader] definePackage name: %s specTitle: %s specVendor: %s url: %s", name == null ? "null" : name, specTitle == null ? "null" : specTitle,
-                specVendor == null ? "null" : specVendor, sealBase == null ? "null" : sealBase.toString());
+        logger.debug("[ClassLoader] definePackage name: {} specTitle: {} specVendor: {} url: {}", name == null ? "null" : name, specTitle == null ? "null" : specTitle, specVendor == null ? "null" : specVendor, sealBase == null ? "null" : sealBase.toString());
         return super.definePackage(name, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor, sealBase);
     }
 

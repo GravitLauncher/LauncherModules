@@ -1,11 +1,17 @@
 package pro.gravit.launchermodules.remotecontrol.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlModule;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.LogHelper;
 
 public class EnabledCommand extends Command {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(EnabledCommand.class);
+
     public EnabledCommand(LaunchServer server) {
         super(server);
     }
@@ -26,6 +32,6 @@ public class EnabledCommand extends Command {
         RemoteControlModule module = server.modulesManager.getModule(RemoteControlModule.class);
         module.config.enabled = Boolean.parseBoolean(args[0]);
         module.configurable.saveConfig();
-        LogHelper.info("Param config.enabled updated");
+        logger.info("Param config.enabled updated");
     }
 }

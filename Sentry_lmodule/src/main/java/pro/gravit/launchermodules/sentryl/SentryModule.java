@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.sentryl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.sentry.IScopes;
 import io.sentry.Scope;
 import io.sentry.Sentry;
@@ -27,6 +29,10 @@ import java.util.Map;
 
 public class SentryModule extends LauncherModule {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(SentryModule.class);
+
+
     public static Config config = new Config();
 
     public static IScopes currentScopes;
@@ -41,7 +47,7 @@ public class SentryModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         if (config.dsn == null || "YOUR_DSN".equals(config.dsn)) {
-            LogHelper.warning("Sentry module disabled. Please configure dsn");
+            logger.warn("Sentry module disabled. Please configure dsn");
             return;
         }
         registerEvent(this::onInit, ClientEngineInitPhase.class);
@@ -61,7 +67,7 @@ public class SentryModule extends LauncherModule {
         if (Sentry.isEnabled()) {
             return;
         }
-        LogHelper.debug("Initialize Sentry");
+        logger.debug("Initialize Sentry");
         Sentry.init(options -> {
             options.addEventProcessor(new SentryEventProcessor());
             options.setDsn(config.dsn);
@@ -80,7 +86,7 @@ public class SentryModule extends LauncherModule {
         if (Request.isAvailable()) {
             Request.getRequestService().registerEventHandler(new SentryEventHandler());
         }
-        LogHelper.debug("Sentry initialized");
+        logger.debug("Sentry initialized");
     }
 
     public void beforeStartClient(ClientProcessPreInvokeMainClassEvent event) {

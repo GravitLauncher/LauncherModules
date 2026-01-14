@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchermodules.unsafecommands.patcher.UnsafePatcher;
 import pro.gravit.launchermodules.unsafecommands.patcher.impl.*;
 import pro.gravit.launchserver.LaunchServer;
@@ -16,6 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PatcherCommand extends Command {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(PatcherCommand.class);
+
     public static Map<String, UnsafePatcher> patchers = new HashMap<>();
 
     public PatcherCommand(LaunchServer server) {
@@ -57,7 +63,7 @@ public class PatcherCommand extends Command {
                 else
                     patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invoke();
             } catch (Throwable e) {
-                LogHelper.dev(LogHelper.toString(e));
+                logger.info("", LogHelper.toString(e));
                 try {
                     patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments();
                 } catch (Throwable t) {

@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.remotecontrol.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlConfig;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlModule;
 import pro.gravit.launchserver.LaunchServer;
@@ -7,6 +9,10 @@ import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.LogHelper;
 
 public class RevokeCommand extends Command {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(RevokeCommand.class);
+
     public RevokeCommand(LaunchServer server) {
         super(server);
     }
@@ -37,6 +43,6 @@ public class RevokeCommand extends Command {
             throw new IllegalArgumentException("Token not found");
         }
         module.config.list.remove(token1);
-        LogHelper.info("Token %s removed", token1.token);
+        logger.info("Token {} removed", token1.token);
     }
 }

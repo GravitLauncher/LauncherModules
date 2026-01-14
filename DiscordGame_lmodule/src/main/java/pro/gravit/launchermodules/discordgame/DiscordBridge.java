@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.discordgame;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.CreateParams;
 import de.jcm.discordgamesdk.GameSDKException;
@@ -15,6 +17,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class DiscordBridge {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DiscordBridge.class);
+
     public static final DiscordActivityService activityService = new DiscordActivityService();
     private static Thread thread;
     private static Core core;
@@ -27,7 +33,7 @@ public class DiscordBridge {
 
     public static void init(long appId, boolean isClient) throws IOException {
         if (JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM32 || JVMHelper.ARCH_TYPE == JVMHelper.ARCH.ARM64) {
-            LogHelper.info("Cannot initialize Discord Game SDK because of launcher started at unsupported system && arch");
+            logger.info("Cannot initialize Discord Game SDK because of launcher started at unsupported system && arch");
             return;
         }
         initCore();
@@ -41,11 +47,11 @@ public class DiscordBridge {
             core = new Core(params);
             core.setLogHook(getLogLevel(), (level, s) -> {
                 switch (level) {
-                    case ERROR -> LogHelper.error(s);
-                    case WARN -> LogHelper.warning(s);
-                    case INFO -> LogHelper.info(s);
-                    case DEBUG -> LogHelper.debug(s);
-                    case VERBOSE -> LogHelper.dev(s);
+                    case ERROR -> logger.error("", s);
+                    case WARN -> logger.warn("", s);
+                    case INFO -> logger.info("", s);
+                    case DEBUG -> logger.debug("", s);
+                    case VERBOSE -> logger.info("", s);
                 }
             });
             {
@@ -56,7 +62,7 @@ public class DiscordBridge {
                 core.activityManager().updateActivity(DiscordBridge.getActivity());
             }
         } catch (GameSDKException e) {
-            LogHelper.info("Failed to start Discord Game SDK. Most surely because local discord app is down");
+            logger.info("Failed to start Discord Game SDK. Most surely because local discord app is down");
             close();
             return;
         }
@@ -66,16 +72,16 @@ public class DiscordBridge {
         } else {
             LauncherEngine.modulesManager.invokeEvent(new DiscordInitEvent(core));
         }
-        LogHelper.debug("Initialized Discord Game. Application ID %d", appId);
+        logger.debug("Initialized Discord Game. Application ID {}", appId);
         thread = CommonHelper.newThread("DiscordGameBridge callbacks", true, new DiscordUpdateTask(core));
         thread.start();
     }
 
     private static LogLevel getLogLevel() {
-        if(LogHelper.isDevEnabled()) {
+        if(true) {
             return LogLevel.VERBOSE;
         }
-        if(LogHelper.isDebugEnabled()) {
+        if(true) {
             return LogLevel.INFO;
         }
         return LogLevel.ERROR;
@@ -98,10 +104,10 @@ public class DiscordBridge {
             try {
                 core.close();
             } catch (Throwable e) {
-                if (LogHelper.isDebugEnabled()) {
-                    LogHelper.error(e);
+                if (true) {
+                    logger.error("", e);
                 }
-                LogHelper.warning("DiscordGame core object not closed correctly. Discord is down?");
+                logger.warn("DiscordGame core object not closed correctly. Discord is down?");
             }
         }
 

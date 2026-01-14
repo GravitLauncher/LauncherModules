@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.osslsigncode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.binary.PipelineContext;
 import pro.gravit.launchserver.binary.tasks.LauncherBuildTask;
@@ -17,6 +19,10 @@ import java.util.List;
 import java.util.zip.ZipInputStream;
 
 public class OSSLSignTask implements LauncherBuildTask {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(OSSLSignTask.class);
+
     private final LaunchServer server;
     private final OSSLSignCodeConfig config;
     private LaunchServerConfig.JarSignerConf signConf;
@@ -42,7 +48,7 @@ public class OSSLSignTask implements LauncherBuildTask {
         long outputLength = output.length();
         long signSize = outputLength - inputLength;
         if (lastSignSize != signSize) {
-            LogHelper.debug("Saved signSize value %d, real %d", lastSignSize, signSize);
+            logger.debug("Saved signSize value {}, real %d", lastSignSize, signSize);
             lastSignSize = signSize;
             Files.deleteIfExists(resultFile);
             updateSignSize(inputFile, signSize);
@@ -69,7 +75,7 @@ public class OSSLSignTask implements LauncherBuildTask {
             long offset = fileSize - 2;
             if (signSize > 0xffff) throw new IllegalArgumentException("Sign size > 65535");
             byte[] toWrite = new byte[]{(byte) (signSize & 0xff), (byte) ((signSize & 0xff00) >> 8)};
-            LogHelper.dev("File size %d offset %d first byte %d last byte %d", fileSize, offset, toWrite[0], toWrite[1]);
+            logger.info("File size {} offset {} first byte {} last byte {}", fileSize, offset, toWrite[0], toWrite[1]);
             file.seek(offset);
             file.write(toWrite);
         }

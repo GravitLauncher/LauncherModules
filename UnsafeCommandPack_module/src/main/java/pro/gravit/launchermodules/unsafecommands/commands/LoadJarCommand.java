@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.StarterAgent;
 import pro.gravit.launchserver.command.Command;
@@ -10,6 +12,10 @@ import java.nio.file.Paths;
 import java.util.jar.JarFile;
 
 public class LoadJarCommand extends Command {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(LoadJarCommand.class);
+
     public LoadJarCommand(LaunchServer server) {
         super(server);
     }
@@ -29,6 +35,6 @@ public class LoadJarCommand extends Command {
         verifyArgs(args, 1);
         Path file = Paths.get(args[0]);
         StarterAgent.inst.appendToSystemClassLoaderSearch(new JarFile(file.toFile()));
-        LogHelper.info("File %s added to system classpath", file.toAbsolutePath().toString());
+        logger.info("File {} added to system classpath", file.toAbsolutePath().toString());
     }
 }

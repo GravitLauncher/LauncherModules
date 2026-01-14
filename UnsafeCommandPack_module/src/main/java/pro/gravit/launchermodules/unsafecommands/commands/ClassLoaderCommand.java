@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchermodules.unsafecommands.UnsafeURLClassLoader;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
@@ -13,6 +15,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class ClassLoaderCommand extends Command {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ClassLoaderCommand.class);
+
     public ClassLoaderCommand(LaunchServer server) {
         super(server);
     }
@@ -61,7 +67,7 @@ public class ClassLoaderCommand extends Command {
             try {
                 return new URI(e);
             } catch (URISyntaxException ex) {
-                LogHelper.error(ex);
+                logger.error("", ex);
                 return null;
             }
         }).toArray(URL[]::new);

@@ -358,7 +358,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             try (Reader reader = IOHelper.newReader(databasePath)) {
                 this.users = Launcher.gsonManager.configGson.fromJson(reader, databaseType);
             } catch (IOException e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
         }
         {
@@ -369,7 +369,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             try (Reader reader = IOHelper.newReader(sessionsPath)) {
                 this.sessions = Launcher.gsonManager.configGson.fromJson(reader, sessionsType);
             } catch (IOException e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
             for (UserSessionEntity sessionEntity : sessions) {
                 if (sessionEntity.userEntityUUID != null) {
@@ -399,7 +399,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             try (Writer writer = IOHelper.newWriter(databasePath)) {
                 Launcher.gsonManager.configGson.toJson(users, databaseType, writer);
             } catch (IOException e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
         }
         {
@@ -409,7 +409,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             try (Writer writer = IOHelper.newWriter(sessionsPath)) {
                 Launcher.gsonManager.configGson.toJson(sessions, sessionsType, writer);
             } catch (IOException e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
         }
     }

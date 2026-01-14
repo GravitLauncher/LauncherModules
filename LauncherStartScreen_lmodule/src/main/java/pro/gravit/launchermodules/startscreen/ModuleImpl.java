@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.startscreen;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.client.events.ClientExitPhase;
 import pro.gravit.launcher.runtime.client.events.ClientGuiPhase;
@@ -15,6 +17,10 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 
 public class ModuleImpl extends LauncherModule {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ModuleImpl.class);
+
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public ImageDisplay screen = null;
 
@@ -39,7 +45,7 @@ public class ModuleImpl extends LauncherModule {
                                 : null, c);
             }
         } catch (Throwable e) {
-            LogHelper.error(e);
+            logger.error("", e);
         }
     }
 
@@ -49,7 +55,7 @@ public class ModuleImpl extends LauncherModule {
                 screen.close();
                 screen = null;
             } catch (Throwable e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
     }
 
@@ -59,7 +65,7 @@ public class ModuleImpl extends LauncherModule {
                 screen.close();
                 screen = null;
             } catch (Throwable e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
     }
 
@@ -69,7 +75,7 @@ public class ModuleImpl extends LauncherModule {
                 screen.close();
                 screen = null;
             } catch (Throwable e) {
-                LogHelper.error(e);
+                logger.error("", e);
             }
     }
 }

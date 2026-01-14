@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.osslsigncode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
@@ -17,6 +19,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class OSSLSignCodeModule extends LauncherModule {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(OSSLSignCodeModule.class);
+
     public OSSLSignCodeConfig config;
 
     public OSSLSignCodeModule() {
@@ -58,7 +64,7 @@ public class OSSLSignCodeModule extends LauncherModule {
         try {
             configurable.loadConfig();
         } catch (IOException e) {
-            LogHelper.error(e);
+            logger.error("", e);
             return;
         }
         config = configurable.getConfig();

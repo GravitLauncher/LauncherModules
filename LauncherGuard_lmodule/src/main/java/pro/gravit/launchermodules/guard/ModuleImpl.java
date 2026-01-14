@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.guard;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launcher.runtime.client.DirBridge;
 import pro.gravit.launcher.client.events.ClientExitPhase;
@@ -22,6 +24,10 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ModuleImpl.class);
+
     public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
     public static final Config config = new Config();
 
@@ -69,7 +75,7 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
     public Path unpackIfPossible(JavaHelper.JavaVersion javaVersion) {
         String key = Launcher.makeSpecialGuardDirName(javaVersion.arch, JVMHelper.OS_TYPE);
         if(config.files.get(key) == null || config.exeFile.get(key) == null) {
-            LogHelper.warning("LauncherGuard disabled: OS or ARCH not supported");
+            logger.warn("LauncherGuard disabled: OS or ARCH not supported");
             return null;
         }
         Path executeFile = unpack(key);

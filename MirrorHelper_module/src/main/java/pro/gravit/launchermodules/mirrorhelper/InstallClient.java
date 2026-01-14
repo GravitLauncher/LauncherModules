@@ -271,7 +271,7 @@ public class InstallClient {
                                 }
                             }
                         } catch (FileNotFoundException e) {
-                            LogHelper.warning("Not found %s", url.url);
+                            logger.warn("Not found {}", url.url);
                         }
                     }
                 }

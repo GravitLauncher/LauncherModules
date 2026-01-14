@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.remotecontrol.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlConfig;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlModule;
 import pro.gravit.launchserver.LaunchServer;
@@ -10,6 +12,10 @@ import pro.gravit.utils.helper.SecurityHelper;
 import java.util.Arrays;
 
 public class NewCommand extends Command {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(NewCommand.class);
+
     public NewCommand(LaunchServer server) {
         super(server);
     }
@@ -37,8 +43,8 @@ public class NewCommand extends Command {
             token1.commands.addAll(Arrays.asList(args).subList(2, args.length));
         }
         module.config.list.add(token1);
-        LogHelper.info("Add new token: %s with %s commands", token, token1.allowAll ? "all" : String.valueOf(token1.commands.size()));
+        logger.info("Add new token: {} with {} commands", token, token1.allowAll ? "all" : String.valueOf(token1.commands.size()));
         module.configurable.saveConfig();
-        LogHelper.info("RemoteControl module config saved");
+        logger.info("RemoteControl module config saved");
     }
 }

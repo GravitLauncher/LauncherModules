@@ -1,5 +1,7 @@
 package pro.gravit.launchermodules.unsafecommands.patcher.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.objectweb.asm.*;
 import pro.gravit.launchermodules.unsafecommands.patcher.ClassTransformerPatcher;
 import pro.gravit.utils.helper.LogHelper;
@@ -8,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FindSunPatcher extends ClassTransformerPatcher {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(FindSunPatcher.class);
+
     public static List<String> noTriggeredMethods = new ArrayList<>();
 
     @Override
@@ -16,7 +22,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
             @Override
             public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
                 if (value instanceof String string && isUnsafe(string)) {
-                    LogHelper.info("Class %s field %s: %s", reader.getClassName(), name, value);
+                    logger.info("Class {} field {}: {}", reader.getClassName(), name, value);
                 }
                 return super.visitField(access, name, descriptor, signature, value);
             }
@@ -27,7 +33,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
                         if (owner != null && isUnsafe(owner)) {
-                            LogHelper.info("Class %s method %s call %s.%s(%s)", reader.getClassName(), methodName, owner, name, descriptor);
+                            logger.info("Class {} method {} call {}.{}({})", reader.getClassName(), methodName, owner, name, descriptor);
                         }
                         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                     }
@@ -35,7 +41,7 @@ public class FindSunPatcher extends ClassTransformerPatcher {
                     @Override
                     public void visitLdcInsn(Object value) {
                         if (value instanceof String string && isUnsafe(string)) {
-                            LogHelper.info("Class %s method %s LDC %s", reader.getClassName(), methodName, value);
+                            logger.info("Class {} method {} LDC {}", reader.getClassName(), methodName, value);
                         }
                         super.visitLdcInsn(value);
                     }

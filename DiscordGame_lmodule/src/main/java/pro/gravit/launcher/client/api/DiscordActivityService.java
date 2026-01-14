@@ -1,5 +1,7 @@
 package pro.gravit.launcher.client.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import de.jcm.discordgamesdk.Core;
 import de.jcm.discordgamesdk.activity.Activity;
 import de.jcm.discordgamesdk.activity.ActivityButton;
@@ -21,6 +23,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DiscordActivityService {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DiscordActivityService.class);
+
     private final Map<String, String> params = new ConcurrentHashMap<>();
     private String details;
     private String state;
@@ -188,7 +194,7 @@ public class DiscordActivityService {
         String result = str;
         for (Map.Entry<String, String> e : params.entrySet()) {
             if (e.getValue() == null) {
-                LogHelper.warning("DiscordGame: Param %s null", e.getKey());
+                logger.warn("DiscordGame: Param {} null", e.getKey());
                 continue;
             }
             result = result.replaceAll("%" + e.getKey() + "%", e.getValue());
@@ -225,7 +231,7 @@ public class DiscordActivityService {
     }
 
     private void setScope(ScopeConfig scopeConfig) {
-        LogHelper.dev(scopeConfig.toString());
+        logger.info("", scopeConfig.toString());
         setDetails(scopeConfig.getDetails());
         setState(scopeConfig.getState());
         setLargeKey(scopeConfig.getLargeImageKey());
