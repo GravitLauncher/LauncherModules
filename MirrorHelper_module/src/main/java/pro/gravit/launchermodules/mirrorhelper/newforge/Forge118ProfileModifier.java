@@ -20,7 +20,7 @@ public class Forge118ProfileModifier extends ProfileModifier {
     private final ForgeProfile forgeProfile;
     private final ClientProfile profile;
     private final Path clientDir;
-    public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge", "libraries/net/neoforged/installertools");
+    public static List<String> exclusionList = List.of("AutoRenamingTool", "net/minecraft/client", "net/neoforged/neoforge", "libraries/net/neoforged/installertools", "net/neoforged/minecraft-client-patched");
     private static final List<String> prevArgsList = List.of("-p", "--add-modules", "--add-opens", "--add-exports");
 
     public Forge118ProfileModifier(Path forgeProfilePath, ClientProfile profile, Path clientDir) {
@@ -58,7 +58,8 @@ public class Forge118ProfileModifier extends ProfileModifier {
         fixSlf4jLibraries(cp);
         builder.setClassPath(cp);
         builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.SYSTEM_ARGS);
-        builder.setFlags(List.of(ClientProfile.CompatibilityFlags.ENABLE_HACKS, ClientProfile.CompatibilityFlags.HIDE_SYSTEM_ARGS_CLASSPATH));
+        List<ClientProfile.CompatibilityFlags> flags = new ArrayList<>();
+        flags.add(ClientProfile.CompatibilityFlags.ENABLE_HACKS);
         LaunchOptions.ModuleConf conf = new LaunchOptions.ModuleConf();
         List<String> jvmArgs = new ArrayList<>(forgeProfile.arguments().jvm().stream().map(this::processPlaceholders).toList());
         AtomicReference<String> prevArg = new AtomicReference<>();
@@ -74,10 +75,14 @@ public class Forge118ProfileModifier extends ProfileModifier {
             }
             return false;
         });
+        if(conf.modules != null && !conf.modules.isEmpty()) {
+            flags.add(ClientProfile.CompatibilityFlags.HIDE_SYSTEM_ARGS_CLASSPATH);
+        }
         jvmArgs.add("--add-opens");
         jvmArgs.add("java.base/java.lang.invoke=ALL-UNNAMED");
         builder.setJvmArgs(jvmArgs);
         builder.setClientArgs(new ArrayList<>(forgeProfile.arguments().game()));
+        builder.setFlags(flags);
 //        List<String> compatClasses = new ArrayList<>();
 //        for(var e : cp) {
 //            if(e.toLowerCase().contains("filesystemfixer")) {
