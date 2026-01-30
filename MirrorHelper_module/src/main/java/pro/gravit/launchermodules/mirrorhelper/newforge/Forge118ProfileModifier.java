@@ -57,7 +57,6 @@ public class Forge118ProfileModifier extends ProfileModifier {
         }
         fixSlf4jLibraries(cp);
         builder.setClassPath(cp);
-        builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.SYSTEM_ARGS);
         List<ClientProfile.CompatibilityFlags> flags = new ArrayList<>();
         flags.add(ClientProfile.CompatibilityFlags.ENABLE_HACKS);
         LaunchOptions.ModuleConf conf = new LaunchOptions.ModuleConf();
@@ -75,8 +74,11 @@ public class Forge118ProfileModifier extends ProfileModifier {
             }
             return false;
         });
-        if(conf.modules != null && !conf.modules.isEmpty()) {
+        if(conf.modules != null && !conf.modules.isEmpty()) { // Modular classloading - bootstrap launcher
+            builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.SYSTEM_ARGS);
             flags.add(ClientProfile.CompatibilityFlags.HIDE_SYSTEM_ARGS_CLASSPATH);
+        } else { // Non-modular classloading - neoforge 1.21.10+
+            builder.setClassLoaderConfig(ClientProfile.ClassLoaderConfig.LAUNCHER);
         }
         jvmArgs.add("--add-opens");
         jvmArgs.add("java.base/java.lang.invoke=ALL-UNNAMED");
