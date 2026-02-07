@@ -398,7 +398,7 @@ public class InstallClient {
             modifier = new BasicProfileModifier(clientProfile, clientPath);
         }
         clientProfile = modifier.build();
-        CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfile, clientPath);
+        CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfile, clientPath, !config.disableDownloadAssets);
         logger.info("Completed");
     }
 

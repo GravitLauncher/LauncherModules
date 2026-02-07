@@ -99,6 +99,7 @@ public class MirrorHelperModule extends LauncherModule {
         commands.registerCommand("applyworkspace", new ApplyWorkspaceCommand(server, this));
         commands.registerCommand("downloadinstaller", new DownloadInstallerCommand(server, this));
         commands.registerCommand("workspace", new WorkspaceCommand(server, this));
+        commands.registerCommand("mirrorhelper", new MirrorHelperCommand(server, this));
         CommandHandler.Category category = new CommandHandler.Category(commands, "mirror");
         server.commandHandler.registerCategory(category);
     }
