@@ -63,9 +63,20 @@ public class DownloadInstallerCommand extends Command {
                     }
                     List<ClientProfile.Version> versions = new ArrayList<>();
                     for(var v : neoForgeVersionData.versions()) {
-                        if(!v.startsWith(prefix)) {
-                            continue;
+                        String[] pParts = prefix.split("\\.");
+                        String[] vParts = v.split("\\.");
+                        boolean match = true;
+                        if(vParts.length < pParts.length) {
+                            match = false;
+                        } else {
+                            for (int i = 0; i < pParts.length; i++) {
+                                if (!vParts[i].equals(pParts[i])) {
+                                    match = false;
+                                    break;
+                                }
+                            }
                         }
+                        if(!match) continue;
                         versions.add(ClientProfile.Version.of(v));
                     }
                     if(versions.isEmpty()) {
