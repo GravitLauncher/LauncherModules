@@ -32,6 +32,14 @@ subprojects {
     }
     tasks.jar {
         archiveFileName.set(project.name+".jar")
+
+        from({
+            configurations.runtimeClasspath.get()
+                .map { if (it.isDirectory) it else zipTree(it) }
+        })
+
+        // Optional: Merge service files if needed
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
     tasks.sourcesJar {
         archiveFileName.set(project.name+"-sources.jar")
@@ -42,11 +50,11 @@ subprojects {
 
     if(project.name.endsWith("_module")) {
         dependencies {
-            api(project(":components:launchserver"))
+            compileOnly(project(":components:launchserver"))
         }
     } else if(project.name.endsWith("_lmodule")) {
         dependencies {
-            api(project(":components:launcher-runtime"))
+            compileOnly(project(":components:launcher-runtime"))
         }
     }
 
