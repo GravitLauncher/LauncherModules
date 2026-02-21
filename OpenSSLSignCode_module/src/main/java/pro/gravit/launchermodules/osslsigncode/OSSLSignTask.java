@@ -48,7 +48,7 @@ public class OSSLSignTask implements LauncherBuildTask {
         long outputLength = output.length();
         long signSize = outputLength - inputLength;
         if (lastSignSize != signSize) {
-            logger.debug("Saved signSize value {}, real %d", lastSignSize, signSize);
+            logger.debug("Saved signSize value {}, real {}", lastSignSize, signSize);
             lastSignSize = signSize;
             Files.deleteIfExists(resultFile);
             updateSignSize(inputFile, signSize);

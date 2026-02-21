@@ -231,7 +231,7 @@ public class DiscordActivityService {
     }
 
     private void setScope(ScopeConfig scopeConfig) {
-        logger.info("", scopeConfig.toString());
+        logger.info("{}", scopeConfig.toString());
         setDetails(scopeConfig.getDetails());
         setState(scopeConfig.getState());
         setLargeKey(scopeConfig.getLargeImageKey());

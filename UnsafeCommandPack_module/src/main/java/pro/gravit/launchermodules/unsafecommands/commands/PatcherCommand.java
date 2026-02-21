@@ -63,7 +63,7 @@ public class PatcherCommand extends Command {
                 else
                     patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invoke();
             } catch (Throwable e) {
-                logger.info("", LogHelper.toString(e));
+                logger.info("{}", e.toString());
                 try {
                     patcher = (UnsafePatcher) MethodHandles.publicLookup().findConstructor(clazz, MethodType.methodType(void.class)).invokeWithArguments();
                 } catch (Throwable t) {
