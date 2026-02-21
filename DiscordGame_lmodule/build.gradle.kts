@@ -14,5 +14,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.JnCrMx:discord-game-sdk4j:v1.0.0")
+    implementation("com.github.JnCrMx:discord-game-sdk4j:v1.0.0") {
+        exclude(group = "com.google.code.gson", module = "gson")
+    }
 }
