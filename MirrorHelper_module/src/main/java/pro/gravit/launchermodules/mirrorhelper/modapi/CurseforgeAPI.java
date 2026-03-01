@@ -2,7 +2,7 @@ package pro.gravit.launchermodules.mirrorhelper.modapi;
 
 import com.google.gson.JsonElement;
 import pro.gravit.launcher.base.Launcher;
-import pro.gravit.launchserver.helper.HttpHelper;
+import pro.gravit.launcher.base.HttpHelper;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -14,7 +14,7 @@ import pro.gravit.launchserver.auth.AuthException;
 import pro.gravit.utils.helper.CommonHelper;
 import pro.gravit.utils.helper.QueryHelper;
 import pro.gravit.launchserver.auth.core.UserSession;
-import pro.gravit.launchserver.helper.HttpHelper;
+import pro.gravit.launcher.base.HttpHelper;
 import pro.gravit.launchserver.manangers.AuthManager;
 import pro.gravit.launchserver.socket.Client;
 import pro.gravit.launchserver.socket.response.auth.AuthResponse;

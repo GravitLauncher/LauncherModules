@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
-import pro.gravit.launchserver.helper.HttpHelper;
+import pro.gravit.launcher.base.HttpHelper;
 import pro.gravit.utils.Version;
 
 import java.io.IOException;
