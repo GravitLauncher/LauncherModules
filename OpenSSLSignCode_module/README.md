@@ -21,6 +21,12 @@ cd /etc/yum.repos.d/
 wget -O VortexOBS.repo https://download.opensuse.org/repositories/home:VortexOBS/CentOS_8/home:VortexOBS.repo
 dnf -y install osslsigncode
 ```
+  - Для AlmaLinux 9:
+```sh
+cd /etc/yum.repos.d/
+wget -O VortexOBS.repo https://download.opensuse.org/repositories/home:VortexOBS/AlmaLinux_9/home:VortexOBS.repo
+dnf -y install osslsigncode
+```
 
 
 1. Выполнить **build** в консоли *LaunchServer*, если всё сделали правильно, **exe** будет подписан сертификатом.
