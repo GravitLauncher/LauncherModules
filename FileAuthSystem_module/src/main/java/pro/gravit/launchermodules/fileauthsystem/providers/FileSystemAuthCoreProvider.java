@@ -51,7 +51,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     public String databaseDir;
     public boolean autoSave = true;
     public boolean autoReg = false;
-    public long oauthTokenExpire = HOURS.toMillis(1);
+    public long oauthTokenExpire = HOURS.toSeconds(1);
     public PasswordVerifier passwordVerifier;
     public String skinUrl;
     public String cloakUrl;

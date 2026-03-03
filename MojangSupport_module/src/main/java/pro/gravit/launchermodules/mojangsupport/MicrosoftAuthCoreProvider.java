@@ -90,9 +90,9 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 var response = getMinecraftTokenByMicrosoftToken(token.access_token);
                 var session = getUserSessionByOAuthAccessToken(response.access_token);
                 if (minecraftAccess) {
-                    return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, SECONDS.toMillis(response.expires_in), session);
+                    return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, response.expires_in, session);
                 } else {
-                    return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, SECONDS.toMillis(response.expires_in), session);
+                    return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, response.expires_in, session);
                 }
             } catch (OAuthAccessTokenExpired e) {
                 throw new AuthException("Internal Auth Error: Token invalid");
