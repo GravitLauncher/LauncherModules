@@ -11,8 +11,6 @@ import pro.gravit.launcher.base.request.auth.details.AuthWebViewDetails;
 import pro.gravit.launcher.base.request.auth.password.AuthCodePassword;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthException;
-import pro.gravit.utils.helper.CommonHelper;
-import pro.gravit.utils.helper.QueryHelper;
 import pro.gravit.launchserver.auth.core.UserSession;
 import pro.gravit.launcher.base.HttpHelper;
 import pro.gravit.launchserver.manangers.AuthManager;
@@ -25,31 +23,41 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
-    private static final String AUTH_CODE_URL = "https://login.live.com/oauth20_authorize.srf?client_id=%s&response_type=code&redirect_uri=%s&scope=XboxLive.signin offline_access";
     private transient final HttpClient client = HttpClient.newBuilder().build();
     private transient final Logger logger = LogManager.getLogger();
-    public String redirectUrl = "https://login.live.com/oauth20_desktop.srf";
-    public String clientId = "00000000402b5328";
+    public String clientId = "d772766b-19b4-4f69-b353-989f890c5d3b";
     public String clientSecret;
     private transient MojangAuthCoreProvider provider;
     private transient LaunchServer server;
 
+    public record DeviceCodeResponse(String device_code, String user_code, String verification_uri,
+                                     String verification_uri_complete, long expires_in, long interval) {
+    }
+
     @Override
     public List<GetAvailabilityAuthRequestEvent.AuthAvailabilityDetails> getDetails(Client client) {
-        String uuid = UUID.randomUUID().toString();
-        client.setStaticProperty("microsoftCode", uuid);
-        return List.of(new AuthWebViewDetails(
-                AUTH_CODE_URL.formatted(clientId, redirectUrl.formatted(uuid)),
-                redirectUrl.formatted(uuid)
-        ));
+        // Use device-code flow to avoid redirect URI mismatches.
+        String scope = "XboxLive.signin offline_access";
+        try {
+            var device = sendMicrosoftDeviceCodeRequest(scope);
+            // pass verification URI (complete if available) as URL and device code marker as redirectUrl
+            String url = device.verification_uri_complete != null ?
+                    device.verification_uri_complete :
+                    device.verification_uri;
+            String redirectMarker = "device:".concat(device.device_code).concat(":").concat(device.user_code);
+            client.setStaticProperty("microsoftDeviceCode", device.device_code);
+            client.setStaticProperty("microsoftUserCode", device.user_code);
+            return List.of(new AuthWebViewDetails(url, redirectMarker));
+        } catch (IOException e) {
+            logger.error("Device code request failed", e);
+            return List.of();
+        }
     }
 
     @Override
@@ -65,10 +73,13 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
                 return null;
             }
             var response = getMinecraftTokenByMicrosoftToken(result.access_token);
-            return AuthManager.AuthReport.ofOAuth(response.access_token, result.refresh_token, SECONDS.toMillis(response.expires_in), null);
+            var session = this.getUserSessionByOAuthAccessToken(response.access_token);
+            return AuthManager.AuthReport.ofOAuth(response.access_token, result.refresh_token, response.expires_in, session);
         } catch (IOException e) {
             logger.error("Microsoft refresh failed", e);
             return null;
+        } catch (OAuthAccessTokenExpired e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -78,82 +89,151 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
             throw AuthException.wrongPassword();
         }
         AuthCodePassword codePassword = (AuthCodePassword) password;
-        var uri = URI.create(codePassword.uri);
-        var queries = QueryHelper.splitUriQuery(uri);
-        var code = CommonHelper.multimapFirstOrNullValue("code", queries);
-        try {
-            var token = sendMicrosoftOAuthTokenRequest(code);
-            if (token == null) {
-                throw new AuthException("Microsoft auth error: oauth token");
-            }
-            try {
-                var response = getMinecraftTokenByMicrosoftToken(token.access_token);
-                var session = getUserSessionByOAuthAccessToken(response.access_token);
-                if (minecraftAccess) {
-                    return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, response.expires_in, session);
-                } else {
-                    return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, response.expires_in, session);
-                }
-            } catch (OAuthAccessTokenExpired e) {
-                throw new AuthException("Internal Auth Error: Token invalid");
-            }
-        } catch (RequestException e) {
-            throw new AuthException(e.toString());
+        var uri = codePassword.uri;
+
+        if (!uri.startsWith("device:")) {
+            throw new AuthException("Only device code flow is supported");
         }
+
+        String marker = uri.substring("device:".length());
+        String deviceCode = marker.contains(":") ? marker.split(":", 2)[0] : marker;
+
+        MicrosoftOAuthTokenResponse token = tryGetDeviceToken(deviceCode);
+        if (token == null) throw new AuthException("Microsoft auth error: device token");
+
+        try {
+            var response = getMinecraftTokenByMicrosoftToken(token.access_token);
+            var session = getUserSessionByOAuthAccessToken(response.access_token);
+            if (minecraftAccess) {
+                return AuthManager.AuthReport.ofOAuthWithMinecraft(response.access_token, response.access_token, token.refresh_token, response.expires_in, session);
+            } else {
+                return AuthManager.AuthReport.ofOAuth(response.access_token, token.refresh_token, response.expires_in, session);
+            }
+        } catch (OAuthAccessTokenExpired e) {
+            throw new AuthException("Internal Auth Error: Token invalid");
+        }
+    }
+
+    private void checkMinecraftOwnership(String xstsToken, String uhs) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(makeURI("https://api.minecraftservices.com/entitlements/mcstore"))
+                .header("Authorization", "Bearer " + xstsToken)
+                .GET()
+                .build();
+        HttpResponse<String> response = null;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        logger.debug("Minecraft entitlements: {}", response.body());
     }
 
     private MinecraftLoginWithXBoxResponse getMinecraftTokenByMicrosoftToken(String microsoftAccessToken) throws IOException {
-        // XBox Live
+        logger.debug("Getting XBox Live token...");
         var xboxLive = sendMicrosoftXBoxLiveRequest(microsoftAccessToken);
-        // XSTS
+        logger.debug("XBox Live token obtained, UHS: {}", xboxLive.getUHS());
+        logger.debug("Getting XSTS token...");
         var xsts = sendMicrosoftXSTSRequest(xboxLive.Token);
-        // Minecraft auth
+        logger.debug("XSTS token obtained, UHS: {}", xsts.getUHS());
+        logger.debug("Getting Minecraft token...");
+        checkMinecraftOwnership(xsts.Token, xsts.getUHS());
         return sendMinecraftLoginWithXBoxRequest(xsts.getUHS(), xsts.Token);
     }
 
-    private URI makeOAuthTokenRequestURI(String code) throws IOException {
-        StringBuilder builder = new StringBuilder("https://login.live.com/oauth20_token.srf?");
+    private DeviceCodeResponse sendMicrosoftDeviceCodeRequest(String scope) throws IOException {
+        String body = new StringBuilder()
+                .append("client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8))
+                .append("&scope=").append(URLEncoder.encode(scope, StandardCharsets.UTF_8))
+                .toString();
 
-        builder.append("client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8));
-        if (clientSecret != null)
-            builder.append("&client_secret=").append(URLEncoder.encode(clientSecret, StandardCharsets.UTF_8));
-        builder.append("&code=").append(URLEncoder.encode(code, StandardCharsets.UTF_8));
-        builder.append("&grant_type=authorization_code");
-        builder.append("&redirect_uri=").append(URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8));
-
-        try {
-            return new URI(builder.toString());
-        } catch (URISyntaxException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private String makeOAuthRefreshTokenRequestBody(String refreshToken) {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8));
-        if (clientSecret != null)
-            builder.append("&client_secret=").append(URLEncoder.encode(clientSecret, StandardCharsets.UTF_8));
-        builder.append("&refresh_token=").append(URLEncoder.encode(refreshToken, StandardCharsets.UTF_8));
-        builder.append("&grant_type=refresh_token");
-
-        return builder.toString();
-    }
-
-    private MicrosoftOAuthTokenResponse sendMicrosoftOAuthTokenRequest(String code) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(makeOAuthTokenRequestURI(code))
-                .GET()
+                .uri(URI.create("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode"))
+                .POST(HttpRequest.BodyPublishers.ofString(body))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
-        var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
+        var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(DeviceCodeResponse.class));
         return e.getOrThrow();
+    }
+    private MicrosoftOAuthTokenResponse tryGetDeviceToken(String deviceCode) throws IOException {
+        String body = new StringBuilder()
+                .append("grant_type=urn:ietf:params:oauth:grant-type:device_code")
+                .append("&device_code=").append(URLEncoder.encode(deviceCode, StandardCharsets.UTF_8))
+                .append("&client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8))
+                .toString();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://login.microsoftonline.com/consumers/oauth2/v2.0/token"))
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .build();
+        try {
+            var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
+            return e.getOrThrow();
+        } catch (RequestException re) {
+            String msg = re.toString();
+            if (msg.contains("authorization_pending")) {
+                throw new AuthException("Microsoft authorization not completed yet. Please finish sign-in in browser and try again.");
+            } else if (msg.contains("expired_token")) {
+                throw new AuthException("Device code expired. Please restart the login process.");
+            } else {
+                throw new IOException(re);
+            }
+        }
+    }
+    private MicrosoftOAuthTokenResponse pollDeviceToken(String deviceCode) throws IOException {
+        long start = System.currentTimeMillis();
+        long expires = System.currentTimeMillis() + 1000L * 60 * 10; // default 10 minutes fallback
+        long interval = 5;
+        // initial request to get interval/expiry if possible
+        // but we don't have that here; poll until token or timeout
+        while (System.currentTimeMillis() < expires) {
+            String body = new StringBuilder()
+                    .append("grant_type=urn:ietf:params:oauth:grant-type:device_code")
+                    .append("&device_code=").append(URLEncoder.encode(deviceCode, StandardCharsets.UTF_8))
+                    .append("&client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8))
+                    .toString();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://login.microsoftonline.com/consumers/oauth2/v2.0/token"))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
+            try {
+                var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
+                var resp = e.getOrThrow();
+                if (resp != null) return resp;
+            } catch (RequestException re) {
+                // parse error code from message if possible
+                String msg = re.toString();
+                if (msg.contains("authorization_pending")) {
+                    // not ready yet
+                } else if (msg.contains("slow_down")) {
+                    interval += 5;
+                } else if (msg.contains("expired_token")) {
+                    return null;
+                } else {
+                    throw new IOException(re);
+                }
+            }
+            try {
+                Thread.sleep(interval * 1000L);
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Interrupted while polling device token");
+            }
+        }
+        throw new IOException("Device code polling timeout");
     }
 
     private MicrosoftOAuthTokenResponse sendMicrosoftOAuthRefreshTokenRequest(String refreshToken) throws IOException {
+        String body = new StringBuilder()
+                .append("client_id=").append(URLEncoder.encode(clientId, StandardCharsets.UTF_8))
+                .append(clientSecret != null ? "&client_secret=".concat(URLEncoder.encode(clientSecret, StandardCharsets.UTF_8)) : "")
+                .append("&refresh_token=").append(URLEncoder.encode(refreshToken, StandardCharsets.UTF_8))
+                .append("&grant_type=refresh_token").toString();
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://login.live.com/oauth20_token.srf"))
-                .POST(HttpRequest.BodyPublishers.ofString(makeOAuthRefreshTokenRequestBody(refreshToken)))
+                .uri(URI.create("https://login.microsoftonline.com/consumers/oauth2/v2.0/token"))
+                .POST(HttpRequest.BodyPublishers.ofString(body))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
         var e = HttpHelper.send(client, request, new MicrosoftErrorHandler<>(MicrosoftOAuthTokenResponse.class));
@@ -183,6 +263,8 @@ public class MicrosoftAuthCoreProvider extends MojangAuthCoreProvider {
     }
 
     private MinecraftLoginWithXBoxResponse sendMinecraftLoginWithXBoxRequest(String uhs, String xstsToken) throws IOException {
+        String identityToken = "XBL3.0 x=%s;%s".formatted(uhs, xstsToken);
+        logger.debug("Identity token prefix: {}", identityToken.substring(0, Math.min(50, identityToken.length())));
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(makeURI("https://api.minecraftservices.com/authentication/login_with_xbox"))
                 .header("Content-Type", "application/json")
