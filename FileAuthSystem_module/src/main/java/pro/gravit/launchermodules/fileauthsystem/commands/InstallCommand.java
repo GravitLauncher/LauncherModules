@@ -6,6 +6,8 @@ import pro.gravit.launchermodules.fileauthsystem.FileAuthSystemModule;
 import pro.gravit.launchermodules.fileauthsystem.providers.FileSystemAuthCoreProvider;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.auth.AuthProviderPair;
+import pro.gravit.launchserver.auth.core.RejectAuthCoreProvider;
+import pro.gravit.launchserver.auth.texture.VoidTextureProvider;
 import pro.gravit.launchserver.command.Command;
 
 public class InstallCommand extends Command {
@@ -36,23 +38,36 @@ public class InstallCommand extends Command {
         if (pair == null) {
             throw new IllegalArgumentException("AuthProvider pair not found");
         }
-        boolean changed = false;
-        if (!(pair.core instanceof FileSystemAuthCoreProvider)) {
-            if (pair.core != null) {
-                pair.core.close();
-                server.unregisterObject("auth.%s.core".formatted(pair.name), pair.core);
+
+        if (!(pair.core instanceof RejectAuthCoreProvider)) {
+            logger.warn("AuthProviderPair '{}' already has a non-reject core provider ({})",
+                    pair.name, pair.core.getClass().getSimpleName());
+            logger.warn("To avoid overwriting, a new auth provider 'fileauthsystem' will be created instead");
+
+            if (server.config.auth.containsKey("fileauthsystem")) {
+                logger.error("Auth provider 'fileauthsystem' already exists. Aborting.");
+                return;
             }
-            pair.core = new FileSystemAuthCoreProvider();
-            pair.core.init(server, pair);
-            server.registerObject("auth.%s.core".formatted(pair.name), pair.core);
-            logger.info("FileSystemAuthCoreProvider installed");
-            changed = true;
-        }
-        if (changed) {
+
+            FileSystemAuthCoreProvider newCore = new FileSystemAuthCoreProvider();
+            AuthProviderPair newPair = new AuthProviderPair(newCore, new VoidTextureProvider());
+            newPair.displayName = "FileAuthSystem";
+            newPair.isDefault = false;
+            newCore.init(server, newPair);
+            server.config.auth.put("fileauthsystem", newPair);
+            newPair.init(server, "fileauthsystem");
+            server.registerObject("auth.fileauthsystem.core", newCore);
             server.launchServerConfigManager.writeConfig(server.config);
-            logger.info("LaunchServer config updated");
-        } else {
-            logger.info("Already installed. Good!");
+            logger.info("New auth provider 'fileauthsystem' created with FileSystemAuthCoreProvider");
+            return;
         }
+
+        pair.core.close();
+        server.unregisterObject("auth.%s.core".formatted(pair.name), pair.core);
+        pair.core = new FileSystemAuthCoreProvider();
+        pair.core.init(server, pair);
+        server.registerObject("auth.%s.core".formatted(pair.name), pair.core);
+        server.launchServerConfigManager.writeConfig(server.config);
+        logger.info("FileSystemAuthCoreProvider installed to '{}'", pair.name);
     }
 }
