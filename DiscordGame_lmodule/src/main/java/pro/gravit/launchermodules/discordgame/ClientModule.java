@@ -13,7 +13,6 @@ import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.request.Request;
 import pro.gravit.launchermodules.discordgame.commands.DiscordCommand;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.LogHelper;
 
 public class ClientModule extends LauncherModule {
 

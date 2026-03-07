@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlModule;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.LogHelper;
 
 public class EnabledCommand extends Command {
 

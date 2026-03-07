@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.StarterAgent;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

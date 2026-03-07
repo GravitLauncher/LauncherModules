@@ -3,7 +3,6 @@ package pro.gravit.launchermodules.discordgame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.jcm.discordgamesdk.Core;
-import pro.gravit.utils.helper.LogHelper;
 
 public class DiscordUpdateTask implements Runnable {
 

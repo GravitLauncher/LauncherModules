@@ -13,7 +13,6 @@ import pro.gravit.launchermodules.discordgame.DiscordBridge;
 import pro.gravit.launchermodules.discordgame.ScopeConfig;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.JVMHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.time.Instant;
 import java.util.ArrayList;

@@ -6,7 +6,6 @@ import pro.gravit.launchermodules.remotecontrol.RemoteControlConfig;
 import pro.gravit.launchermodules.remotecontrol.RemoteControlModule;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.LogHelper;
 import pro.gravit.utils.helper.SecurityHelper;
 
 import java.util.Arrays;

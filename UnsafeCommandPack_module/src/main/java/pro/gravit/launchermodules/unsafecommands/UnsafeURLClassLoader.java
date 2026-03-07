@@ -2,7 +2,6 @@ package pro.gravit.launchermodules.unsafecommands;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.net.URL;
 import java.net.URLClassLoader;

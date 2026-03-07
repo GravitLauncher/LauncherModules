@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.objectweb.asm.*;
 import pro.gravit.launchermodules.unsafecommands.patcher.ClassTransformerPatcher;
-import pro.gravit.utils.helper.LogHelper;
 
 public class FindRemotePatcher extends ClassTransformerPatcher {
 
