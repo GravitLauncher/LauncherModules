@@ -4,7 +4,7 @@
 
 #### Установка модуля
 
-1. Скопировать модуль **SystemdNotifer_module.jar** в папку **/LaunchServer/modules/**
+1. Установить модуль командой `modules load SystemdNotifer`.
 2. Для работы *unit* потребуется так же установленная утилита **screen**.
     - Debian подобные системы `sudo apt install screen`
     - CentOS `sudo yum install screen`
@@ -23,13 +23,20 @@
 
 ```
 ● Launcher.service - LaunchServer
-   Loaded: loaded (/etc/systemd/system/launcher.service; enabled; vendor preset: disabled)
-   Active: active (running)
-   CGroup: /system.slice/Launcher.service
-           ├─36023 /usr/bin/SCREEN -DmS LaunchServer /usr/bin/java -Xmx512M -javaagent:LaunchServer.jar -jar LaunchServer.jar
-           └─36024 /usr/bin/java -Xmx512M -javaagent:LaunchServer.jar -jar LaunchServer.jar
-systemd[1]: Starting LaunchServer...
-systemd[1]: Started LaunchServer.
+     Loaded: loaded (/etc/systemd/system/Launcher.service; enabled; preset: enabled)
+     Active: active (running) since Thu 2026-01-29 00:25:20 UTC; 3min 50s ago
+    Process: 1024358 ExecStartPre=/usr/bin/screen -S launchserver -X quit (code=exited, status=1/FAILURE)
+   Main PID: 1024359 (screen)
+      Tasks: 33 (limit: 76910)
+     Memory: 233.3M (peak: 706.4M)
+        CPU: 4.564s
+     CGroup: /system.slice/Launcher.service
+             ├─1024359 /usr/bin/SCREEN -DmS launchserver /home/launcher/launchserver/src/components/launchserver/build/install/launchserver/bin/launchserver
+             └─1024362 java --add-modules ALL-MODULE-PATH --add-modules java.net.http --add-opens java.base/java.lang.invoke=launchserver -Dlauncher.useSlf4j=true -Dio.netty.noUnsafe=true -Xmx512M -classpath /home/launcher/launchserver/src/components/launchserver/build/install/la>
+
+Jan 29 00:25:18 ubuntu2404lts systemd[1]: Starting Launcher.service - LaunchServer...
+Jan 29 00:25:18 ubuntu2404lts screen[1024358]: No screen session found.
+Jan 29 00:25:20 ubuntu2404lts systemd[1]: Started Launcher.service - LaunchServer.
 ```
 
 #### Конфигурация
@@ -37,18 +44,32 @@ systemd[1]: Started LaunchServer.
 ```bash
 [Unit]
 Description=LaunchServer
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-WorkingDirectory=/home/launchserver/
-Type=notify
-User=launchserver
-Group=servers
-NotifyAccess=all
-Restart=always    
+WorkingDirectory=/home/launcher/launchserver
+User=launcher
+Group=launcher
 
-ExecStart=/usr/bin/screen -DmS launchserver /usr/bin/java -Xmx512M -javaagent:LaunchServer.jar -jar LaunchServer.jar
-ExecStop=/usr/bin/screen -p 0 -S launchserver -X eval 'stuff "stop"\015'
+Type=notify
+NotifyAccess=all
+
+Environment=APP_HOME=app
+Environment=JAVA_OPTS=-Xmx512M
+
+ExecStartPre=-/usr/bin/screen -S launchserver -X quit
+ExecStart=/usr/bin/screen -DmS launchserver /home/launcher/launchserver/src/components/launchserver/build/install/launchserver/bin/launchserver
+ExecStop=/usr/bin/screen -S launchserver -p 0 -X stuff "stop$(printf '\r')"
+
+StandardOutput=journal
+StandardError=journal
+
+Restart=always
+RestartSec=5
+TimeoutStopSec=60
+KillMode=mixed
+KillSignal=SIGTERM
 
 [Install]
 WantedBy=multi-user.target
