@@ -40,6 +40,9 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -239,7 +242,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
     public UserSession getUserSessionByOAuthAccessToken(String accessToken) throws OAuthAccessTokenExpired {
         UserSessionEntity session = getSessionByAccessToken(accessToken);
         if (session == null) return null;
-        if (session.expireMillis != 0 && session.expireMillis < System.currentTimeMillis())
+        if (session.expireIn.isBefore(LocalDateTime.now(ZoneOffset.UTC)))
             throw new OAuthAccessTokenExpired();
         return session;
     }
@@ -252,7 +255,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         session.refreshToken = SecurityHelper.randomStringToken();
         session.accessToken = SecurityHelper.randomStringToken();
         if (oauthTokenExpire != 0) {
-            session.update(oauthTokenExpire);
+            session.update(Duration.ofSeconds(oauthTokenExpire));
         }
         return AuthManager.AuthReport.ofOAuth(session.accessToken, session.refreshToken, oauthTokenExpire, session);
     }
@@ -275,7 +278,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         UserSessionEntity session = new UserSessionEntity(user);
         addNewSession(session);
         if (oauthTokenExpire != 0) {
-            session.update(oauthTokenExpire);
+            session.update(Duration.ofSeconds(oauthTokenExpire));
         }
         if (minecraftAccess) {
             return AuthManager.AuthReport.ofOAuthWithMinecraft(session.minecraftAccessToken, session.accessToken, session.refreshToken, oauthTokenExpire, session);
@@ -545,7 +548,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         public String refreshToken;
         public String serverId;
         public String minecraftAccessToken;
-        public long expireMillis;
+        public LocalDateTime expireIn;
 
         public UserSessionEntity(UserEntity entity) {
             this.uuid = UUID.randomUUID();
@@ -553,12 +556,11 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
             this.accessToken = SecurityHelper.randomStringToken();
             this.refreshToken = SecurityHelper.randomStringToken();
             this.minecraftAccessToken = SecurityHelper.randomStringToken();
-            this.expireMillis = 0;
             this.userEntityUUID = entity.uuid;
         }
 
-        public void update(long expireMillis) {
-            this.expireMillis = System.currentTimeMillis() + expireMillis;
+        public void update(Duration duration) {
+            this.expireIn = LocalDateTime.now().plus(duration);
         }
 
         @Override
@@ -591,7 +593,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
 
         @Override
         public long getExpireIn() {
-            return expireMillis;
+            return expireIn.toEpochSecond(ZoneOffset.UTC);
         }
 
         @Override
@@ -601,7 +603,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
                     ", entity=" + entity +
                     ", accessToken='" + accessToken + '\'' +
                     ", refreshToken='" + refreshToken + '\'' +
-                    ", expireMillis=" + expireMillis +
+                    ", expireIn=" + getExpireIn() +
                     '}';
         }
     }
