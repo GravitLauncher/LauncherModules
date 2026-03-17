@@ -548,7 +548,7 @@ public class FileSystemAuthCoreProvider extends AuthCoreProvider implements Auth
         public String refreshToken;
         public String serverId;
         public String minecraftAccessToken;
-        public LocalDateTime expireIn;
+        public transient LocalDateTime expireIn;
 
         public UserSessionEntity(UserEntity entity) {
             this.uuid = UUID.randomUUID();
