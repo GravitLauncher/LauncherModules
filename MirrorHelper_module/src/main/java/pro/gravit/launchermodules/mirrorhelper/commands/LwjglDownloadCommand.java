@@ -79,6 +79,9 @@ public class LwjglDownloadCommand extends Command {
         List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc", "lwjgl-freetype", "lwjgl-sdl");
         List<String> archs = List.of("linux", "windows", "windows-x86", "windows-arm64", "macos", "macos-arm64", "linux-arm64", "linux-arm32");
         String mirror = "https://repo1.maven.org/maven2/org/lwjgl/";
+        if(version.contains("-")) { // SNAPSHOT versions
+            mirror = "https://central.sonatype.com/repository/maven-snapshots/";
+        }
         for (String component : components) {
             Path jarPath = lwjglDir.resolve(component).resolve(version).resolve(component.concat("-").concat(version).concat(".jar"));
             Path jarDirPath = jarPath.getParent();
