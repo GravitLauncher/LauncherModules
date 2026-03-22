@@ -17,6 +17,7 @@ import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.*;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -55,6 +56,7 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
             event.processBuilder.executeFile = executeFile;
             event.processBuilder.useLegacyJavaClassPathProperty = config.useClasspathProperty;
             event.processBuilder.systemEnv.put("JAVA_HOME", javaVersion.jvmDir.toAbsolutePath().toString());
+            prependJavaBinToPath(event.processBuilder.systemEnv, javaVersion);
             var agentArgument = makeAgentlibArgument(javaVersion);
             if(agentArgument != null) {
                 event.processBuilder.jvmArgs.add(agentArgument);
@@ -132,10 +134,27 @@ public class ModuleImpl extends LauncherModule implements ClientWrapperModule {
             context.useLegacyClasspathProperty = config.useClasspathProperty;
             Map<String, String> env = context.processBuilder.environment();
             env.put("JAVA_HOME", context.javaVersion.jvmDir.toAbsolutePath().toString());
+            prependJavaBinToPath(env, context.javaVersion);
             var agentArgument = makeAgentlibArgument(context.javaVersion);
             if(agentArgument != null) {
                 context.args.add(agentArgument);
             }
         }
+    }
+
+    private static void prependJavaBinToPath(Map<String, String> env, JavaHelper.JavaVersion javaVersion) {
+        Path javaBinPath = javaVersion.jvmDir.resolve("bin").toAbsolutePath().normalize();
+        String javaBin = javaBinPath.toString();
+        String key = env.containsKey("Path") ? "Path" : "PATH";
+        String currentPath = env.get(key);
+        if (currentPath == null || currentPath.isBlank()) {
+            env.put(key, javaBin);
+            return;
+        }
+        String lowerCurrent = currentPath.toLowerCase();
+        if (lowerCurrent.startsWith(javaBin.toLowerCase() + File.pathSeparator)) {
+            return;
+        }
+        env.put(key, javaBin + File.pathSeparator + currentPath);
     }
 }
