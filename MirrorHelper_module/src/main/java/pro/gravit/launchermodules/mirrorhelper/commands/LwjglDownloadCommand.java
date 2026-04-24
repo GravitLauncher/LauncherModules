@@ -83,7 +83,7 @@ public class LwjglDownloadCommand extends Command {
 
         String mirror = "https://repo1.maven.org/maven2/org/lwjgl/";
         if(version.contains("SNAPSHOT")) { // SNAPSHOT versions
-            mirror = "https://oss.sonatype.org/content/repositories/snapshots/org/lwjgl/";
+            mirror = "https://central.sonatype.com/repository/maven-snapshots/org/lwjgl/";
         }
 
         for (String component : components) {
