@@ -1,13 +1,15 @@
 package pro.gravit.launchermodules.mirrorhelper.commands;
 
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
@@ -78,30 +80,39 @@ public class LwjglDownloadCommand extends Command {
         Path natives = clientDir.resolve("natives");
         List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc", "lwjgl-freetype", "lwjgl-sdl", "lwjgl-spng");
         List<String> archs = List.of("linux", "windows", "windows-x86", "windows-arm64", "macos", "macos-arm64", "linux-arm64", "linux-arm32");
+
         String mirror = "https://repo1.maven.org/maven2/org/lwjgl/";
-        if(version.contains("-")) { // SNAPSHOT versions
-            mirror = "https://central.sonatype.com/repository/maven-snapshots/org/lwjgl/";
+        if(version.contains("SNAPSHOT")) { // SNAPSHOT versions
+            mirror = "https://oss.sonatype.org/content/repositories/snapshots/org/lwjgl/";
         }
+
         for (String component : components) {
+            // Local file will still be named cleanly like lwjgl-3.3.3-SNAPSHOT.jar
             Path jarPath = lwjglDir.resolve(component).resolve(version).resolve(component.concat("-").concat(version).concat(".jar"));
             Path jarDirPath = jarPath.getParent();
             Files.createDirectories(jarDirPath);
+
             String prepareUrl = mirror
                     .concat(component)
                     .concat("/")
                     .concat(version)
                     .concat("/");
+
+            // Resolve exact snapshot timestamp file name
+            String resolvedVersion = resolveSnapshotVersion(mirror, component, version);
+
             URL jarUrl = new URI(prepareUrl
-                    .concat("%s-%s.jar".formatted(component, version))).toURL();
+                    .concat("%s-%s.jar".formatted(component, resolvedVersion))).toURL();
             logger.info("Download {} to {}", jarUrl, jarPath);
             try {
                 download(jarUrl, jarPath);
             } catch (FileNotFoundException e) {
                 logger.warn("{} not found, skipping", jarUrl);
             }
+
             for (String arch : archs) {
                 URL nativesUrl = new URI(prepareUrl
-                        .concat("%s-%s-natives-%s.jar".formatted(component, version, arch))).toURL();
+                        .concat("%s-%s-natives-%s.jar".formatted(component, resolvedVersion, arch))).toURL();
                 var pair = getFromLwjglNativeName(arch);
                 Path nativesPath = natives.resolve(pair.os.name.toLowerCase()).resolve(pair.arch.name.toLowerCase());
                 IOHelper.createParentDirs(nativesPath);
@@ -135,6 +146,25 @@ public class LwjglDownloadCommand extends Command {
                 }
             }
             logger.info("Complete");
+        }
+    }
+
+    private String resolveSnapshotVersion(String mirror, String component, String version) {
+        if (!version.endsWith("-SNAPSHOT")) return version;
+        try {
+            URL url = new URI(mirror + component + "/" + version + "/maven-metadata.xml").toURL();
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            try (InputStream input = IOHelper.newInput(url)) {
+                Document doc = dBuilder.parse(input);
+                doc.getDocumentElement().normalize();
+                String timestamp = doc.getElementsByTagName("timestamp").item(0).getTextContent();
+                String buildNumber = doc.getElementsByTagName("buildNumber").item(0).getTextContent();
+                return version.replace("SNAPSHOT", timestamp + "-" + buildNumber);
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to resolve maven-metadata.xml for snapshot {} {}: {}", component, version, e.getMessage());
+            return version; // Fallback to raw string just in case
         }
     }
 
