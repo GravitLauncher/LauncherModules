@@ -1,49 +1,26 @@
-# Sentry ServerModule
+# Prestarter ServerModule
 
-Интеграция **[LaunchServer](https://github.com/GravitLauncher/Launcher)** с Sentry
+Модуль для интеграции нового престартера с вашим LaunchServer. По умолчанию лаунчер поставляется в виде обычного `.jar` приложения, однако данный модуль позволяет автоматически собирать нативную `.exe` сборку клиента со встроенным загрузчиком Java. Исходный код престартера находится в репозитории **[LauncherPrestarter](https://github.com/GravitLauncher/LauncherPrestarter)**.
 
-- `Этот модуль позволяет отслеживать ошибки возникающие на стороне вашего лаунчсервера`
+- `Этот модуль склеивает собранный exe-престартер с jar-файлом лаунчера, а также автоматически подписывает итоговый файл цифровым сертификатом (если установлен соответствующий модуль подписи)`
 
-![sentry-java](https://user-images.githubusercontent.com/12544425/236633515-88d3d837-35c0-47e4-a4c1-765d9cb152bc.png)
+#### О престартере
+
+Сам престартер представляет собой легковесное нативное приложение, написанное на языке **Rust** с использованием фреймворка **Tauri** (фронтенд построен на **Svelte**). Он отвечает за первичный запуск, скачивание необходимой Java-рантайм и подготовку окружения для лаунчера на стороне клиента.
 
 #### Установка модуля
 
-1. Скопировать модуль **Sentry_module.jar** в папку **/LaunchServer/modules/**
-   - Либо установкой symlink:
-     ```
-     cd modules
-     ln -s ../src/modules/Sentry_module/build/libs/Sentry_module.jar
-     ```
-2. Запустить и остановить **LaunchServer.jar** для создания файла конфигурации.
-3. Зарегистрироваться на сайте **Sentry.io** и создайте там Java проект.
-4. После создания проекта потребуется скопировать **DSN** ключ:
-    - `https://<ОРГАНИЗАЦИЯ>.sentry.io/settings/sentry/projects/<ИМЯ_ПРОЕКТА_ДЛЯ_ЛАУНЧСЕРВЕРА>/keys/ => DSN`
-    - **Settings -> Projects -> [Выбрать созданный проект] -> Client Keys (DSN)**
-    - **Настройки -> Проекты -> [Выбрать созданный проект] -> Клиентские ключи (DSN)**
-5. Изменить в файле конфигурации **YOUR_DSN** на скопированный.
+1. В консоли запущенного **LaunchServer** выполните команду для автоматической загрузки:
+   ```text
+   modules load Prestarter
+   ```
 
-#### Конфигурация
+#### Разработка и кастомизация престартера
 
-- **/LaunchServer/config/SentryServerModule/Config.json**
+Если вам необходимо изменить дизайн, иконки или логику самого престартера, склонируйте его исходный код из официального репозитория:
 
-  ```json
-  {
-    "dsn": "YOUR_DSN",
-    "sampleRate": 1.0,
-    "enableTracing": false,
-    "tracingSampleRate": 1.0,
-    "addSentryAppender": true,
-    "filterExceptions": true,
-    "requestTracker": true,
-    "captureRequestData": false,
-    "captureRequestError": false,
-    "appenderLogLevel": "ERROR",
-    "ignoreErrors": [
-      "auth.wrongpassword", "auth.require2fa", "auth.usernotfound", "auth.require.factor."
-    ]
-  }
-  ```
+```bash
+git clone https://github.com/GravitLauncher/LauncherPrestarter.git
+```
 
-#### P.S.
-
-- Настройка в вашей учётной записи: языка, часового пояса и темы по ссылке [\[Account Details\]](https://sentry.io/settings/account/details/)
+*Инструкции по настройке окружения (NodeJS, Yarn, Rust, Visual Studio) и команды сборки (`yarn tauri build`) находятся в файле README репозитория престартера.*
