@@ -10,6 +10,7 @@ tasks.jar {
 }
 
 dependencies {
-    implementation("io.sentry:sentry:8.20.0")
-    compileOnly(libs.oshi)
+    implementation(libs.sentry)
+    compileOnly(libs.oshi.core)
+    compileOnly(libs.oshi.common)
 }

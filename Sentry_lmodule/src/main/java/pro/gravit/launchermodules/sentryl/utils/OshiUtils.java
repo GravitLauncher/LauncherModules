@@ -37,7 +37,7 @@ public class OshiUtils {
     public static Map<String, String> makeMemoryProperties() {
         Map<String, String> memory = new HashMap<>();
         memory.put("Global Free memory", humanReadableByteCountBin(globalMemory.getAvailable()));
-        memory.put("Process Resident memory", humanReadableByteCountBin(process.getResidentSetSize()));
+        memory.put("Process Resident memory", humanReadableByteCountBin(process.getResidentMemory()));
         memory.put("Process Virtual memory", humanReadableByteCountBin(process.getVirtualSize()));
         memory.put("Java Max memory", humanReadableByteCountBin(runtime.maxMemory()));
         memory.put("Java Free memory", humanReadableByteCountBin(runtime.freeMemory()));
