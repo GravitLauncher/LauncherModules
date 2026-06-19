@@ -8,6 +8,7 @@ import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
+import pro.gravit.utils.Version;
 import pro.gravit.utils.helper.IOHelper;
 
 import java.io.InputStream;
@@ -54,7 +55,7 @@ public class DownloadInstallerCommand extends Command {
                         neoForgeVersionData = Launcher.gsonManager.gson.fromJson(reader, NeoForgeVersionData.class);
                     }
                     String key = version.toString();
-                    boolean isSnapshot = !key.startsWith("1.");
+                    boolean isSnapshot = !key.startsWith("1.") && key.contains("w");
                     String prefix;
                     if(isSnapshot) {
                         prefix = "0.".concat(key).concat(".");
