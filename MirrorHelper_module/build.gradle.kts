@@ -8,5 +8,5 @@ tasks.jar {
 }
 
 dependencies {
-    
+    api(libs.jline.reader)
 }
