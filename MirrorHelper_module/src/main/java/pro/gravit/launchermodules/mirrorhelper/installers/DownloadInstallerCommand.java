@@ -60,7 +60,11 @@ public class DownloadInstallerCommand extends Command {
                     if(isSnapshot) {
                         prefix = "0.".concat(key).concat(".");
                     } else {
-                        prefix = key.substring(2).concat(".");
+                        if(key.startsWith("1.")) {
+                            prefix = key.substring(2).concat(".");
+                        } else {
+                            prefix = key.concat(".");
+                        }
                     }
                     List<ClientProfile.Version> versions = new ArrayList<>();
                     for(var v : neoForgeVersionData.versions()) {
