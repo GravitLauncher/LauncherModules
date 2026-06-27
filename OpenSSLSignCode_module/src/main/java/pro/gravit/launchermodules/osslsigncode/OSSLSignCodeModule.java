@@ -68,9 +68,20 @@ public class OSSLSignCodeModule extends LauncherModule {
         }
         config = configurable.getConfig();
         server.commandHandler.registerCommand("osslsignexe", new OSSLSignEXECommand(server, config));
-        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_X86_64, new OSSLSignTask(server, config));
-        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_X86, new OSSLSignTask(server, config));
-        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_ARM64, new OSSLSignTask(server, config));
+        
+        // Choose the appropriate task based on signing method
+        LauncherBuildTask task;
+        if (config.signingMethod == OSSLSignCodeConfig.SigningMethod.SIGNTOOL) {
+            logger.info("Using Windows signtool for signing");
+            task = new SigntoolTask(server, config);
+        } else {
+            logger.info("Using osslsigncode for signing");
+            task = new OSSLSignTask(server, config);
+        }
+        
+        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_X86_64, task);
+        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_X86, task);
+        tryAddTask(server, CoreFeatureAPI.UpdateVariant.EXE_WINDOWS_ARM64, task);
     }
 
     public boolean tryAddTask(LaunchServer server, CoreFeatureAPI.UpdateVariant variant, LauncherBuildTask task) {

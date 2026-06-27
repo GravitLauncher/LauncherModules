@@ -29,6 +29,11 @@ public class OSSLSignEXECommand extends Command {
         verifyArgs(args, 2);
         Path inputPath = Paths.get(args[0]);
         Path outputPath = Paths.get(args[1]);
-        OSSLSignTask.signLaunch4j(config, server.config.sign, inputPath, outputPath);
+        
+        if (config.signingMethod == OSSLSignCodeConfig.SigningMethod.SIGNTOOL) {
+            SigntoolTask.signLaunch4j(config, server.config.sign, inputPath, outputPath);
+        } else {
+            OSSLSignTask.signLaunch4j(config, server.config.sign, inputPath, outputPath);
+        }
     }
 }
