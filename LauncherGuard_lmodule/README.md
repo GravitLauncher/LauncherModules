@@ -7,6 +7,7 @@
 1. Скопировать модуль **LauncherGuard_lmodule.jar** в папку **/LaunchServer/launcher-modules/**
 2. Положить файлы exe и dll вашей нативной защиты в папки вида **/LaunchServer/launcher-pack/guard/ARCH-OS/**(например */LaunchServer/launcher-pack/guard/x86-64-mustdie/* для Windows x64)
 3. Настроить конфигурацию
+4. Для работоспособности параметра **protectLauncher**: **true** в конфигурации лаунчсервера установите параметр **launcher.alwaysUseRelauncher**: **true**
 4. Выполнить **build** Launcher.
 
 #### Конфигурация
