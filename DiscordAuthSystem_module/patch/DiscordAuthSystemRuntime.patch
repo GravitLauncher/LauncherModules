@@ -1,0 +1,129 @@
+From ddeb1507e0a6e74737877906db56c62769dd9b2b Mon Sep 17 00:00:00 2001
+From: Meido <popenkodaniil@mail.ru>
+Date: Wed, 29 Jun 2022 12:17:57 +0700
+Subject: [PATCH] DiscordAuthSystemRuntime
+
+---
+ .../client/gui/impl/GuiEventHandler.java      | 18 +++++++++--
+ .../client/gui/scenes/login/LoginScene.java   |  9 ++++++
+ .../scenes/login/methods/WebAuthMethod.java   | 31 ++++++++++++++-----
+ 3 files changed, 48 insertions(+), 10 deletions(-)
+
+diff --git a/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java b/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
+index c817abe..c9b5f02 100644
+--- a/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
++++ b/src/main/java/pro/gravit/launcher/client/gui/impl/GuiEventHandler.java
+@@ -3,12 +3,15 @@ package pro.gravit.launcher.client.gui.impl;
+ import pro.gravit.launcher.client.gui.JavaFXApplication;
+ import pro.gravit.launcher.client.gui.scenes.login.LoginScene;
+ import pro.gravit.launcher.events.RequestEvent;
++import pro.gravit.launcher.events.request.AdditionalDataRequestEvent;
+ import pro.gravit.launcher.events.request.AuthRequestEvent;
+ import pro.gravit.launcher.request.RequestService;
+ import pro.gravit.launcher.request.WebSocketEvent;
+ import pro.gravit.launcher.request.websockets.ClientWebSocketService;
+ import pro.gravit.utils.helper.LogHelper;
+ 
++import java.util.Map;
++
+ public class GuiEventHandler implements RequestService.EventHandler {
+     private final JavaFXApplication application;
+ 
+@@ -26,11 +29,22 @@ public class GuiEventHandler implements RequestService.EventHandler {
+         try {
+             if (event instanceof AuthRequestEvent) {
+                 boolean isNextScene = application.getCurrentScene() instanceof LoginScene;
++                AuthRequestEvent rawAuthResult = (AuthRequestEvent) event;
+                 ((LoginScene) application.getCurrentScene()).isLoginStarted = true;
+                 LogHelper.dev("Receive auth event. Send next scene %s", isNextScene ? "true" : "false");
+-                application.stateService.setAuthResult(null, (AuthRequestEvent) event);
+-                if (isNextScene && ((LoginScene) application.getCurrentScene()).isLoginStarted)
++                application.stateService.setAuthResult(null, rawAuthResult);
++                if (isNextScene && ((LoginScene) application.getCurrentScene()).isLoginStarted) {
+                     ((LoginScene) application.getCurrentScene()).onGetProfiles();
++
++                    if (((LoginScene) application.getCurrentScene()).getSavePasswordCheckBoxSelected()) {
++                        application.runtimeSettings.login = rawAuthResult.playerProfile.username;
++                        application.runtimeSettings.oauthAccessToken = rawAuthResult.oauth.accessToken;
++                        application.runtimeSettings.oauthRefreshToken = rawAuthResult.oauth.refreshToken;
++                        application.runtimeSettings.oauthExpire = System.currentTimeMillis() + rawAuthResult.oauth.expire;
++                        application.runtimeSettings.lastAuth = ((LoginScene) application.getCurrentScene()).getAuthAvailability();
++                    }
++                }
++
+             }
+         } catch (Throwable e) {
+             LogHelper.error(e);
+diff --git a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
+index 80cf2ed..d12f6c0 100644
+--- a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
++++ b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/LoginScene.java
+@@ -146,6 +146,15 @@ public class LoginScene extends AbstractScene {
+         LogHelper.info("Selected auth: %s", authAvailability.name);
+     }
+ 
++    public GetAvailabilityAuthRequestEvent.AuthAvailability getAuthAvailability() {
++        return this.authAvailability;
++    }
++
++    public boolean getSavePasswordCheckBoxSelected() {
++        CheckBox checkBox = this.savePasswordCheckBox;
++        return checkBox != null && checkBox.isSelected();
++    }
++
+     public void addAuthAvailability(GetAvailabilityAuthRequestEvent.AuthAvailability authAvailability) {
+         RadioButton radio = new RadioButton();
+         radio.setToggleGroup(authToggleGroup);
+diff --git a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/methods/WebAuthMethod.java b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/methods/WebAuthMethod.java
+index cf888f1..d6cb6f9 100644
+--- a/src/main/java/pro/gravit/launcher/client/gui/scenes/login/methods/WebAuthMethod.java
++++ b/src/main/java/pro/gravit/launcher/client/gui/scenes/login/methods/WebAuthMethod.java
+@@ -13,6 +13,10 @@ import pro.gravit.launcher.request.auth.details.AuthWebViewDetails;
+ import pro.gravit.launcher.request.auth.password.AuthCodePassword;
+ import pro.gravit.utils.helper.LogHelper;
+ 
++import java.awt.Desktop;
++import java.io.IOException;
++import java.net.URI;
++import java.net.URISyntaxException;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.function.Consumer;
+ 
+@@ -52,15 +56,26 @@ public class WebAuthMethod extends AbstractAuthMethod<AuthWebViewDetails> {
+     @Override
+     public CompletableFuture<LoginScene.LoginAndPasswordResult> auth(AuthWebViewDetails details) {
+         overlay.future = new CompletableFuture<>();
+-        overlay.follow(details.url, details.redirectUrl, (r) -> {
+-            String code = r;
+-            LogHelper.debug("Code: %s", code);
+-            if(code.startsWith("?code=")) {
+-                code = r.substring("?code=".length(), r.indexOf("&"));
++        if (details.onlyBrowser) {
++            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
++                try {
++                    Desktop.getDesktop().browse(new URI(details.url));
++                } catch (IOException | URISyntaxException e) {
++                    e.printStackTrace();
++                }
+             }
+-            LogHelper.debug("Code: %s", code);
+-            overlay.future.complete(new LoginScene.LoginAndPasswordResult(null, new AuthCodePassword(code)));
+-        });
++            overlay.disable();
++        } else {
++            overlay.follow(details.url, details.redirectUrl, (r) -> {
++                String code = r;
++                LogHelper.debug("Code: %s", code);
++                if(code.startsWith("?code=")) {
++                    code = r.substring("?code=".length(), r.indexOf("&"));
++                }
++                LogHelper.debug("Code: %s", code);
++                overlay.future.complete(new LoginScene.LoginAndPasswordResult(null, new AuthCodePassword(code)));
++            });
++        }
+         return overlay.future;
+     }
+ 
+-- 
+2.29.2.windows.2
+
