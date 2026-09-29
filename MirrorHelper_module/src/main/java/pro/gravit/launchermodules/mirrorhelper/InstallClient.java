@@ -3,6 +3,7 @@ package pro.gravit.launchermodules.mirrorhelper;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.NonNull;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.Downloader;
 import pro.gravit.launcher.base.profiles.ClientProfile;
@@ -34,17 +35,17 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class InstallClient {
-    private static final Logger logger = LogManager.getLogger();
-    private final LaunchServer launchServer;
-    private final Config config;
-    private final Path workdir;
-    private final String name;
-    private final ClientProfile.Version version;
-    private final WorkspaceTools tools;
+    static final Logger logger = LogManager.getLogger();
+    final LaunchServer launchServer;
+    final Config config;
+    final Path workdir;
+    final String name;
+    final ClientProfile.Version version;
+    final WorkspaceTools tools;
 
-    private final List<String> mods;
-    private final MirrorWorkspace mirrorWorkspace;
-    private final VersionType versionType;
+    final List<String> mods;
+    final MirrorWorkspace mirrorWorkspace;
+    final VersionType versionType;
 
     public InstallClient(MirrorHelperModule module, String name, ClientProfile.Version version, List<String> mods, VersionType versionType, MirrorWorkspace mirrorWorkspace) {
         this.launchServer = module.server;
@@ -143,183 +144,85 @@ public class InstallClient {
     }
 
     public void run() throws Exception {
-        if(mirrorWorkspace == null) {
-            throw new RuntimeException("Workspace not found! Please use 'applyworkspace'");
-        }
-        logger.info("Install client {} {}", version.toString(), versionType);
+        runPrepare();
         Path originalMinecraftProfile = null;
         Path clientPath = launchServer.createTempDirectory(name);
-        {
-            Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.toString());
-            if (Files.notExists(fetchDir)) {
-                downloadVanillaTo(fetchDir);
-            }
-            copyDir(fetchDir, clientPath, path -> !(
-                    path.toString().contains("icu4j-core-mojang") &&
-                            versionType == VersionType.FORGE &&
-                            version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0
-            ));
-        }
+        checkAndDownloadVanilla(clientPath);
         Path tmpFile = workdir.resolve("file.tmp");
-        {
-            Path pathToLauncherAuthlib = getPathToLauncherAuthlib();
-            logger.info("Found launcher authlib in {}", pathToLauncherAuthlib);
-            Path pathToOriginalAuthlib = findClientAuthlib(clientPath);
-            logger.info("Found original authlib in {}", pathToOriginalAuthlib);
-            merge2Jars(pathToOriginalAuthlib, pathToLauncherAuthlib, tmpFile);
-            Files.delete(pathToOriginalAuthlib);
-            Files.move(tmpFile, pathToOriginalAuthlib);
-            logger.info("Authlib patched");
-        }
-        {
-            if (versionType == VersionType.FABRIC) {
-                FabricInstallerCommand fabricInstallerCommand = new FabricInstallerCommand(launchServer);
-                if(mirrorWorkspace == null || mirrorWorkspace.fabricLoaderVersion() == null) {
-                    fabricInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
-                } else {
-                    fabricInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString(), mirrorWorkspace.fabricLoaderVersion());
-                }
-                Files.createDirectories(clientPath.resolve("mods"));
-                logger.info("Fabric installed");
-            } else if (versionType == VersionType.QUILT) {
-                QuiltInstallerCommand quiltInstallerCommand = new QuiltInstallerCommand(launchServer);
-                quiltInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
-                Files.createDirectories(clientPath.resolve("mods"));
-                logger.info("Quilt installed");
-            } else if (versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) {
-                String forgePrefix = versionType == VersionType.NEOFORGE ? "neoforge" : "forge";
-                boolean noGui = true;
-                Path forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer-nogui.jar");
-                Path tmpDir = workdir.resolve("clients").resolve(forgePrefix).resolve(version.toString());
-                if(Files.notExists(forgeInstaller)) {
-                    logger.warn("{} not found", forgeInstaller.toAbsolutePath().toString());
-                    forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer.jar");
-                    noGui = false;
-                }
-                if(Files.notExists(forgeInstaller) && Files.notExists(tmpDir)) {
-                    throw new FileNotFoundException(forgeInstaller.toAbsolutePath().toString());
-                }
-                if(Files.notExists(tmpDir)) {
-                    Files.createDirectories(tmpDir);
-                    Files.createDirectories(tmpDir.resolve("versions"));
-                    IOHelper.transfer("{\"profiles\": {}}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
-                    int counter = 5;
-                    do {
-                        Process forgeProcess;
-                        if(noGui) {
-                            logger.info("Install forge client into {} (no gui)", tmpDir.toAbsolutePath().toString());
-                            forgeProcess = new ProcessBuilder()
-                                    .command("java", "-jar", forgeInstaller.toAbsolutePath().toString(), "--installClient", tmpDir.toAbsolutePath().toString())
-                                    .inheritIO()
-                                    .start();
-                        } else {
-                            logger.info("Please install forge client into {} (require gui)", tmpDir.toAbsolutePath().toString());
-                            forgeProcess = new ProcessBuilder()
-                                    .command("java", "-jar", forgeInstaller.toAbsolutePath().toString())
-                                    .inheritIO()
-                                    .start();
-                        }
-                        int code = forgeProcess.waitFor();
-                        logger.info("Process return with status code {}", code);
-                        counter--;
-                        if (counter <= 0) {
-                            IOHelper.deleteDir(tmpDir, true);
-                            throw new RuntimeException("Forge not installed");
-                        }
-                    } while (!Files.isDirectory(tmpDir.resolve("libraries")));
-                }
-                copyDir(tmpDir.resolve("libraries"), clientPath.resolve("libraries"));
-                {
-                    Path forgeClientDir;
-                    try (Stream<Path> stream = Files.list(tmpDir.resolve("versions"))
-                                 .filter(x -> {
-                                     String fname = x.getFileName().toString().toLowerCase(Locale.ROOT);
-                                     return  fname.contains("forge") || fname.contains("cleanroom");
-                                 })) {
-                        forgeClientDir = stream.findFirst().orElseThrow();
-                    }
-                    Path forgeProfileFile;
-                    try(Stream<Path> stream = Files.list(forgeClientDir).filter(p -> p.getFileName().toString().endsWith(".json"))) {
-                        forgeProfileFile = stream.findFirst().orElseThrow();
-                    }
-                    originalMinecraftProfile = forgeProfileFile;
-                    logger.debug("Forge profile {}", forgeProfileFile.toString());
-                    ForgeProfile forgeProfile;
-                    try (Reader reader = IOHelper.newReader(forgeProfileFile)) {
-                        forgeProfile = Launcher.gsonManager.configGson.fromJson(reader, ForgeProfile.class);
-                    }
-                    for (ForgeProfile.ForgeProfileLibrary library : forgeProfile.libraries()) {
-                        String libUrl = library.downloads() == null ? null : library.downloads().artifact().url();
-                        String name = library.name();
-                        if (libUrl == null || libUrl.isEmpty()) {
-                            libUrl = "https://libraries.minecraft.net/";
-                        }
-                        if(name.endsWith("@jar")) {
-                            name = name.substring(0, name.length()-4);
-                        }
-                        FabricInstallerCommand.NamedURL url = FabricInstallerCommand.makeURL(libUrl, name);
-                        Path file = clientPath.resolve("libraries").resolve(url.name);
-                        IOHelper.createParentDirs(file);
-                        if (Files.exists(file)) {
-                            continue;
-                        }
-                        logger.info("Download {} into {}", url.url.toString(), url.name);
-                        try {
-                            try (InputStream stream = IOHelper.newInput(url.url)) {
-                                try (OutputStream output = IOHelper.newOutput(file)) {
-                                    IOHelper.transfer(stream, output);
-                                }
-                            }
-                        } catch (FileNotFoundException e) {
-                            logger.warn("Not found {}", url.url);
-                        }
-                    }
-                }
-                if(config.deleteTmpDir) {
-                    IOHelper.deleteDir(tmpDir, true);
-                }
-                Files.createDirectories(clientPath.resolve("mods"));
-                logger.info("Forge installed");
-            }
-        }
-        {
-            for(var entry : mirrorWorkspace.build().entrySet()) {
-                var k = entry.getKey();
-                var v = entry.getValue();
-                if(!v.check(versionType, version)) {
-                    continue;
-                }
-                Path target = workdir.resolve(v.path());
-                if(entry.getValue().dynamic() || Files.notExists(target)) {
-                    logger.info("Build {}", k);
-                    try {
-                        tools.build(k, v, clientPath);
-                    } catch (Throwable e) {
-                        logger.error("Build error", e);
-                    }
-                }
-            }
-        }
+        patchAuthlib(clientPath, tmpFile);
+        originalMinecraftProfile = installModloader(clientPath, originalMinecraftProfile);
+        runWorkspaceLibraryBuild(clientPath);
         logger.info("Build required libraries");
-        String lwjgl3Version = mirrorWorkspace.lwjgl3version();
-        for(var e : mirrorWorkspace.lwjglVersionOverride()) {
-            if(version.compareTo(e.minVersion()) < 0) {
-                continue;
-            }
-            if(version.compareTo(e.maxVersion()) > 0) {
-                continue;
-            }
-            lwjgl3Version = e.value();
+        String lwjgl3Version = getLwjgl3Version();
+        copyCommonDirs(clientPath, lwjgl3Version);
+        installModsFromInternet(clientPath);
+        logger.info("Install multiMods");
+        installMultimods(clientPath);
+        runDedupLibraries(clientPath);
+        ClientProfile clientProfile = makeClientProfile(clientPath);
+        ProfileModifier modifier = getProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+        clientProfile = modifier.build();
+        CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfile, clientPath, !config.disableDownloadAssets);
+        logger.info("Completed");
+    }
+
+    @NonNull ProfileModifier getProfileModifier(Path originalMinecraftProfile, ClientProfile clientProfile, Path clientPath) {
+        ProfileModifier modifier;
+        if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
+            logger.info("Run Forge118ProfileModifier");
+            modifier = new Forge118ProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+        } else if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
+            logger.info("Run CleanroomProfileModifier");
+            modifier = new CleanroomProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
+        } else if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_7_10) == 0) {
+            logger.info("Run Lwjgl3ifyProfileModifier");
+            modifier = new Lwjgl3ifyProfileModifier(clientProfile, clientPath);
+        } else {
+            logger.info("Run BasicProfileModifier");
+            modifier = new BasicProfileModifier(clientProfile, clientPath);
         }
+        return modifier;
+    }
+
+    ClientProfile makeClientProfile(Path clientPath) throws IOException {
+        ClientProfile clientProfile;
         {
-            copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
-            copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
-            copyDir(workdir.resolve("workdir").resolve("lwjgl").resolve(lwjgl3Version), clientPath);
-            copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
-            copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve("ALL"), clientPath);
-            copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve(versionType.name()), clientPath);
-            logger.info("Files copied");
+            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientPath, version);
+            for (MakeProfileHelper.MakeProfileOption option : options) {
+                logger.debug("Detected option {}", option.getClass().getSimpleName());
+            }
+            clientProfile = MakeProfileHelper.makeProfile(version, name, options);
+            logger.info("makeprofile completed");
         }
+        return clientProfile;
+    }
+
+    void runDedupLibraries(Path clientPath) throws Exception {
+        DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);
+        deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
+        logger.info("deduplibraries completed");
+    }
+
+    void installMultimods(Path clientPath) throws IOException {
+        for (var m : mirrorWorkspace.multiMods().entrySet()) {
+            var k = m.getKey();
+            var v = m.getValue();
+            if(!v.check(versionType, version)) {
+                continue;
+            }
+            Path file = workdir.resolve("multimods").resolve(k.concat(".jar"));
+            if (Files.notExists(file)) {
+                logger.warn("File {} not exist", file);
+                continue;
+            }
+            Path targetMod = v.target() != null ? clientPath.resolve(v.target()) : clientPath.resolve("mods").resolve(file.getFileName());
+            logger.info("Copy {} to {}", file, targetMod);
+            IOHelper.copy(file, targetMod);
+            logger.info("MultiMods installed");
+        }
+    }
+
+    void installModsFromInternet(Path clientPath) {
         if (mods != null && !mods.isEmpty()) {
             ModrinthAPI modrinthAPI = null;
             CurseforgeAPI curseforgeApi = null;
@@ -352,57 +255,195 @@ public class InstallClient {
             }
             logger.info("Mods installed");
         }
-        logger.info("Install multiMods");
-        for (var m : mirrorWorkspace.multiMods().entrySet()) {
-            var k = m.getKey();
-            var v = m.getValue();
+    }
+
+    void copyCommonDirs(Path clientPath, String lwjgl3Version) throws IOException {
+        copyDir(workdir.resolve("workdir").resolve("ALL"), clientPath);
+        copyDir(workdir.resolve("workdir").resolve(versionType.name()), clientPath);
+        copyDir(workdir.resolve("workdir").resolve("lwjgl").resolve(lwjgl3Version), clientPath);
+        copyDir(workdir.resolve("workdir").resolve("java17"), clientPath);
+        copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve("ALL"), clientPath);
+        copyDir(workdir.resolve("workdir").resolve(version.toString()).resolve(versionType.name()), clientPath);
+        logger.info("Files copied");
+    }
+
+    String getLwjgl3Version() {
+        String lwjgl3Version = mirrorWorkspace.lwjgl3version();
+        for(var e : mirrorWorkspace.lwjglVersionOverride()) {
+            if(version.compareTo(e.minVersion()) < 0) {
+                continue;
+            }
+            if(version.compareTo(e.maxVersion()) > 0) {
+                continue;
+            }
+            lwjgl3Version = e.value();
+        }
+        return lwjgl3Version;
+    }
+
+    void runWorkspaceLibraryBuild(Path clientPath) {
+        for(var entry : mirrorWorkspace.build().entrySet()) {
+            var k = entry.getKey();
+            var v = entry.getValue();
             if(!v.check(versionType, version)) {
                 continue;
             }
-            Path file = workdir.resolve("multimods").resolve(k.concat(".jar"));
-            if (Files.notExists(file)) {
-                logger.warn("File {} not exist", file);
-                continue;
+            Path target = workdir.resolve(v.path());
+            if(entry.getValue().dynamic() || Files.notExists(target)) {
+                logger.info("Build {}", k);
+                try {
+                    tools.build(k, v, clientPath);
+                } catch (Throwable e) {
+                    logger.error("Build error", e);
+                }
             }
-            Path targetMod = v.target() != null ? clientPath.resolve(v.target()) : clientPath.resolve("mods").resolve(file.getFileName());
-            logger.info("Copy {} to {}", file, targetMod);
-            IOHelper.copy(file, targetMod);
-            logger.info("MultiMods installed");
         }
-        {
-            DeDupLibrariesCommand deDupLibrariesCommand = new DeDupLibrariesCommand(launchServer);
-            deDupLibrariesCommand.invoke(clientPath.toAbsolutePath().toString(), "false");
-            logger.info("deduplibraries completed");
-        }
-        ClientProfile clientProfile;
-        {
-            MakeProfileHelper.MakeProfileOption[] options = MakeProfileHelper.getMakeProfileOptionsFromDir(clientPath, version);
-            for (MakeProfileHelper.MakeProfileOption option : options) {
-                logger.debug("Detected option {}", option.getClass().getSimpleName());
-            }
-            clientProfile = MakeProfileHelper.makeProfile(version, name, options);
-            logger.info("makeprofile completed");
-        }
-        ProfileModifier modifier;
-        if((versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) && version.compareTo(ClientProfileVersions.MINECRAFT_1_17) >= 0) {
-            logger.info("Run Forge118ProfileModifier");
-            modifier = new Forge118ProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
-        } else if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0) {
-            logger.info("Run CleanroomProfileModifier");
-            modifier = new CleanroomProfileModifier(originalMinecraftProfile, clientProfile, clientPath);
-        } else if (versionType == VersionType.FORGE && version.compareTo(ClientProfileVersions.MINECRAFT_1_7_10) == 0) {
-            logger.info("Run Lwjgl3ifyProfileModifier");
-            modifier = new Lwjgl3ifyProfileModifier(clientProfile, clientPath);
-        } else {
-            logger.info("Run BasicProfileModifier");
-            modifier = new BasicProfileModifier(clientProfile, clientPath);
-        }
-        clientProfile = modifier.build();
-        CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfile, clientPath, !config.disableDownloadAssets);
-        logger.info("Completed");
     }
 
-    private Path getPathToLauncherAuthlib() {
+    Path installModloader(Path clientPath, Path originalMinecraftProfile) throws Exception {
+        if (versionType == VersionType.FABRIC) {
+            FabricInstallerCommand fabricInstallerCommand = new FabricInstallerCommand(launchServer);
+            if(mirrorWorkspace == null || mirrorWorkspace.fabricLoaderVersion() == null) {
+                fabricInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString());
+            } else {
+                fabricInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("fabric-installer.jar").toAbsolutePath().toString(), mirrorWorkspace.fabricLoaderVersion());
+            }
+            Files.createDirectories(clientPath.resolve("mods"));
+            logger.info("Fabric installed");
+        } else if (versionType == VersionType.QUILT) {
+            QuiltInstallerCommand quiltInstallerCommand = new QuiltInstallerCommand(launchServer);
+            quiltInstallerCommand.invoke(version.toString(), clientPath.toAbsolutePath().toString(), workdir.resolve("installers").resolve("quilt-installer.jar").toAbsolutePath().toString());
+            Files.createDirectories(clientPath.resolve("mods"));
+            logger.info("Quilt installed");
+        } else if (versionType == VersionType.FORGE || versionType == VersionType.NEOFORGE) {
+            String forgePrefix = versionType == VersionType.NEOFORGE ? "neoforge" : "forge";
+            boolean noGui = true;
+            Path forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer-nogui.jar");
+            Path tmpDir = workdir.resolve("clients").resolve(forgePrefix).resolve(version.toString());
+            if(Files.notExists(forgeInstaller)) {
+                logger.warn("{} not found", forgeInstaller.toAbsolutePath().toString());
+                forgeInstaller = workdir.resolve("installers").resolve(forgePrefix+"-" + version + "-installer.jar");
+                noGui = false;
+            }
+            if(Files.notExists(forgeInstaller) && Files.notExists(tmpDir)) {
+                throw new FileNotFoundException(forgeInstaller.toAbsolutePath().toString());
+            }
+            if(Files.notExists(tmpDir)) {
+                Files.createDirectories(tmpDir);
+                Files.createDirectories(tmpDir.resolve("versions"));
+                IOHelper.transfer("{\"profiles\": {}}".getBytes(StandardCharsets.UTF_8), tmpDir.resolve("launcher_profiles.json"), false);
+                int counter = 5;
+                do {
+                    Process forgeProcess;
+                    if(noGui) {
+                        logger.info("Install forge client into {} (no gui)", tmpDir.toAbsolutePath().toString());
+                        forgeProcess = new ProcessBuilder()
+                                .command("java", "-jar", forgeInstaller.toAbsolutePath().toString(), "--installClient", tmpDir.toAbsolutePath().toString())
+                                .inheritIO()
+                                .start();
+                    } else {
+                        logger.info("Please install forge client into {} (require gui)", tmpDir.toAbsolutePath().toString());
+                        forgeProcess = new ProcessBuilder()
+                                .command("java", "-jar", forgeInstaller.toAbsolutePath().toString())
+                                .inheritIO()
+                                .start();
+                    }
+                    int code = forgeProcess.waitFor();
+                    logger.info("Process return with status code {}", code);
+                    counter--;
+                    if (counter <= 0) {
+                        IOHelper.deleteDir(tmpDir, true);
+                        throw new RuntimeException("Forge not installed");
+                    }
+                } while (!Files.isDirectory(tmpDir.resolve("libraries")));
+            }
+            copyDir(tmpDir.resolve("libraries"), clientPath.resolve("libraries"));
+            {
+                Path forgeClientDir;
+                try (Stream<Path> stream = Files.list(tmpDir.resolve("versions"))
+                             .filter(x -> {
+                                 String fname = x.getFileName().toString().toLowerCase(Locale.ROOT);
+                                 return  fname.contains("forge") || fname.contains("cleanroom");
+                             })) {
+                    forgeClientDir = stream.findFirst().orElseThrow();
+                }
+                Path forgeProfileFile;
+                try(Stream<Path> stream = Files.list(forgeClientDir).filter(p -> p.getFileName().toString().endsWith(".json"))) {
+                    forgeProfileFile = stream.findFirst().orElseThrow();
+                }
+                originalMinecraftProfile = forgeProfileFile;
+                logger.debug("Forge profile {}", forgeProfileFile.toString());
+                ForgeProfile forgeProfile;
+                try (Reader reader = IOHelper.newReader(forgeProfileFile)) {
+                    forgeProfile = Launcher.gsonManager.configGson.fromJson(reader, ForgeProfile.class);
+                }
+                for (ForgeProfile.ForgeProfileLibrary library : forgeProfile.libraries()) {
+                    String libUrl = library.downloads() == null ? null : library.downloads().artifact().url();
+                    String name = library.name();
+                    if (libUrl == null || libUrl.isEmpty()) {
+                        libUrl = "https://libraries.minecraft.net/";
+                    }
+                    if(name.endsWith("@jar")) {
+                        name = name.substring(0, name.length()-4);
+                    }
+                    FabricInstallerCommand.NamedURL url = FabricInstallerCommand.makeURL(libUrl, name);
+                    Path file = clientPath.resolve("libraries").resolve(url.name);
+                    IOHelper.createParentDirs(file);
+                    if (Files.exists(file)) {
+                        continue;
+                    }
+                    logger.info("Download {} into {}", url.url.toString(), url.name);
+                    try {
+                        try (InputStream stream = IOHelper.newInput(url.url)) {
+                            try (OutputStream output = IOHelper.newOutput(file)) {
+                                IOHelper.transfer(stream, output);
+                            }
+                        }
+                    } catch (FileNotFoundException e) {
+                        logger.warn("Not found {}", url.url);
+                    }
+                }
+            }
+            if(config.deleteTmpDir) {
+                IOHelper.deleteDir(tmpDir, true);
+            }
+            Files.createDirectories(clientPath.resolve("mods"));
+            logger.info("Forge installed");
+        }
+        return originalMinecraftProfile;
+    }
+
+    void patchAuthlib(Path clientPath, Path tmpFile) throws IOException {
+        Path pathToLauncherAuthlib = getPathToLauncherAuthlib();
+        logger.info("Found launcher authlib in {}", pathToLauncherAuthlib);
+        Path pathToOriginalAuthlib = findClientAuthlib(clientPath);
+        logger.info("Found original authlib in {}", pathToOriginalAuthlib);
+        merge2Jars(pathToOriginalAuthlib, pathToLauncherAuthlib, tmpFile);
+        Files.delete(pathToOriginalAuthlib);
+        Files.move(tmpFile, pathToOriginalAuthlib);
+        logger.info("Authlib patched");
+    }
+
+    void checkAndDownloadVanilla(Path clientPath) throws Exception {
+        Path fetchDir = workdir.resolve("clients").resolve("vanilla").resolve(version.toString());
+        if (Files.notExists(fetchDir)) {
+            downloadVanillaTo(fetchDir);
+        }
+        copyDir(fetchDir, clientPath, path -> !(
+                path.toString().contains("icu4j-core-mojang") &&
+                        versionType == VersionType.FORGE &&
+                        version.compareTo(ClientProfileVersions.MINECRAFT_1_12_2) == 0
+        ));
+    }
+
+    void runPrepare() {
+        if(mirrorWorkspace == null) {
+            throw new RuntimeException("Workspace not found! Please use 'applyworkspace'");
+        }
+        logger.info("Install client {} {}", version.toString(), versionType);
+    }
+
+    Path getPathToLauncherAuthlib() {
         Path pathToLauncherAuthlib;
         if (version.compareTo(ClientProfileVersions.MINECRAFT_1_16_5) < 0) {
             pathToLauncherAuthlib = workdir.resolve("authlib").resolve("LauncherAuthlib1.jar");
@@ -430,10 +471,10 @@ public class InstallClient {
         return pathToLauncherAuthlib;
     }
 
-    private void copyDir(Path source, Path target) throws IOException {
+    void copyDir(Path source, Path target) throws IOException {
         copyDir(source, target, path -> true);
     }
-    private void copyDir(Path source, Path target, Predicate<Path> predicate) throws IOException {
+    void copyDir(Path source, Path target, Predicate<Path> predicate) throws IOException {
         if (Files.notExists(source)) {
             return;
         }
@@ -455,13 +496,13 @@ public class InstallClient {
         }
     }
 
-    private Path findClientAuthlib(Path clientDir) throws IOException {
+    Path findClientAuthlib(Path clientDir) throws IOException {
         try (Stream<Path> stream = Files.walk(clientDir).filter(p -> !Files.isDirectory(p) && p.getFileName().toString().startsWith("authlib-"))) {
             return stream.findFirst().orElseThrow();
         }
     }
 
-    private void merge2Jars(Path source, Path source2, Path target) throws IOException {
+    void merge2Jars(Path source, Path source2, Path target) throws IOException {
         try (ZipOutputStream output = new ZipOutputStream(IOHelper.newOutput(target))) {
             Set<String> blacklist = new HashSet<>();
             try (ZipInputStream input = IOHelper.newZipInput(source2)) {

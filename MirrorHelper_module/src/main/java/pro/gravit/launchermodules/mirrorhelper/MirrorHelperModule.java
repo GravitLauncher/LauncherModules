@@ -100,6 +100,9 @@ public class MirrorHelperModule extends LauncherModule {
         commands.registerCommand("downloadinstaller", new DownloadInstallerCommand(server, this));
         commands.registerCommand("workspace", new WorkspaceCommand(server, this));
         commands.registerCommand("mirrorhelper", new MirrorHelperCommand(server, this));
+        if(server.config.experimentalDevOnlyFeatures) {
+            commands.registerCommand("prisminstallclient", new PrismInstallClientCommand(server, this)); // WIP
+        }
         CommandHandler.Category category = new CommandHandler.Category(commands, "mirror");
         server.commandHandler.registerCategory(category);
     }
