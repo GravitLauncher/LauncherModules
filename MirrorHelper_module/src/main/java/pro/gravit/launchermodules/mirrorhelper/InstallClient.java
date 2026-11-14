@@ -19,7 +19,6 @@ import pro.gravit.launchserver.command.Command;
 import pro.gravit.launchserver.command.profiles.CreateProfileCommand;
 import pro.gravit.launchserver.helper.MakeProfileHelper;
 import pro.gravit.utils.helper.IOHelper;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.io.*;
 import java.net.URI;
@@ -101,7 +100,7 @@ public class InstallClient {
         JsonObject obj;
         Path vanillaProfileJson = workdir.resolve("profiles").resolve("vanilla").resolve(version.toString().concat(".json"));
         if (Files.exists(vanillaProfileJson)) {
-            LogHelper.subInfo("Using file %s", vanillaProfileJson);
+            logger.info("Using file {}", vanillaProfileJson);
             try (Reader reader = IOHelper.newReader(vanillaProfileJson)) {
                 obj = ClientDownloader.GSON.fromJson(reader, JsonObject.class);
             }
@@ -115,7 +114,7 @@ public class InstallClient {
         IOHelper.createParentDirs(clientDir);
         ClientDownloader.ClientInfo info = ClientDownloader.getClient(obj);
         // Download required files
-        LogHelper.subInfo("Downloading client, it may take some time");
+        logger.info("Downloading client, it may take some time");
         //info.libraries.addAll(info.natives); // Hack
         List<Downloader.SizedFile> applies = info.libraries.stream()
                 .filter(l -> !(l.name.contains("natives")))
@@ -124,7 +123,7 @@ public class InstallClient {
         var downloader = Command.downloadWithProgressBar(version.toString(), applies, null, clientDir);
         downloader.getFuture().get();
         // Finished
-        LogHelper.subInfo("Client downloaded!");
+        logger.info("Client downloaded!");
     }
 
     private void fetchNatives(Path resolve, List<ClientDownloader.Artifact> natives) {
@@ -138,7 +137,7 @@ public class InstallClient {
                     e = z.getNextEntry();
                 }
             } catch (Throwable e) {
-                LogHelper.subWarning(LogHelper.toString(e));
+                logger.warn("Client installation failed", e);
             }
         }
     }

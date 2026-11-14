@@ -21,7 +21,6 @@ import pro.gravit.launcher.base.profiles.PlayerProfile;
 import pro.gravit.launchermodules.sentryl.utils.BasicProperties;
 import pro.gravit.launchermodules.sentryl.utils.OshiUtils;
 import pro.gravit.utils.Version;
-import pro.gravit.utils.helper.LogHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +80,6 @@ public class SentryModule extends LauncherModule {
             BasicProperties.setupBasicProperties((Scope) scope);
             OshiUtils.systemProperties((Scope) scope);
         });
-        LogHelper.addExcCallback(Sentry::captureException);
         logger.debug("Sentry initialized");
     }
 

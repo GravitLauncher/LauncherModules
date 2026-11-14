@@ -5,7 +5,6 @@ plugins {
 group = "com.gravitlauncher.launcher.modules"
 
 repositories {
-    mavenCentral()
     maven {
         url = uri("https://repo.clojars.org")
     }
@@ -17,12 +16,7 @@ val copyModules = tasks.register("copyModules", Copy::class) {
 }
 
 subprojects {
-    apply(plugin = "java")
-    apply(plugin = "java-library")
-    apply(plugin = "maven-publish")
-
     repositories {
-        mavenCentral()
         maven {
             url = uri("https://repo.clojars.org")
         }

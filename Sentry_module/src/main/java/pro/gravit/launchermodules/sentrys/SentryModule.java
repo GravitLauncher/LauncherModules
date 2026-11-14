@@ -14,7 +14,6 @@ import pro.gravit.launcher.base.modules.LauncherModuleInfoBuilder;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.config.log4j.LogAppender;
 import pro.gravit.launchserver.modules.events.LaunchServerInitPhase;
-import pro.gravit.launchserver.modules.events.LaunchServerNettyFullInitEvent;
 import pro.gravit.utils.Version;
 import pro.gravit.utils.command.CommandException;
 import pro.gravit.utils.helper.JVMHelper;
@@ -38,7 +37,6 @@ public class SentryModule extends LauncherModule {
     @Override
     public void init(LauncherInitContext initContext) {
         registerEvent(this::preInit, LaunchServerInitPhase.class);
-        registerEvent(this::onPostInit, LaunchServerNettyFullInitEvent.class);
     }
 
     public void preInit(LaunchServerInitPhase phase) {
@@ -91,9 +89,6 @@ public class SentryModule extends LauncherModule {
         } catch (Throwable e) {
             logger.error("Sentry module not configured", e);
         }
-    }
-
-    public void onPostInit(LaunchServerNettyFullInitEvent event) {
     }
 
     public void append(LogEvent event) {
