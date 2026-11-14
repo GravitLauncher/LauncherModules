@@ -28,7 +28,6 @@ public class SentryModule extends LauncherModule {
     private transient final Logger logger = LogManager.getLogger();
     public Config c = null;
 
-    public SentryTransactionTracker tracker = new SentryTransactionTracker(this);
     private LaunchServer server;
     private SentryAppender appender;
 
@@ -77,9 +76,6 @@ public class SentryModule extends LauncherModule {
                     if (event.getThrowable() != null && c.ignoreErrors != null && c.ignoreErrors.contains(event.getThrowable().getMessage())) {
                         return null;
                     }
-                    if (event.getThrowable() instanceof SentryTransactionTracker.RequestError) {
-                        event.setFingerprints(Arrays.asList("RequestError", event.getThrowable().getMessage()));
-                    }
                     return event;
                 });
             });
@@ -98,9 +94,6 @@ public class SentryModule extends LauncherModule {
     }
 
     public void onPostInit(LaunchServerNettyFullInitEvent event) {
-        if (c.requestTracker) {
-            tracker.register(server.nettyServerSocketHandler);
-        }
     }
 
     public void append(LogEvent event) {
