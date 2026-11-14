@@ -10,7 +10,6 @@ import pro.gravit.launcher.runtime.client.events.ClientProcessBuilderParamsWritt
 import pro.gravit.launcher.client.events.ClientProcessLaunchEvent;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
-import pro.gravit.launcher.base.request.Request;
 import pro.gravit.launchermodules.discordgame.commands.DiscordCommand;
 import pro.gravit.utils.Version;
 
@@ -62,8 +61,6 @@ public class ClientModule extends LauncherModule {
         DiscordBridge.activityService.updateClientStage(phase.params);
         try {
             DiscordBridge.init(config.appId, true);
-            RequestEventWatcher.INSTANCE = new RequestEventWatcher(true);
-            Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
             logger.error("", e);
         }
@@ -77,8 +74,6 @@ public class ClientModule extends LauncherModule {
         DiscordBridge.activityService.updateLoginStage();
         try {
             DiscordBridge.init(config.appId, false);
-            RequestEventWatcher.INSTANCE = new RequestEventWatcher(false);
-            Request.getRequestService().registerEventHandler(RequestEventWatcher.INSTANCE);
         } catch (Throwable e) {
             logger.error("", e);
         }
@@ -86,8 +81,6 @@ public class ClientModule extends LauncherModule {
 
     private void exitHandler(ClientExitPhase phase) {
         if (isClosed(true)) return;
-        if (RequestEventWatcher.INSTANCE != null)
-            Request.getRequestService().unregisterEventHandler(RequestEventWatcher.INSTANCE);
         DiscordBridge.close();
     }
 

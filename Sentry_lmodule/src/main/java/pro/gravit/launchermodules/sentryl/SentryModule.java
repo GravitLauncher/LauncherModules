@@ -18,7 +18,6 @@ import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.PlayerProfile;
-import pro.gravit.launcher.base.request.Request;
 import pro.gravit.launchermodules.sentryl.utils.BasicProperties;
 import pro.gravit.launchermodules.sentryl.utils.OshiUtils;
 import pro.gravit.utils.Version;
@@ -83,9 +82,6 @@ public class SentryModule extends LauncherModule {
             OshiUtils.systemProperties((Scope) scope);
         });
         LogHelper.addExcCallback(Sentry::captureException);
-        if (Request.isAvailable()) {
-            Request.getRequestService().registerEventHandler(new SentryEventHandler());
-        }
         logger.debug("Sentry initialized");
     }
 
