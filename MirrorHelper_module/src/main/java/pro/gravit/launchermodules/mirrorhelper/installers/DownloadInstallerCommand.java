@@ -6,6 +6,7 @@ import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
+import pro.gravit.launchermodules.mirrorhelper.WorkspaceManifest;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
 import pro.gravit.utils.Version;
@@ -46,7 +47,14 @@ public class DownloadInstallerCommand extends Command {
         verifyArgs(args, 2);
         InstallClient.VersionType type = InstallClient.VersionType.valueOf(args[0]);
         ClientProfile.Version version = parseClientVersion(args[1]);
-        String forgeVersion = args.length > 2 ? args[2] : null;
+        WorkspaceManifest.component(version.toString());
+        String forgeVersion = args.length > 2 ? WorkspaceManifest.component(args[2]) : null;
+        synchronized (module) {
+            download(type, version, forgeVersion);
+        }
+    }
+
+    private void download(InstallClient.VersionType type, ClientProfile.Version version, String forgeVersion) throws Exception {
         switch (type) {
             case NEOFORGE -> {
                 if(forgeVersion == null || forgeVersion.equals("latest")) {
@@ -83,18 +91,8 @@ public class DownloadInstallerCommand extends Command {
                 }
                 String url = "https://maven.neoforged.net/releases/net/neoforged/neoforge/${forge_version}/neoforge-${forge_version}-installer.jar"
                         .replace("${forge_version}", forgeVersion);
-                Path path = module.getWorkspaceDir().resolve("installers").resolve(String.format("neoforge-%s-installer-nogui.jar", version));
-                logger.info("Download {} into {}", url, path.toString());
-                try(InputStream input = IOHelper.newInput(URI.create(url).toURL())) {
-                    IOHelper.transfer(input, path);
-                }
-                logger.info("Download completed");
-                Path cachePath = module.getWorkspaceDir().resolve("clients").resolve("neoforge").resolve(version.toString());
-                if(Files.exists(cachePath)) {
-                    logger.info("Clear cache {}", cachePath);
-                    IOHelper.deleteDir(cachePath, true);
-                    logger.info("Cache cleared");
-                }
+                Path path = module.getInstallerDir().resolve(String.format("neoforge-%s-installer-nogui.jar", version));
+                saveInstaller(url, path);
             }
             case FORGE -> {
                 if(forgeVersion == null || forgeVersion.equals("latest")) {
@@ -114,28 +112,38 @@ public class DownloadInstallerCommand extends Command {
                     url = "https://maven.minecraftforge.net/net/minecraftforge/forge/${version}-${forge_version}-${version}/forge-${version}-${forge_version}-${version}-installer.jar"
                             .replace("${version}", version.toString())
                             .replace("${forge_version}", forgeVersion);
-                    path = module.getWorkspaceDir().resolve("installers").resolve(String.format("forge-%s-installer.jar", version));
+                    path = module.getInstallerDir().resolve(String.format("forge-%s-installer.jar", version));
                 } else {
                     url = "https://maven.minecraftforge.net/net/minecraftforge/forge/${version}-${forge_version}/forge-${version}-${forge_version}-installer.jar"
                             .replace("${version}", version.toString())
                             .replace("${forge_version}", forgeVersion);
-                    path = module.getWorkspaceDir().resolve("installers").resolve(String.format("forge-%s-installer-nogui.jar", version));
+                    path = module.getInstallerDir().resolve(String.format("forge-%s-installer-nogui.jar", version));
                 }
-                logger.info("Download {} into {}", url, path.toString());
-                try(InputStream input = IOHelper.newInput(URI.create(url).toURL())) {
-                    IOHelper.transfer(input, path);
-                }
-                logger.info("Download completed");
-                Path cachePath = module.getWorkspaceDir().resolve("clients").resolve("forge").resolve(version.toString());
-                if(Files.exists(cachePath)) {
-                    logger.info("Clear cache {}", cachePath);
-                    IOHelper.deleteDir(cachePath, true);
-                    logger.info("Cache cleared");
-                }
+                saveInstaller(url, path);
             }
             default -> {
                 throw new UnsupportedOperationException(String.format("Unknown installer type %s", type));
             }
+        }
+    }
+
+    private void saveInstaller(String url, Path path) throws Exception {
+        Files.createDirectories(path.getParent());
+        Path staging = Files.createTempFile(path.getParent(), "installer-", ".tmp");
+        try {
+            logger.info("Download {} into {}", url, path);
+            try (InputStream input = IOHelper.newInput(WorkspaceManifest.remoteUri(url).toURL())) {
+                IOHelper.transfer(input, staging);
+            }
+            try (var archive = new java.util.zip.ZipFile(staging.toFile())) {
+                if (archive.size() == 0) {
+                    throw new java.io.IOException("Empty installer archive");
+                }
+            }
+            Files.move(staging, path, java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(staging);
         }
     }
 

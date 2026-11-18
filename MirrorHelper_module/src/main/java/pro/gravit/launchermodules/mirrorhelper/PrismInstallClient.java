@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launcher.base.profiles.ClientProfileBuilder;
-import pro.gravit.launchermodules.mirrorhelper.newforge.ProfileModifier;
-import pro.gravit.launchserver.command.profiles.CreateProfileCommand;
 import pro.gravit.utils.helper.IOHelper;
 import pro.gravit.utils.helper.JVMHelper;
 
@@ -81,9 +79,9 @@ public class PrismInstallClient extends InstallClient {
     }
 
     @Override
-    public void run() throws Exception {
+    ClientProfile prepareProfile(Path clientPath) throws Exception {
         Path prismBaseDir = getPrismBaseDir();
-        Path instanceDir = prismBaseDir.resolve("instances").resolve(prismClientName);
+        Path instanceDir = WorkspaceManifest.resolve(prismBaseDir.resolve("instances"), WorkspaceManifest.component(prismClientName));
         if(Files.notExists(instanceDir)) {
             throw new FileNotFoundException(instanceDir.toString());
         }
@@ -96,7 +94,7 @@ public class PrismInstallClient extends InstallClient {
         }
         List<ExtendedClientInfo> list = new ArrayList<>(data.components.size());
         for(var component : data.components) {
-            Path jsonFile = metaDir.resolve(component.uid).resolve(component.version+".json");
+            Path jsonFile = WorkspaceManifest.resolve(metaDir, WorkspaceManifest.component(component.uid) + "/" + WorkspaceManifest.component(component.version) + ".json");
             try(Reader reader = IOHelper.newReader(jsonFile)) {
                 list.add(getPrismClient(ClientDownloader.GSON.fromJson(reader, JsonObject.class)));
             }
@@ -123,8 +121,6 @@ public class PrismInstallClient extends InstallClient {
             merged.natives = new ArrayList<>(natives.values());
             merged.libraries = new ArrayList<>(libraries.values());
         }
-        Path clientPath = launchServer.createTempDirectory(name);
-        checkAndDownloadVanilla(clientPath);
         logger.info("Copy {} into {}", instanceMinecraftDir, clientPath);
         copyDir(instanceMinecraftDir, clientPath);
         logger.info("Copy libraries");
@@ -134,25 +130,17 @@ public class PrismInstallClient extends InstallClient {
                 logger.warn("Library path is null {}", l.name);
                 continue;
             }
-            Path sourceFile = prismLibrariesDir.resolve(l.path);
+            Path sourceFile = WorkspaceManifest.resolve(prismLibrariesDir, l.path);
             if(Files.notExists(sourceFile)) {
-                logger.warn("Skip {}: {} not found", l.name, sourceFile);
+                throw new FileNotFoundException(sourceFile.toString());
             }
-            Path targetFile = clientPath.resolve("libraries").resolve(l.path);
+            Path targetFile = WorkspaceManifest.resolve(clientPath, "libraries/" + l.path);
             logger.debug("Copy {} into {}", sourceFile, targetFile);
             IOHelper.createParentDirs(targetFile);
             IOHelper.copy(sourceFile, targetFile);
         }
-        logger.info("Patch authlib");
-        Path tmpFile = workdir.resolve("file.tmp");
-        patchAuthlib(clientPath, tmpFile);
-        logger.info("Copy common directories");
-        String lwjgl3Version = getLwjgl3Version();
-        copyCommonDirs(clientPath, lwjgl3Version);
-        installModsFromInternet(clientPath);
-        logger.info("Install multiMods");
-        installMultimods(clientPath);
-        runDedupLibraries(clientPath);
+        patchAuthlib(clientPath);
+        applyClientWorkspace(clientPath);
 
         ClientProfileBuilder clientProfileBuilder = new ClientProfileBuilder(makeClientProfile(clientPath));
         {
@@ -184,8 +172,7 @@ public class PrismInstallClient extends InstallClient {
                 }
             }
         }
-        CreateProfileCommand.pushClientAndDownloadAssets(launchServer, clientProfileBuilder.createClientProfile(), clientPath, !config.disableDownloadAssets);
-        logger.info("Completed");
+        return clientProfileBuilder.createClientProfile();
     }
 
     public static class ExtendedClientInfo extends ClientDownloader.ClientInfo {

@@ -38,23 +38,15 @@ public class PrismInstallClientCommand extends Command {
         String name = args[0];
         ClientProfile.Version version = parseClientVersion(args[1]);
         InstallClient.VersionType versionType = InstallClient.VersionType.valueOf(args[2]);
-        List<String> mods = new ArrayList<>();
-        MirrorWorkspace mirrorWorkspace = module.getWorkspace();
-        if(mirrorWorkspace != null) {
-            switch (versionType) {
-                case VANILLA -> {
-                }
-                case FABRIC -> mods.addAll(module.getWorkspace().fabricMods());
-                case FORGE -> mods.addAll(module.getWorkspace().forgeMods());
-                case QUILT -> mods.addAll(module.getWorkspace().quiltMods());
-            }
+        synchronized (module) {
+            MirrorWorkspace workspace = module.getWorkspace();
+            List<String> mods = args.length > 4
+                    ? (args[4].isBlank() ? List.of() : Arrays.asList(args[4].split(",")))
+                    : workspace.mods(versionType);
+            new PrismInstallClient(module, name, version, mods, versionType, workspace, args[3]).run();
         }
-        if (args.length > 4) {
-            mods = Arrays.stream(args[4].split(",")).toList();
-        }
-        PrismInstallClient run = new PrismInstallClient(module, name, version, mods, versionType, mirrorWorkspace, args[3]);
-        run.run();
     }
+
     @Override
     public List<Candidate> complete(List<String> words, int wordIndex, String word) {
         if (wordIndex == 0) {

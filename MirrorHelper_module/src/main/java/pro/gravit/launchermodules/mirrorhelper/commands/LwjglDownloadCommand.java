@@ -1,6 +1,7 @@
 package pro.gravit.launchermodules.mirrorhelper.commands;
 
 import org.apache.logging.log4j.LogManager;
+import pro.gravit.launchermodules.mirrorhelper.WorkspaceManifest;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import pro.gravit.launchserver.LaunchServer;
@@ -74,8 +75,11 @@ public class LwjglDownloadCommand extends Command {
     @Override
     public void invoke(String... args) throws Exception {
         verifyArgs(args, 2);
-        String version = args[0];
-        Path clientDir = Path.of(args[1]);
+        download(args[0], Path.of(args[1]));
+    }
+
+    public void download(String version, Path clientDir) throws Exception {
+        WorkspaceManifest.component(version);
         Path lwjglDir = clientDir.resolve("libraries").resolve("org").resolve("lwjgl");
         Path natives = clientDir.resolve("natives");
         List<String> components = List.of("lwjgl", "lwjgl-stb", "lwjgl-opengl", "lwjgl-openal", "lwjgl-glfw", "lwjgl-tinyfd", "lwjgl-jemalloc", "lwjgl-freetype", "lwjgl-sdl", "lwjgl-spng", "lwjgl-vma", "lwjgl-spvc", "lwjgl-shaderc");
@@ -107,6 +111,9 @@ public class LwjglDownloadCommand extends Command {
             try {
                 download(jarUrl, jarPath);
             } catch (FileNotFoundException e) {
+                if (component.equals("lwjgl")) {
+                    throw e;
+                }
                 logger.warn("{} not found, skipping", jarUrl);
             }
 
@@ -136,7 +143,7 @@ public class LwjglDownloadCommand extends Command {
                                     logger.warn("Duplicate {}", filename);
                                 }
                             }
-                            IOHelper.transfer(input, nativesPath.resolve(filename));
+                            IOHelper.transfer(input, WorkspaceManifest.resolve(nativesPath, WorkspaceManifest.component(filename)));
                             processedFiles.add(filename);
                         }
                         entry = input.getNextEntry();

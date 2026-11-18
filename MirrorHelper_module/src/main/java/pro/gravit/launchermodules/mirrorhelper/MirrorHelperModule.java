@@ -2,7 +2,6 @@ package pro.gravit.launchermodules.mirrorhelper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.config.JsonConfigurable;
 import pro.gravit.launcher.base.modules.LauncherInitContext;
 import pro.gravit.launcher.base.modules.LauncherModule;
@@ -19,12 +18,12 @@ import pro.gravit.utils.command.CommandHandler;
 import pro.gravit.utils.helper.IOHelper;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class MirrorHelperModule extends LauncherModule {
-    public static final Version version = new Version(1, 0, 0, 1, Version.Type.LTS);
+    public static final Version version = new Version(2, 0, 0, 1, Version.Type.LTS);
     private final Logger logger = LogManager.getLogger();
     LaunchServer server;
     public Config config;
@@ -36,27 +35,83 @@ public class MirrorHelperModule extends LauncherModule {
     }
 
     public Path getWorkspaceDir() {
-        return getConfigDir().resolve("workspace");
+        return getConfigDir().resolve("workspace-v2");
     }
 
     public Path getConfigDir() {
         return modulesConfigManager.getModuleConfigDir(moduleInfo.name);
     }
 
-    public MirrorWorkspace getWorkspace() {
-        if(config.workspace == null) {
-            if(config.workspaceFile == null) {
-                return null;
-            }
-            try(Reader reader = IOHelper.newReader(Paths.get(config.workspaceFile))) {
-                config.workspace = Launcher.gsonManager.gson.fromJson(reader, MirrorWorkspace.class);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return config.workspace;
+    public Path getCacheDir() {
+        return getConfigDir().resolve("workspace-cache");
     }
 
+    public Path getInstallerDir() {
+        return getConfigDir().resolve("downloaded-installers");
+    }
+
+    private Path workspaceBackup() {
+        return getConfigDir().resolve("workspace-v2.backup");
+    }
+
+    private void recoverWorkspace() throws IOException {
+        if (Files.notExists(getWorkspaceDir()) && Files.exists(workspaceBackup())) {
+            Files.move(workspaceBackup(), getWorkspaceDir(), StandardCopyOption.ATOMIC_MOVE);
+        }
+    }
+
+    public synchronized MirrorWorkspace getWorkspace() throws IOException {
+        recoverWorkspace();
+        Path active = getWorkspaceDir();
+        if (Files.notExists(active)) {
+            throw new IOException("No active v2 workspace. Run applyworkspace first.");
+        }
+        return WorkspaceManifest.read(active.resolve("manifest.json"), Files.exists(active.resolve("local-manifest")));
+    }
+
+    public synchronized void applyWorkspace(Path source, boolean local) throws Exception {
+        recoverWorkspace();
+        Files.createDirectories(getConfigDir());
+        Path staging = Files.createTempDirectory(getConfigDir(), "workspace-stage-");
+        Path active = getWorkspaceDir();
+        Path backup = workspaceBackup();
+        try {
+            Path manifest = staging.resolve("manifest.json");
+            Files.copy(source, manifest);
+            MirrorWorkspace workspace = WorkspaceManifest.read(manifest, local);
+            if (local) {
+                Files.createFile(staging.resolve("local-manifest"));
+            }
+            tools.prepareWorkspace(workspace, staging);
+            if (Files.exists(backup)) {
+                IOHelper.deleteDir(backup, true);
+            }
+            if (Files.exists(active)) {
+                Files.move(active, backup, StandardCopyOption.ATOMIC_MOVE);
+            }
+            try {
+                Files.move(staging, active, StandardCopyOption.ATOMIC_MOVE);
+            } catch (IOException e) {
+                try {
+                    recoverWorkspace();
+                } catch (IOException rollback) {
+                    e.addSuppressed(rollback);
+                }
+                throw e;
+            }
+            if (Files.exists(backup)) {
+                try {
+                    IOHelper.deleteDir(backup, true);
+                } catch (IOException e) {
+                    logger.warn("Workspace activated but backup cleanup failed", e);
+                }
+            }
+        } finally {
+            if (Files.exists(staging)) {
+                IOHelper.deleteDir(staging, true);
+            }
+        }
+    }
 
     public void finish(LaunchServerPostInitPhase event) {
         initialize(event.server);

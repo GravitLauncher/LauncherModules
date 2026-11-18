@@ -2,15 +2,12 @@ package pro.gravit.launchermodules.mirrorhelper.commands;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pro.gravit.launcher.base.Launcher;
 import pro.gravit.launcher.base.Downloader;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
-import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;
+import pro.gravit.launchermodules.mirrorhelper.WorkspaceManifest;
 import pro.gravit.launchserver.LaunchServer;
 import pro.gravit.launchserver.command.Command;
-import pro.gravit.utils.helper.IOHelper;
 
-import java.io.Reader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,40 +29,28 @@ public class ApplyWorkspaceCommand extends Command {
 
     @Override
     public String getUsageDescription() {
-        return "apply workspace. This action remove your files in workspace!";
+        return "Validate and activate a workspace manifest";
     }
 
     @Override
     public void invoke(String... args) throws Exception {
-        URI url = null;
-        Path workspaceFilePath = null;
-        if(args.length == 0) {
-            url = server.mirrorManager.getDefaultMirror().getURL("workspace.json").toURI();
-        } else if(args[0].startsWith("http://") || args[0].startsWith("https://")) {
-            url = new URI(args[0]);
+        if (args.length > 1) {
+            throw new IllegalArgumentException("Expected at most one workspace path or URL");
+        }
+        if (args.length == 1 && !args[0].startsWith("http://") && !args[0].startsWith("https://")) {
+            module.applyWorkspace(Paths.get(args[0]), true);
         } else {
-            workspaceFilePath = Paths.get(args[0]);
-        }
-        if(url != null) {
-            workspaceFilePath = module.getConfigDir().resolve("workspace.json");
-            logger.info("Download {} to {}", url, workspaceFilePath);
-            Downloader.downloadFile(url, workspaceFilePath, null).getFuture().get();
-        }
-        MirrorWorkspace workspace;
-        try(Reader reader = IOHelper.newReader(workspaceFilePath)) {
-            workspace = Launcher.gsonManager.gson.fromJson(reader, MirrorWorkspace.class);
-        }
-        Path workspacePath = module.getWorkspaceDir();
-        if(Files.exists(workspacePath)) {
-            logger.warn("THIS ACTION DELETE ALL FILES IN {}", workspacePath);
-            if(!showApplyDialog("Continue?")) {
-                return;
+            URI uri = WorkspaceManifest.remoteUri(args.length == 0
+                    ? server.mirrorManager.getDefaultMirror().getURL("workspace.json").toString()
+                    : args[0]);
+            Path temporary = Files.createTempFile("mirrorhelper-manifest-", ".json");
+            try {
+                Downloader.downloadFile(uri, temporary, null).getFuture().get();
+                module.applyWorkspace(temporary, false);
+            } finally {
+                Files.deleteIfExists(temporary);
             }
-            IOHelper.deleteDir(workspacePath, false);
-        } else {
-            Files.createDirectories(workspacePath);
         }
-        module.tools.applyWorkspace(workspace, workspaceFilePath);
-        logger.info("Complete");
+        logger.info("Workspace activated");
     }
 }
