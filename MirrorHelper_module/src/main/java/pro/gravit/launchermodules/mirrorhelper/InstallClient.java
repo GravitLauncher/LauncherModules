@@ -110,14 +110,8 @@ public class InstallClient {
     ClientProfile prepareProfile(Path clientPath) throws Exception {
         patchAuthlib(clientPath);
         Path loaderProfile = installModloader(clientPath, null);
-        try {
-            applyClientWorkspace(clientPath);
-            return getProfileModifier(loaderProfile, makeClientProfile(clientPath), clientPath).build();
-        } finally {
-            if (config.deleteTmpDir && loaderProfile != null) {
-                IOHelper.deleteDir(loaderProfile.getParent().getParent().getParent(), true);
-            }
-        }
+        applyClientWorkspace(clientPath);
+        return getProfileModifier(loaderProfile, makeClientProfile(clientPath), clientPath).build();
     }
 
     @NonNull ProfileModifier getProfileModifier(Path originalMinecraftProfile, ClientProfile clientProfile, Path clientPath) {
