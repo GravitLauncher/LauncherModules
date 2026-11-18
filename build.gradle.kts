@@ -10,8 +10,8 @@ repositories {
     }
 }
 
-val copyModules = tasks.register("copyModules", Copy::class) {
-    from(subprojects.map { it -> it.tasks["jar"].outputs })
+val copyModules = tasks.register<Sync>("copyModules") {
+    from(subprojects.map { it.tasks.named<Jar>("jar").flatMap { jar -> jar.archiveFile } })
     into(layout.buildDirectory.dir("all-modules"))
 }
 

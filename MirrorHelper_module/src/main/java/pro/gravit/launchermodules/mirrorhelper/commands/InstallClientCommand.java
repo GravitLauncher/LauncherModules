@@ -1,19 +1,13 @@
 package pro.gravit.launchermodules.mirrorhelper.commands;
 
-import org.jline.reader.Candidate;
-import pro.gravit.launcher.base.profiles.ClientProfile;
 import pro.gravit.launchermodules.mirrorhelper.InstallClient;
 import pro.gravit.launchermodules.mirrorhelper.MirrorHelperModule;
 import pro.gravit.launchermodules.mirrorhelper.MirrorWorkspace;
 import pro.gravit.launchserver.LaunchServer;
-import pro.gravit.launchserver.command.Command;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class InstallClientCommand extends Command {
+public class InstallClientCommand extends AbstractInstallClientCommand {
     private final MirrorHelperModule module;
 
     public InstallClientCommand(LaunchServer server, MirrorHelperModule module) {
@@ -33,42 +27,12 @@ public class InstallClientCommand extends Command {
 
     @Override
     public void invoke(String... args) throws Exception {
-        verifyArgs(args, 3);
-        String name = args[0];
-        ClientProfile.Version version = parseClientVersion(args[1]);
-        InstallClient.VersionType versionType = InstallClient.VersionType.valueOf(args[2]);
+        var target = parseTarget(args, 3);
         synchronized (module) {
             MirrorWorkspace workspace = module.getWorkspace();
-            List<String> mods = args.length > 3
-                    ? (args[3].isBlank() ? List.of() : Arrays.asList(args[3].split(",")))
-                    : workspace.mods(versionType);
-            new InstallClient(module, name, version, mods, versionType, workspace).run();
+            List<String> mods = mods(args, 3, workspace, target.loader());
+            new InstallClient(module, target.name(), target.version(), mods, target.loader(), workspace).run();
         }
     }
 
-    @Override
-    public List<Candidate> complete(List<String> words, int wordIndex, String word) {
-        if (wordIndex == 0) {
-            return List.of(new Candidate(
-                    word.isEmpty() ? "" : word,
-                    "<name> — Profile Name and Dir",       // display
-                    null, null, null, null, false  // group, desc, suffix, key, complete
-            ));
-        }
-        if (wordIndex == 1) {
-            return List.of(new Candidate(
-                    word.isEmpty() ? "" : word,
-                    "<version> — Minecraft version (example: 1.22.11)",
-                    null, null, null, null, false
-            ));
-        }
-        if (wordIndex == 2) {
-            return Arrays.stream(InstallClient.VersionType.values())
-                    .map(Enum::name)
-                    .filter(name -> name.startsWith(word))
-                    .map(Candidate::new)
-                    .collect(Collectors.toList());
-        }
-        return new ArrayList<>();
-    }
 }
